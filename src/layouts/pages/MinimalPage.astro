@@ -1,0 +1,40 @@
+---
+// Import the global.css file here so that it is included on
+// all pages through the use of the <BaseHead /> component.
+import '../../styles/global.css';
+import 'photoswipe/style.css';
+
+import {ClientRouter} from 'astro:transitions';
+
+import Footer from '../Footer.astro';
+import Header from '../Header.astro';
+
+interface Props {
+    showContact?: boolean
+}
+
+const footerProps = Astro.props
+---
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <ClientRouter/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"/>
+    <link rel="manifest" href="/site.webmanifest"/>
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"/>
+    <slot name="head"/>
+</head>
+<body>
+<Header/>
+<main class="container">
+    <slot/>
+</main>
+<Footer {...footerProps}>
+    <slot name="postContact"/>
+</Footer>
+</body>
+</html>
+

@@ -1,0 +1,52 @@
+---
+import Form from "./Form.astro";
+
+interface Props {
+    showContact?: boolean
+}
+const {showContact = true} = Astro.props
+const today = new Date();
+---
+
+<footer class="container flex-col pb-4">
+    {showContact &&
+            <div class="mb-2 mt-6">
+                <div class="grid gap-y-2 sm:grid-cols-2 sm:gap-x-2 sm:gap-y-0">
+                    <div class="group">
+                        <a
+                                class="button styled flex items-center rounded-2xl border border-black px-4 py-2 group-hover:bg-black group-hover:text-white"
+                                target="_blank"
+                                href="mailto:florian@reisinger.pictures?subject=%5BKONTAKTFORMULAR%5D%20Anfrage&body=%0D%0AMeine%20Telefonnummer%20f%C3%BCr%20R%C3%BCckfragen%3A">
+                            <span class="mdi--email-outline mr-2 text-4xl"/>
+                            <span class="grow basis-1"></span>
+                            <span>Per E-Mail kontaktieren</span>
+                            <span class="grow basis-1"></span>
+                        </a>
+                    </div>
+                    <div class="group">
+                        <a
+                                class="button styled flex items-center rounded-2xl border border-brand-whatsapp group-hover:bg-black group-hover:text-white group-hover:border-black px-4 py-2 "
+                                target="_blank" href="https://wa.me/436702017710">
+                            <span class="mdi--whatsapp mr-2 text-4xl text-brand-whatsapp"/>
+                            <span class="grow basis-1"></span>
+                            <span>Per WhatsApp kontaktieren</span>
+                            <span class="grow basis-1"></span>
+                        </a>
+                    </div>
+                </div>
+                <Form/>
+            </div>
+    }
+    <div>
+        <slot/>
+    </div>
+
+    <div class="flex justify-center text-lg">
+        <a href="/impressum">Impressum</a>
+    </div>
+    <div class="mt-4 flex flex-wrap items-center justify-center">
+        &copy; 2017 - {today.getFullYear()} Florian Reisinger. Mit
+        <span class="mdi--heart mx-1 text-xl text-red-500"></span>
+        aus Linz, Österreich
+    </div>
+</footer>

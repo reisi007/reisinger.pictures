@@ -1,0 +1,16 @@
+---
+import { getCollection } from "astro:content";
+import { groupBy, slugToName } from "../utils";
+import { ReviewType } from "../content/config";
+
+const testimoinials = await getCollection("testimonials");
+
+const grouped = groupBy(testimoinials, e => e.data.type);
+
+const categories: ReviewType[] = [ReviewType.Beauty, ReviewType.Akt, ReviewType.Paare, ReviewType.Tanz];
+---
+<div class="grid md:grid-cols-2 xl:grid-cols-4">
+  {categories.map(category => (<a class="button m-2" href={`/${category}/testimonials`}>
+    {grouped[category].length} {slugToName(category)} Bewertungen
+  </a>))}
+</div>

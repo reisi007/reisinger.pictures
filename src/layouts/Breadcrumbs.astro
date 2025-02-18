@@ -1,0 +1,67 @@
+---
+import { DataCollectionKey, getCollection } from "astro:content";
+
+
+const astroUrl = Astro.url;
+const sharedUrl = encodeURIComponent(astroUrl.toString());
+const { pathname } = astroUrl;
+const url = pathname.replace(/\/+$/, "");
+
+function toName(input: string): string {
+  const parts = input.split("/");
+  const last = parts[parts.length - 1];
+  const formatted = last.replace(/[-_]/g, " ");
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+}
+
+const contentPrefixConfig: Record<DataCollectionKey, string> = {
+  testimonials: "testimonials",
+  areas: "",
+  einblicke: "einblicke",
+  simple: "",
+  sport: "sport",
+  videos: "videos",
+  shootingCards: "cards"
+};
+
+const additionalSlugs = [
+  "einblicke"
+].map(e => `/${e}`);
+
+const matchingContent = (await Promise.all(
+  Object.entries(contentPrefixConfig)
+    .filter(([, v]) => url.startsWith(v))
+    .map(([k]) => k as DataCollectionKey).flatMap(async k => (await getCollection(k))
+    .map(e => `${contentPrefixConfig[k]}/${e.slug}`)
+  )
+)).concat(additionalSlugs);
+
+const matchingUrls: { name: string, path: string }[] = matchingContent.flatMap(k => k)
+  .filter(pu => url.startsWith(pu) && pu !== url)
+  .sort((a, b) => a.length - b.length)
+  .map(path => ({ name: toName(path), path }));
+---
+
+<div class="inline-block mb-2 mt-4 sm:flex flex-row-reverse items-center justify-between w-full">
+  <div class="flex flex-wrap items-center my-1 justify-self-end">
+    <span class="pr-2">Teilen diese Seite via Whatsapp: </span>
+    <a
+      class="black socialLink"
+      target="_blank" rel="noopener"
+      href={`https://wa.me/?text=${sharedUrl}`}
+      aria-label="Teile via Whatsapp" draggable="false">
+      <span class="mdi--whatsapp" />
+    </a>
+  </div>
+  {url !== "" &&
+    <div>
+      <a aria-label="Home" href="/" class="text-xl black material-symbols--home"></a>
+      {matchingUrls.map(({ name, path }) => (
+        <>
+          <span class="mx-1 material-symbols--chevron-right text-sm"></span>
+          <a class="black underline text-lg" href={path}>{name}</a>
+
+        </>
+      ))}
+    </div>}
+</div>

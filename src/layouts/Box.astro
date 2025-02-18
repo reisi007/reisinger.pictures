@@ -1,0 +1,20 @@
+---
+import {BoxLayoutType} from "./BoxLayoutType";
+
+interface Props {
+    title: string,
+    type: BoxLayoutType,
+    class?: string,
+    bg?: string
+}
+
+const {title, type, class: className, bg = "bg-white"} = Astro.props;
+---
+<div class:list={['static border rounded-lg p-2 mx-4 relative p', {
+    'border-primary': type === BoxLayoutType.INFO
+}, className]}>
+    <div class:list={['absolute -translate-y-1/2 px-2 ml-1 top-0 inline left-2', {
+        'text-primary': type === BoxLayoutType.INFO
+    }, bg]}> {title}</div>
+    <slot/>
+</div>

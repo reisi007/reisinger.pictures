@@ -1,0 +1,23 @@
+---
+
+---
+<h3 class="mt-4">Kontaktformular</h3>
+<form method="POST" action="https://form.reisinger.pictures" class="container grid md:grid-cols-2">
+    <label class="required md:pr-1">
+        <span>Name</span>
+        <input type="text" name="name" required/>
+    </label>
+    <label class="required md:pl-1">
+        <span>Email</span>
+        <input type="email" name="email" required/>
+    </label>
+    <label class="required md:col-span-2">
+        <span>Nachricht</span>
+        <textarea name="message" rows="6" required></textarea>
+    </label>
+    <label class="hidden">
+        <input type="checkbox" name="dsgvo"/> Do not check
+    </label>
+    <input type="hidden" name="honeypot" value="6786c25a-b4fc-800d-b3c6-fa0d36f41154"/>
+    <button class="primary md:col-span-2" type="submit">Abschicken</button>
+</form>

@@ -1,0 +1,16 @@
+---
+import '../styles/gallery.css';
+
+import {getImageImportNameByFolder} from '../images/Images';
+import ImageStrip from './ImageStrip.astro';
+
+interface Props {
+    folder: string,
+    sorted?: string[]
+}
+
+const {folder, sorted} = Astro.props;
+const images = getImageImportNameByFolder(folder, sorted);
+---
+<ImageStrip images={images}/>
+

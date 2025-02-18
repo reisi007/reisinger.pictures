@@ -1,0 +1,27 @@
+---
+import {type CollectionEntry, getCollection} from 'astro:content';
+
+import BaseHead from '../layouts/BaseHead.astro';
+import MinimalPage from '../layouts/pages/MinimalPage.astro';
+import Breadcrumbs from "../layouts/Breadcrumbs.astro";
+
+export async function getStaticPaths() {
+    const posts = await getCollection('simple');
+    return posts.map((post) => ({
+        params: {simple: post.slug},
+        props: post,
+    }));
+}
+type Props = CollectionEntry<'simple'>;
+
+const {render, data} = Astro.props;
+const {title, description, showContact, index = true} = data;
+const {Content} = await render();
+---
+
+<MinimalPage showContact={showContact}>
+    <BaseHead title={title} description={description} noIndex={!index}/>
+    <Breadcrumbs/>
+    <h1>{title}</h1>
+    <Content/>
+</MinimalPage>

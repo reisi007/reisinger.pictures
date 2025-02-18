@@ -1,0 +1,37 @@
+---
+import {type CollectionEntry,  getCollection} from 'astro:content';
+
+import BaseHead from '../../layouts/BaseHead.astro';
+import FeaturedTestimonials from '../../layouts/FeaturedTestimonials.astro';
+import Gallery from '../../layouts/Gallery.astro';
+import MinimalPage from '../../layouts/pages/MinimalPage.astro';
+import {groupBy} from '../../utils';
+import Breadcrumbs from "../../layouts/Breadcrumbs.astro";
+
+interface Props {
+  entry: CollectionEntry<'areas'>,
+  reviews: CollectionEntry<'testimonials'>[]
+}
+
+export async function getStaticPaths() {
+  const areas = await getCollection('areas');
+  const testimonials = groupBy(await getCollection('testimonials'), e => e.data.type);
+  return areas.map(entry => ({params: {area: entry.slug}, props: {entry, reviews: testimonials[entry.slug]}}));
+}
+
+const {entry: {slug, render, data: {name, testimonials}}, reviews: categoryReviews} = Astro.props;
+const reviewSlugs: string[] | undefined = testimonials?.map(e => e.id);
+const {Content} = await render();
+---
+<MinimalPage>
+    <Breadcrumbs/>
+    <BaseHead title={name}></BaseHead>
+    <h1>{name}</h1>
+    <Content/>
+
+    <FeaturedTestimonials slug={slug} categoryTestimonials={categoryReviews} featuredTestimonials={reviewSlugs}/>
+
+    <div slot="postContact">
+        <Gallery limit={10} moreLink={`/${slug}/1`} folder={slug}/>
+    </div>
+</MinimalPage>

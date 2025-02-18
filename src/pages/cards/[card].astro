@@ -1,0 +1,24 @@
+---
+import {type CollectionEntry, getCollection} from "astro:content";
+import MinimalPage from "../../layouts/pages/MinimalPage.astro";
+import BaseHead from "../../layouts/BaseHead.astro";
+import ShootingCard from "../../layouts/ShootingCard.astro";
+import Breadcrumbs from "../../layouts/Breadcrumbs.astro";
+
+export async function getStaticPaths() {
+    const posts = await getCollection('shootingCards');
+    return posts.map((post) => ({
+        params: {card: post.slug},
+        props: post,
+    }));
+}
+type Props = CollectionEntry<'shootingCards'>;
+
+const {data} = Astro.props;
+const {title} = data;
+---
+<MinimalPage>
+    <Breadcrumbs/>
+    <BaseHead title={`Einstellungen für ein ${title} Shooting`}/>
+    <ShootingCard {...Astro.props}/>
+</MinimalPage>

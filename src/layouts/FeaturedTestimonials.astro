@@ -1,0 +1,27 @@
+---
+import {type CollectionEntry} from 'astro:content';
+
+import ReviewCards from './ReviewCards.astro';
+
+interface Props {
+  slug: string,
+  featuredTestimonials: string[] | undefined,
+  categoryTestimonials: CollectionEntry<'testimonials'>[]
+}
+
+const {slug, featuredTestimonials, categoryTestimonials} = Astro.props;
+---
+{featuredTestimonials &&
+<>
+  {featuredTestimonials.length >= 2 &&
+   <a class="black" href={`/${slug}/testimonials`}>
+       <ReviewCards slugs={featuredTestimonials}></ReviewCards>
+     {categoryTestimonials.length > 2 &&
+      <div class="my-4 flex flex-col items-center">
+          <button class="primary md:w-1/2">Alle {categoryTestimonials.length} Bewertungen lesen</button>
+      </div>
+     }
+   </a>}
+  {featuredTestimonials.length === 1 &&
+   <ReviewCards slugs={featuredTestimonials}></ReviewCards>}
+</>}

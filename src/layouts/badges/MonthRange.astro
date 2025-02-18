@@ -1,0 +1,29 @@
+---
+import type {MonthEnum, MonthRange} from "./Types";
+import Month from "./Month.astro";
+
+type Props = MonthRange
+
+export function generateMonthElements(from: MonthEnum, to: MonthEnum, elementGenerator: (index: MonthEnum) => Element): Element[] {
+    const elements: Element[] = [];
+    if (from < to)
+        for (let i = from; i <= to; i += 1) {
+            elements.push(elementGenerator(i));
+        }
+    else {
+        let i: MonthEnum
+        for (i = from; i <= 12; i += 1) {
+            elements.push(elementGenerator(i));
+        }
+        for (i = 1; i <= to; i += 1) {
+            elements.push(elementGenerator(i));
+        }
+    }
+    return elements;
+}
+
+const {from, to} = Astro.props
+---
+{generateMonthElements(from,to,i =>
+<Month month={i}/>)}
+

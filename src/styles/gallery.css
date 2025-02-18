@@ -1,0 +1,7 @@
+section[data-gallery]:not(.scrolling) :not([data-bg]) {
+    @apply cursor-pointer;
+}
+
+.scrolling {
+    @apply cursor-grabbing;
+}

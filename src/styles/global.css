@@ -1,0 +1,160 @@
+@import "tailwindcss" source("../../src");
+
+@theme {
+    --width-unlimited: 9999px;
+    --font-logo: sans-serif;
+
+    --color-primary: #2A9D8F;
+    --color-primary-alternative: #1A6158;
+    --color-primary-accent: #4ED0C1;
+
+    --color-onPrimary: #ffffff;
+    --color-onPrimary-accent: #f5f5f5;
+
+    --color-secondary: #fdfdfd;
+    --color-secondary-alternative: #040F0F;
+
+    --color-onSecondary: #1A6158;
+    --color-onSecondary-alternative: #FFFFFF;
+
+    --color-gold: #EBE357;
+    --color-error: #B12A2A;
+
+    --color-brand-whatsapp: #25D366;
+    --color-brand-facebook: #3B5998;
+    --color-brand-instagram: #E1306C;
+    --color-brand-podcast: #8940FA;
+    --color-brand-messenger: #00C6FF;
+
+    --screens-3xl: 2048px;
+}
+
+@plugin "@iconify/tailwind4" {
+    prefixes: mdi, material-symbols;
+}
+
+@layer base {
+    [class*="mdi--"], [class*="material-symbols--"] {
+        @apply iconify;
+    }
+
+    h1, .h1 {
+        @apply text-4xl text-center font-logo;
+    }
+
+    h2, .h2 {
+        @apply text-3xl text-center font-logo;
+    }
+
+    h3, .h3 {
+        @apply text-2xl text-center font-logo my-1;
+    }
+
+    h4, .h4 {
+        @apply text-xl text-center font-logo my-1 font-light
+    }
+
+    h5, .h5 {
+        @apply text-lg text-center font-logo my-1
+    }
+
+    a:not(.black):not(.button) {
+        @apply text-primary visited:text-primary-alternative font-logo underline hover:text-primary-accent;
+    }
+
+    a {
+        @apply cursor-pointer;
+    }
+
+    pre {
+        @apply whitespace-pre text-left font-mono bg-gray-100 w-full;
+    }
+
+    ul {
+        @apply list-disc list-inside
+    }
+
+    ol {
+        @apply list-decimal list-inside
+    }
+
+    hr {
+        @apply my-4 h-px bg-gray-400
+    }
+
+    blockquote {
+        @apply p-4 my-4 bg-gray-50 border-l-4 border-gray-300 leading-relaxed italic
+    }
+
+    p, .p {
+        @apply p-4
+    }
+
+    img {
+        @apply object-contain;
+    }
+
+    li {
+        @apply py-0.5 px-4
+    }
+
+    li p {
+        @apply inline pl-0
+    }
+
+    table {
+        @apply mt-2 mb-6 mx-auto w-11/12 px-4 sm:w-full;
+    }
+
+    th {
+        @apply p-3 border border-gray-500 text-center leading-4 text-primary tracking-wider;
+    }
+
+    td {
+        @apply p-6 border text-center border-gray-500;
+    }
+}
+
+@layer components {
+    html, body {
+        @apply h-full
+    }
+
+    button, .button {
+        @apply cursor-pointer transition-colors duration-150 focus:ring disabled:opacity-75 disabled:bg-gray-600 disabled:text-gray-200;
+    }
+
+    button.primary, .button.primary {
+        @apply bg-primary text-onPrimary py-4 px-3 text-xl text-center border rounded-xl border-primary-alternative hover:bg-primary-alternative;
+    }
+
+    button:not(.primary):not(.styled):not(.pswp__button), .button:not(.primary):not(.styled):not(.pswp__button) {
+        @apply bg-secondary text-onSecondary p-2 text-xl text-center border rounded-xl border-secondary-alternative;
+    }
+
+    input, textarea {
+        @apply rounded-lg p-2 my-1 w-full border border-gray-600 inline-block;
+    }
+
+    .required span::after {
+        @apply content-["_*"] text-error;
+    }
+
+    .socialLink {
+        @apply mb-1 mr-1 border-2 duration-200 inline-flex items-center ease-in-out transition p-1 rounded-lg text-2xl text-onPrimary border-primary bg-primary hover:bg-primary-alternative hover:border-primary-alternative
+    }
+}
+
+@layer utilities {
+    .container {
+        @apply w-full px-2 sm:px-0 sm:mx-auto sm:w-[540px] md:w-[720px] lg:w-[960px] xl:w-[1140px] 2xl:w-[86vw];
+    }
+
+    [data-type="dialog"] {
+        @apply hidden;
+
+        &[data-state="visible"] {
+            @apply flex;
+        }
+    }
+}

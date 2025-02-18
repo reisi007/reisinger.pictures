@@ -1,0 +1,29 @@
+---
+import '../styles/gallery.css';
+import {type BreakPoints, mergeBreakpoints} from '../styles/Breakpoints';
+import ResponsiveImage from './ResponsiveImage.astro';
+import Photoswipe from "./Photoswipe.astro";
+
+interface Props {
+    images: string[];
+    breakpoints?: Partial<Omit<BreakPoints<number>, 'default'>>;
+    class?: string;
+}
+
+const {images, breakpoints, class: className} = Astro.props;
+const galleryBreakpoints: Omit<BreakPoints<number>, 'default'> = {
+    'sm': 1,
+    'md': 1,
+    'lg': 1,
+    'xl': 2,
+    '2xl': 2,
+    '3xl': 2,
+};
+---
+<section data-gallery class:list={['grid w-full', {
+    'gap-y-8 xl:grid-cols-2 xl:gap-x-4': className === undefined,
+}, className]}>
+    {images.map(image =>
+            <ResponsiveImage name={image} sizeModifiers={mergeBreakpoints(galleryBreakpoints, breakpoints)}/>)}
+</section>
+<Photoswipe/>

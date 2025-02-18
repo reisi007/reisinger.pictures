@@ -1,0 +1,65 @@
+---
+import {getEntry} from 'astro:content';
+import {SITE_DESCRIPTION, SITE_TITLE} from '../consts';
+import BaseHead from '../layouts/BaseHead.astro';
+import MinimalPage from '../layouts/pages/MinimalPage.astro';
+import ResponsiveImage from '../layouts/ResponsiveImage.astro';
+import ReviewCardsCards from '../layouts/ReviewCard.astro';
+import {ResponsiveImageLoading} from "../layouts/ResponsiveImageLoading";
+import Breadcrumbs from "../layouts/Breadcrumbs.astro";
+
+const beautyReview = await getEntry('testimonials', 'irishammer2');
+const aktReview = await getEntry('testimonials', 'w2');
+const tanzReview = await getEntry('testimonials', 'susannezopf1');
+const couplesReview = await getEntry('testimonials', 'evaf1');
+---
+<MinimalPage>
+    <head>
+        <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION}/>
+    </head>
+
+    <Breadcrumbs/>
+
+    <h1>{SITE_TITLE}</h1>
+    <div class="mb-2 mt-6 flex justify-center">
+    <span class="size-64">
+        <ResponsiveImage bg={false} loading={ResponsiveImageLoading.EAGER} widths={[256]} class="rounded-full"
+                         alt="Bild des Fotografen" name="me"/>
+        </span>
+    </div>
+    <p>Willkommen auf meiner Webseite. Ich bin Florian, der Fotograf hinter den Bildern, die du hier siehst.</p>
+
+    <p>
+        Ich biete Fotoshootings in den Kategorien Beauty, Boudoir, Sport und Tanz vor allem in Linz an. Mit über 100
+        Fotoshootings Erfahrung, findest du mich regelmäßig als Fotograf bei Spielen des LASK in der ADMIRAL Bundesliga
+        und bei den Black Wings Linz in der win2day ICE Hockey League.
+    </p>
+
+    <p>
+        Falls du Fragen hast, die diese Webseite nicht beantworten kann oder Interesse an einem gemeinsamen Fotoshooting
+        besteht, zögere nicht, mich über das Kontaktformular zu kontaktieren.
+    </p>
+
+    <div class="mx-2 grid gap-y-4 xl:grid-cols-2 xl:gap-x-4">
+        {beautyReview &&
+                <a class="black" href="/beauty">
+                    <ReviewCardsCards {...beautyReview}/>
+                </a>
+        }
+        {couplesReview &&
+                <a class="black" href="/couples">
+                    <ReviewCardsCards {...couplesReview}/>
+                </a>
+        }
+        {tanzReview &&
+                <a class="black" href="/tanz">
+                    <ReviewCardsCards {...tanzReview}/>
+                </a>
+        }
+        {aktReview &&
+                <a class="black" href="/akt">
+                    <ReviewCardsCards {...aktReview}/>
+                </a>
+        }
+    </div>
+</MinimalPage>

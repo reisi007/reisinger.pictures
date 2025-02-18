@@ -1,0 +1,33 @@
+---
+import type {CollectionEntry} from 'astro:content';
+
+import BaseHead from '../BaseHead.astro';
+import FormattedDate from '../FormattedDate.astro';
+import ResponsiveImage from '../ResponsiveImage.astro';
+import MinimalPage from './MinimalPage.astro';
+import Breadcrumbs from "../Breadcrumbs.astro";
+
+type Props = CollectionEntry<'einblicke'>['data'];
+
+const {title, description, pubDate, updated, heroImage} = Astro.props;
+---
+
+<MinimalPage>
+    <BaseHead title={title} description={description}/>
+    <Breadcrumbs/>
+    <article>
+        <section class="mx-2 flex flex-col items-center">
+            <h1 class="mb-2">{title}</h1>
+            <span>Veröffentlicht am  <FormattedDate date={pubDate}/>
+              {updated &&
+               <>- aktualisiert am
+                   <FormattedDate date={updated}/>
+               </>
+              }</span>
+          {heroImage &&
+           <ResponsiveImage class="my-4 max-h-128" alt={title} name={heroImage}/>}
+        </section>
+        <hr class="mx-auto h-0.5 w-3/4 border-0  bg-primary sm:w-2/3"/>
+        <slot/>
+    </article>
+</MinimalPage>

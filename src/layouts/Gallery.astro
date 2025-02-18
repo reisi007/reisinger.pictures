@@ -1,0 +1,26 @@
+---
+import {getImageImportNameByFolder} from '../images/Images';
+import ImageGallery from './ImageGallery.astro';
+import type {BreakPoints} from "../styles/Breakpoints";
+
+interface Props {
+    folder: string,
+    limit?: number,
+    moreLink?: string,
+    sorted?: string[],
+    className?: string,
+    breakpoints?: Partial<Omit<BreakPoints<number>, 'default'>>;
+}
+
+const {folder, limit, moreLink, sorted, className, breakpoints} = Astro.props;
+const images = getImageImportNameByFolder(folder, sorted);
+
+const showMore = moreLink !== undefined && limit !== undefined && images.length > limit;
+
+const displayedImages = limit === undefined ? images : images.slice(0, limit);
+---
+{displayedImages.length > 0 &&
+<div class="my-12 flex flex-col items-center">
+    <ImageGallery class={className} images={displayedImages} breakpoints={breakpoints}/>
+    {showMore && <a href={moreLink} class="button primary mt-6">Weitere Bilder ansehen</a>}
+</div>}

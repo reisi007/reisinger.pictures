@@ -1,0 +1,17 @@
+---
+import type {CollectionEntry} from 'astro:content';
+
+import FormattedDate from './FormattedDate.astro';
+import YouTube from './YouTube.astro';
+
+type Props = CollectionEntry<'videos'>
+
+const {data, render} = Astro.props;
+const {date} = data;
+const {Content} = await render();
+---
+<div class="flex flex-col items-center rounded-2xl border border-black pb-2">
+    <YouTube {...data}/>
+    <Content></Content>
+    <FormattedDate date={date}/>
+</div>
