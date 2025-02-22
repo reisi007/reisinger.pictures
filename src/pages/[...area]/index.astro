@@ -19,7 +19,7 @@ export async function getStaticPaths() {
   return areas.map(entry => ({params: {area: entry.slug}, props: {entry, reviews: testimonials[entry.slug]}}));
 }
 
-const {entry: {slug, render, data: {name, testimonials}}, reviews: categoryReviews} = Astro.props;
+const {entry: {slug, render, data: {name, testimonials, images}}, reviews: categoryReviews} = Astro.props;
 const reviewSlugs: string[] | undefined = testimonials?.map(e => e.id);
 const {Content} = await render();
 ---
@@ -32,6 +32,6 @@ const {Content} = await render();
     <FeaturedTestimonials slug={slug} categoryTestimonials={categoryReviews} featuredTestimonials={reviewSlugs}/>
 
     <div slot="postContact">
-        <Gallery limit={10} moreLink={`/${slug}/1`} folder={slug}/>
+        <Gallery moreLink={`/${slug}/1`} folder={slug} sorted={images}/>
     </div>
 </MinimalPage>

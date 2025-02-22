@@ -44,7 +44,8 @@ const testimonials = defineCollection({
 const sport = defineCollection({
   type: "content",
   schema: z.object({
-    name: z.string()
+    name: z.string(),
+    images: z.array(z.string())
   })
 });
 
@@ -52,7 +53,8 @@ const areas = defineCollection({
   type: "content",
   schema: z.object({
     name: z.string(),
-    testimonials: z.array(reference("testimonials")).optional()
+    testimonials: z.array(reference("testimonials")).optional(),
+    images: z.array(z.string())
   })
 });
 

@@ -56,10 +56,10 @@ const paddingTop = `${maxOptimizedHeight / maxOptimizedWidth * 100}%`;
 <div data-name={name} style={style}
      class:list={["relative w-full max-h-[80vh]", containerStyles]}
 >
-    <div style={{paddingTop}}>
+    <div style={{paddingTop}} class="">
         <Image
                 format="avif"
-                class:list={['absolute z-20 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2  max-h-[80vh] object-fit', clazz]}
+                class:list={['top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 absolute z-20 max-h-[80vh] object-fit', clazz]}
                 quality="med"
                 loading={loading}
                 widths={widths}

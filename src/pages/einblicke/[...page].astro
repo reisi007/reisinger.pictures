@@ -15,7 +15,7 @@ export async function getStaticPaths({paginate}: { paginate: PaginateFunction })
         (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
     );
 
-    return paginate(posts, {pageSize: 6});
+    return paginate(posts, {pageSize: 12});
 }
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;

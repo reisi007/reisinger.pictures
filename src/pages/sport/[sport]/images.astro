@@ -1,44 +1,45 @@
 ---
-import type {InferGetStaticPropsType} from 'astro';
-import {getCollection} from 'astro:content';
-import {getImageImportNameByFolder} from '../../../images/Images';
-import MinimalPage from '../../../layouts/pages/MinimalPage.astro';
-import BaseHead from '../../../layouts/BaseHead.astro';
-import ImageGallery from '../../../layouts/ImageGallery.astro';
-import {type BreakPoints} from '../../../styles/Breakpoints';
+import type { InferGetStaticPropsType } from "astro";
+import { getCollection } from "astro:content";
+import { getImageImportNameByFolder } from "../../../images/Images";
+import MinimalPage from "../../../layouts/pages/MinimalPage.astro";
+import BaseHead from "../../../layouts/BaseHead.astro";
+import ImageGallery from "../../../layouts/ImageGallery.astro";
+import { type BreakPoints } from "../../../styles/Breakpoints";
 import { slugToName } from "../../../utils";
 
 
 export async function getStaticPaths() {
-  const areas = (await getCollection('sport')).map(area => area.slug);
+  return (await getCollection("sport"))
+    .map(entry => {
+      const { slug: sport, data: { images: sorted } } = entry;
 
-  return areas.map(sport => {
-    const images = getImageImportNameByFolder(`sport/${sport}`);
-    return ({
-      params: {sport},
-      props: {images, sport},
+      const images = getImageImportNameByFolder(`sport/${sport}`, sorted);
+      return ({
+        params: { sport },
+        props: { images, sport }
+      });
     });
-  });
 }
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
-const {sport, images} = Astro.props as Props;
+const { sport, images } = Astro.props as Props;
 
 
 
 const name = slugToName(sport);
 
-const breakpoints: Omit<BreakPoints<number>, 'default'> = {
-  'sm': 4,
-  'md': 4,
-  'lg': 4,
-  'xl': 4,
-  '2xl': 4,
-  '3xl': 4,
+const breakpoints: Omit<BreakPoints<number>, "default"> = {
+  "sm": 4,
+  "md": 4,
+  "lg": 4,
+  "xl": 4,
+  "2xl": 4,
+  "3xl": 4
 };
 ---
 <MinimalPage>
-    <BaseHead title={name} noIndex={true}/>
-    <ImageGallery images={images} breakpoints={breakpoints} class="grid-cols-4 gap-4 xl:grid-cols-8"/>
+  <BaseHead title={name} noIndex={true} />
+  <ImageGallery images={images} breakpoints={breakpoints} class="grid-cols-4 gap-4 xl:grid-cols-8" />
 </MinimalPage>

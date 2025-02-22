@@ -1,2 +1,11 @@
 RewriteEngine On
+RewriteRule ^paare/?(.*)$ /couples/$1 [R=301,L]
+RewriteRule ^gymnastics/?(.*)$ /turnen/$1 [R=301,L]
+RewriteRule ^(.+)/images/? /$1 [R=301,L]
 RewriteRule ^shootings/tfp/?$ /shootings/ [R=301,L]
+RewriteRule ^([^/]+)/reviews(?:/\d+)?/?$ /$1/testimonials [R=301,L]
+RewriteRule ^akt/boudoir-ablauf/?$ /akt/ablauf [R=301,L]
+RewriteRule ^fotoshooting$ /shootings [R=301,L]
+RewriteRule ^einblicke/aerobic/$ /einblicke/turnen/ [R=301,L]
+RewriteRule ^(akt|beauty|couples|tanz)/(\d+)/?$ /$1 [R=301,L]
+RewriteRule ^turnen(/[^/]+)?/?$ /einblicke/pbs [R=302,L]
