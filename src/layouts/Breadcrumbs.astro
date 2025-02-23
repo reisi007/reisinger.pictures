@@ -1,11 +1,20 @@
 ---
 import { DataCollectionKey, getCollection } from "astro:content";
 
-
 const astroUrl = Astro.url;
 const sharedUrl = encodeURIComponent(astroUrl.toString());
 const { pathname } = astroUrl;
 const url = pathname.replace(/\/+$/, "");
+
+function titleOrUndefined(o: Record<string, unknown>): string | undefined {
+  if (typeof o.title === "string") {
+    return o.title;
+  }
+  if (typeof o.name === "string") {
+    return o.name;
+  }
+  return undefined;
+}
 
 function toName(input: string): string {
   const parts = input.split("/");
@@ -24,22 +33,34 @@ const contentPrefixConfig: Record<DataCollectionKey, string> = {
   shootingCards: "cards"
 };
 
-const additionalSlugs = [
+type MatchingUrls = { name: string, path: string }[];
+
+const additionalSlugs: MatchingUrls = [
   "einblicke"
-].map(e => `/${e}`);
+].map(e => ({
+  path: `/${e}`,
+  name: toName(e)
+}));
 
-const matchingContent = (await Promise.all(
-  Object.entries(contentPrefixConfig)
-    .filter(([, v]) => url.startsWith(v))
-    .map(([k]) => k as DataCollectionKey).flatMap(async k => (await getCollection(k))
-    .map(e => `${contentPrefixConfig[k]}/${e.slug}`)
+const matchingContent: MatchingUrls = (await Promise.all(
+    Object.entries(contentPrefixConfig)
+      .filter(([, v]) => url.startsWith(v))
+      .map(([k]) => k as DataCollectionKey)
+      .flatMap(async k => (await getCollection(k))
+        .map(e => ({
+            path: `${contentPrefixConfig[k]}/${e.slug}`,
+            name: titleOrUndefined(e.data) ?? toName(e.slug)
+          })
+        )
+      )
   )
-)).concat(additionalSlugs);
+).flatMap(e => e)
+  .concat(additionalSlugs);
 
-const matchingUrls: { name: string, path: string }[] = matchingContent.flatMap(k => k)
-  .filter(pu => url.startsWith(pu) && pu !== url)
-  .sort((a, b) => a.length - b.length)
-  .map(path => ({ name: toName(path), path }));
+
+const matchingUrls: MatchingUrls = matchingContent.flatMap(k => k)
+  .filter(({ path }) => url.startsWith(path) && path !== url)
+  .sort(({ path: a }, { path: b }) => a.length - b.length);
 ---
 
 <div class="inline-block mb-2 mt-4 sm:flex flex-row-reverse items-center justify-between w-full">

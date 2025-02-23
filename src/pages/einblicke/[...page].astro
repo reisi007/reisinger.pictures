@@ -1,63 +1,28 @@
 ---
-import type {InferGetStaticPropsType, PaginateFunction} from 'astro';
-import {getCollection} from 'astro:content';
-
-import BaseHead from '../../layouts/BaseHead.astro';
-import FormattedDate from '../../layouts/FormattedDate.astro';
-import MinimalPage from '../../layouts/pages/MinimalPage.astro';
-import Pagination from '../../layouts/Pagination.astro';
-import ResponsiveImage from '../../layouts/ResponsiveImage.astro';
-import type {NumericBreakpoints} from '../../styles/Breakpoints';
+import type { InferGetStaticPropsType, PaginateFunction } from "astro";
+import { getCollection } from "astro:content";
+import Einblicke from "../../layouts/Einblicke.astro";
+import BaseHead from "../../layouts/BaseHead.astro";
 import Breadcrumbs from "../../layouts/Breadcrumbs.astro";
+import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 
-export async function getStaticPaths({paginate}: { paginate: PaginateFunction }) {
-    const posts = (await getCollection('einblicke')).sort(
-        (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-    );
+export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
+  const posts = (await getCollection("einblicke")).sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+  );
 
-    return paginate(posts, {pageSize: 12});
+  return paginate(posts, { pageSize: 12 });
 }
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
-const {page} = Astro.props as Props;
-
-const {data: posts} = page;
-
-const breakpoints: NumericBreakpoints = {
-    'sm': 1,
-    'md': 2,
-    'lg': 2,
-    'xl': 2,
-    '2xl': 3,
-    '3xl': 3,
-};
+const { page } = Astro.props;
+const title = "Einblicke in die Fotoshootings";
 ---
 <MinimalPage>
-    <BaseHead title="Einblicke in die Fotoshootings"/>
-    <Breadcrumbs/>
-    <h1>Einblicke in die Fotoshootings</h1>
-
-    <Pagination page={page}/>
-
-    <section class="mx-2 my-4 grid gap-y-2 md:grid-cols-2 md:gap-x-2 xl:grid-cols-3">
-        {
-            posts.map((post) => (
-                    <a class="black rounded-xl border-2 border-black/75 p-4" href={`/einblicke/${post.slug}/`}>
-                        {post.data.heroImage &&
-                                <ResponsiveImage sizeModifiers={breakpoints} name={post.data.heroImage}
-                                                 containerStyles="h-64" class="h-64"/>
-                        }
-                        <h3 class="mt-2">{post.data.title}</h3>
-                        <p class="text-center">
-                            <FormattedDate date={post.data.pubDate}/>
-                        </p>
-                    </a>
-            ))
-        }
-
-    </section>
-
-    <Pagination page={page}/>
+  <BaseHead title={title} />
+  <Breadcrumbs />
+  <h1>{title}</h1>
+  <Einblicke page={page} />
 
 </MinimalPage>
