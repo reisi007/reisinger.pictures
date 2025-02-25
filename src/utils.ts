@@ -1,4 +1,4 @@
-import { Page } from "astro";
+import { type Page } from "astro";
 
 export function groupBy<T>(
   items: T[],
