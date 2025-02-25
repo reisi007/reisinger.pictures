@@ -4,7 +4,7 @@ import { DataCollectionKey, getCollection } from "astro:content";
 const astroUrl = Astro.url;
 const sharedUrl = encodeURIComponent(astroUrl.toString());
 const { pathname } = astroUrl;
-const url = pathname.replace(/\/+$/, "");
+const url = pathname.replace(/\/$/, "");
 
 function titleOrUndefined(o: Record<string, unknown>): string | undefined {
   if (typeof o.title === "string") {
@@ -14,6 +14,15 @@ function titleOrUndefined(o: Record<string, unknown>): string | undefined {
     return o.name;
   }
   return undefined;
+}
+
+function getSlug(o: { id: string, slug?: string, data: Record<string, unknown> }) {
+  if (typeof o.data.slug === "string") {
+    return o.data.slug;
+  }
+  if (o.slug)
+    return o.slug;
+  return o.id;
 }
 
 function toName(input: string): string {
@@ -27,38 +36,40 @@ const contentPrefixConfig: Record<DataCollectionKey, string> = {
   testimonials: "testimonials",
   areas: "",
   einblicke: "einblicke",
+  einblickeOverviews: "einblicke",
   simple: "",
   sport: "sport",
   videos: "videos",
   shootingCards: "cards"
 };
 
-type MatchingUrls = { name: string, path: string }[];
+const collectionKeys = Object.entries(contentPrefixConfig)
+  .filter(([, v]) => url.startsWith(`/${v}`))
+  .map(([k]) => k as DataCollectionKey);
 
-const additionalSlugs: MatchingUrls = [
-  "einblicke"
-].map(e => ({
-  path: `/${e}`,
-  name: toName(e)
-}));
 
-const matchingContent: MatchingUrls = (await Promise.all(
-    Object.entries(contentPrefixConfig)
-      .filter(([, v]) => url.startsWith(v))
-      .map(([k]) => k as DataCollectionKey)
+const matchingContent = (await Promise.all(
+    collectionKeys
       .flatMap(async k => (await getCollection(k))
-        .map(e => ({
-            path: `${contentPrefixConfig[k]}/${e.slug}`,
-            name: titleOrUndefined(e.data) ?? toName(e.slug)
-          })
-        )
+            .map(e => {
+                let path = contentPrefixConfig[k];
+                if (path.length > 0)
+                  path = `/${  path}`;
+                const slug = getSlug(e);
+                if (slug)
+                  path += `/${slug}`;
+                return ({
+                  path,
+                  name: titleOrUndefined(e.data) ?? toName(slug)
+                });
+              }
+            )
       )
   )
-).flatMap(e => e)
-  .concat(additionalSlugs);
+);
 
 
-const matchingUrls: MatchingUrls = matchingContent.flatMap(k => k)
+const matchingUrls = matchingContent.flatMap(k => k)
   .filter(({ path }) => url.startsWith(path) && path !== url)
   .sort(({ path: a }, { path: b }) => a.length - b.length);
 ---

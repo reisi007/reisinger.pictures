@@ -1,4 +1,5 @@
 import { defineCollection, reference, z } from "astro:content";
+import { file } from "astro/loaders";
 
 const einblicke = defineCollection({
   type: "content",
@@ -11,6 +12,14 @@ const einblicke = defineCollection({
     pubDate: z.coerce.date(),
     updated: z.coerce.date().optional(),
     heroImage: z.string().optional()
+  })
+});
+
+const einblickeOverviews = defineCollection({
+  loader: file("src/content/einblickeOverviews.json"),
+  schema: z.object({
+    title: z.string(),
+    slug: z.string()
   })
 });
 
@@ -94,6 +103,7 @@ const shootingCards = defineCollection({
 export const collections = {
   areas,
   einblicke,
+  einblickeOverviews,
   shootingCards,
   simple,
   sport,

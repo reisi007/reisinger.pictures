@@ -19,15 +19,15 @@ export function slugToName(slug: string) {
   return slug[0].toUpperCase() + slug.substring(1);
 }
 
-export function singlePage<T>(posts: T[]): Page<T> {
+export function singlePage<T>(data: T[]): Page<T> {
   return {
     start: 0,
-    end: posts.length - 1,
-    total: posts.length - 1,
+    end: data.length - 1,
+    total: data.length - 1,
     currentPage: 1,
-    size: posts.length - 1,
+    size: data.length - 1,
     lastPage: 1,
-    data: posts,
+    data,
     url: { current: "", next: undefined, last: undefined, prev: undefined, first: "" }
   };
 }

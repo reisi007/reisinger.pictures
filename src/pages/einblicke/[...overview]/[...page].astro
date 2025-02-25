@@ -1,0 +1,33 @@
+---
+import type { InferGetStaticPropsType, PaginateFunction } from "astro";
+import { getCollection } from "astro:content";
+import Einblicke from "../../../layouts/Einblicke.astro";
+import BaseHead from "../../../layouts/BaseHead.astro";
+import Breadcrumbs from "../../../layouts/Breadcrumbs.astro";
+import MinimalPage from "../../../layouts/pages/MinimalPage.astro";
+
+export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
+  const overviewPages = (await getCollection("einblickeOverviews")).map(e => e.data);
+
+  const posts = (await getCollection("einblicke")).sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+  );
+
+  return overviewPages.flatMap(({ title, slug }) => {
+    const relevantPosts = posts.filter(p => slug === "" || p.slug.startsWith(slug));
+    return paginate(relevantPosts, { pageSize: 12, params: { overview: slug }, props: { title } });
+  });
+}
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { page, title } = Astro.props;
+---
+<MinimalPage>
+  <BaseHead title={title} />
+  <Breadcrumbs />
+  <h1>{title}</h1>
+  <Einblicke page={page} />
+
+</MinimalPage>
+
+---
