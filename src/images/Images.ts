@@ -37,6 +37,9 @@ export async function getImageImportByName(name?: string) {
 
 export function getImageImportNameByFolder(root: string, sortedImages: string[]) {
   const folderPicture = Object.keys(IMAGES).filter(i => i.startsWith(root));
-  return sortedImages.map(name => folderPicture.find(i => i.endsWith(name)))
+  return sortedImages.map(rawName => {
+    const name = `${root  }/${  rawName}`;
+    return folderPicture.find(i => i === name);
+  })
     .filter(e => e !== undefined) as string[];
 }

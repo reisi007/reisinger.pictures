@@ -1,38 +1,38 @@
 ---
-import type {InferGetStaticPropsType} from "astro";
-import {getCollection} from "astro:content";
+import type { InferGetStaticPropsType } from "astro";
+import { getCollection } from "astro:content";
 import BaseHead from "../../layouts/BaseHead.astro";
 import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import ReviewCard from "../../layouts/ReviewCard.astro";
-import type {NumericBreakpoints} from "../../styles/Breakpoints";
+import type { NumericBreakpoints } from "../../styles/Breakpoints";
 import Breadcrumbs from "../../layouts/Breadcrumbs.astro";
 
 export async function getStaticPaths() {
-    return (await getCollection('testimonials')).map(r => ({
-        params: {slug: r.slug},
-        props: r
-    }));
+  return (await getCollection("testimonials")).map(r => ({
+    params: { slug: r.slug },
+    props: r
+  }));
 
 }
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 const props = Astro.props as Props;
-const {data} = props;
-const {name} = data
-const title = `Bewertung von ${  name}`
+const { data } = props;
+const { name } = data;
+const title = `Bewertung von ${name}`;
 
 const breakpoints: NumericBreakpoints = {
-    'sm': 1,
-    'md': 1,
-    'lg': 1,
-    'xl': 1,
-    '2xl': 1,
-    '3xl': 1,
+  "sm": 1,
+  "md": 1,
+  "lg": 1,
+  "xl": 1,
+  "2xl": 1,
+  "3xl": 1
 };
 ---
 <MinimalPage>
-    <BaseHead title={title}/>
-    <Breadcrumbs/>
-    <ReviewCard {...props} isLargeImageFullSize={true} breakpoints={breakpoints} />
+  <BaseHead title={title} author={name} />
+  <Breadcrumbs />
+  <ReviewCard {...props} isLargeImageFullSize={true} breakpoints={breakpoints} />
 </MinimalPage>

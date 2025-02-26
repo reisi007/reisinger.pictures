@@ -1,7 +1,6 @@
 ---
 import type { InferGetStaticPropsType } from "astro";
 import { getCollection } from "astro:content";
-import { getImageImportNameByFolder } from "../../images/Images";
 import type { BreakPoints } from "../../styles/Breakpoints";
 import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import BaseHead from "../../layouts/BaseHead.astro";
@@ -11,13 +10,13 @@ import { slugToName } from "../../utils";
 export async function getStaticPaths() {
   return (await getCollection("areas"))
     .map(entry => {
-    const { slug: area, data: { images: sorted } } = entry;
-    const images = getImageImportNameByFolder(area, sorted);
-    return ({
-      params: { area },
-      props: { images, area }
+      const { slug: area, data: { images: rawImages } } = entry;
+      const images = rawImages.map((image) => `${area}/${image}`);
+      return ({
+        params: { area },
+        props: { images, area }
+      });
     });
-  });
 }
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;

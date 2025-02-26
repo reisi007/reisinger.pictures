@@ -1,7 +1,6 @@
 ---
 import type { InferGetStaticPropsType } from "astro";
 import { getCollection } from "astro:content";
-import { getImageImportNameByFolder } from "../../../images/Images";
 import MinimalPage from "../../../layouts/pages/MinimalPage.astro";
 import BaseHead from "../../../layouts/BaseHead.astro";
 import ImageGallery from "../../../layouts/ImageGallery.astro";
@@ -12,9 +11,8 @@ import { slugToName } from "../../../utils";
 export async function getStaticPaths() {
   return (await getCollection("sport"))
     .map(entry => {
-      const { slug: sport, data: { images: sorted } } = entry;
-
-      const images = getImageImportNameByFolder(`sport/${sport}`, sorted);
+      const { slug: sport, data: { images: rawImages } } = entry;
+      const images = rawImages.map(e => `sport/${sport}/${e}`);
       return ({
         params: { sport },
         props: { images, sport }
