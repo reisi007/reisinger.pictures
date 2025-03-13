@@ -6,7 +6,9 @@ import Pagination from "./Pagination.astro";
 import ResponsiveImage from "./ResponsiveImage.astro";
 import type { NumericBreakpoints } from "../styles/Breakpoints";
 
-interface Props { page: Page<CollectionEntry<"einblicke">> }
+interface Props {
+  page: Page<CollectionEntry<"einblicke">>;
+}
 
 const breakpoints: NumericBreakpoints = {
   "sm": 1,
@@ -30,8 +32,7 @@ const { data: posts } = page;
     posts.map((post) => (
       <a class="black rounded-xl border-2 border-black/75 p-4" href={`/einblicke/${post.slug}/`}>
         {post.data.heroImage &&
-          <ResponsiveImage sizeModifiers={breakpoints} name={post.data.heroImage}
-                           containerStyles="h-64" class="h-64" />
+          <ResponsiveImage sizeModifiers={breakpoints} name={post.data.heroImage} height="16rem" />
         }
         <h3 class="mt-2">{post.data.title}</h3>
         <p class="text-center">

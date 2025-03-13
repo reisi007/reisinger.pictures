@@ -1,48 +1,47 @@
 ---
-import {Image} from 'astro:assets';
-
-import {type JSX} from "astro/jsx-runtime";
-import {getImageImportByName} from '../images/Images';
-import type {NumericBreakpoints} from '../styles/Breakpoints';
-import {computeSizes, DEFAULT_IMAGE_SIZES, mergeBreakpoints} from '../styles/Breakpoints';
-import {ResponsiveImageLoading} from "./ResponsiveImageLoading";
+import { Image } from "astro:assets";
+import { type JSX } from "astro/jsx-runtime";
+import { getImageImportByName } from "../images/Images";
+import type { NumericBreakpoints } from "../styles/Breakpoints";
+import { computeSizes, DEFAULT_IMAGE_SIZES, mergeBreakpoints } from "../styles/Breakpoints";
+import { ResponsiveImageLoading } from "./ResponsiveImageLoading";
 
 interface Props {
-    name: string,
-    class?: string,
-    alt?: string,
-    bg?: boolean,
-    sizes?: string,
-    widths?: number[],
-    loading?: ResponsiveImageLoading,
-    sizeModifiers?: Partial<NumericBreakpoints>,
-    containerStyles?: string
-    style?: JSX.CSSProperties
+  name: string,
+  class?: string,
+  style?: JSX.CSSProperties,
+  height?: string,
+  alt?: string,
+  bg?: boolean,
+  sizes?: string,
+  widths?: number[],
+  loading?: ResponsiveImageLoading,
+  sizeModifiers?: Partial<NumericBreakpoints>
 }
 
 const {
-    name,
-    alt = '',
-    class: clazz,
-    bg = true,
-    sizes,
-    sizeModifiers,
-    widths: widthsOverride,
-    containerStyles = "size-full",
-    loading = ResponsiveImageLoading.LAZY,
-    style,
-    ...other
+  name,
+  alt = "",
+  bg = true,
+  sizes,
+  sizeModifiers,
+  widths: widthsOverride,
+  height = "80vh",
+  loading = ResponsiveImageLoading.LAZY,
+  class: clazz,
+  style,
+  ...other
 } = Astro.props;
 
 const image = (await getImageImportByName(name)).default;
 
 const standaloneSizes: NumericBreakpoints = {
-    'sm': 1,
-    'md': 1,
-    'lg': 1,
-    'xl': 1,
-    '2xl': 1,
-    '3xl': 1,
+  "sm": 1,
+  "md": 1,
+  "lg": 1,
+  "xl": 1,
+  "2xl": 1,
+  "3xl": 1
 };
 
 const computedSizes = computeSizes(mergeBreakpoints(standaloneSizes, sizeModifiers));
@@ -51,36 +50,38 @@ const widths: number[] = (widthsOverride ?? DEFAULT_IMAGE_SIZES).filter(s => s <
 const maxOptimizedWidth = widths[widths.length - 1];
 const maxOptimizedHeight = maxOptimizedWidth * image.height / image.width;
 
-const paddingTop = `${maxOptimizedHeight / maxOptimizedWidth * 100}%`;
+const paddingTop = `min(${maxOptimizedHeight / maxOptimizedWidth * 100}% , ${height})`;
+const styleObject: JSX.CSSProperties = { ...style, maxHeight: height };
 ---
-<div data-name={name} style={style}
-     class:list={["relative w-full max-h-[80vh]", containerStyles]}
+<div data-name={name} style={styleObject}
+     class:list={["relative size-full ", height, clazz]}
 >
-    <div style={{paddingTop}} class="">
-        <Image
-                format="avif"
-                class:list={['top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 absolute z-20 max-h-[80vh] object-fit', clazz]}
-                quality="med"
-                loading={loading}
-                widths={widths}
-                sizes={sizes ?? computedSizes}
-                data-pswp-width={maxOptimizedWidth}
-                data-pswp-height={maxOptimizedHeight}
-                src={image}
-                alt={alt}
-                {...other}
-        />
+  <div style={{paddingTop}} >
+    <Image
+      format="avif"
+      style={{ maxHeight: height }}
+      class:list={["top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 absolute z-20  object-fit", clazz]}
+      quality="med"
+      loading={loading}
+      widths={widths}
+      sizes={sizes ?? computedSizes}
+      data-pswp-width={maxOptimizedWidth}
+      data-pswp-height={maxOptimizedHeight}
+      src={image}
+      alt={alt}
+      {...other}
+    />
 
-        {bg &&
-                <Image data-bg class="absolute inset-0 -z-10 size-full object-cover blur-3xl"
-                       src={image}
-                       quality="low"
-                       widths={[10]}
-                       loading="lazy"
-                       sizes="10px"
-                       alt={alt}
-                       format="avif"
-                />}
+    {bg &&
+      <Image data-bg class="absolute inset-0 -z-10 size-full object-cover blur-3xl"
+             src={image}
+             quality="low"
+             widths={[10]}
+             loading="lazy"
+             sizes="10px"
+             alt={alt}
+             format="avif"
+      />}
 
-    </div>
+  </div>
 </div>

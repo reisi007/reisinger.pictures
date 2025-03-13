@@ -24,6 +24,6 @@ const galleryBreakpoints: Omit<BreakPoints<number>, 'default'> = {
     'gap-y-8 xl:grid-cols-2 xl:gap-x-4': className === undefined,
 }, className]}>
     {images.map(image =>
-            <ResponsiveImage name={image} sizeModifiers={mergeBreakpoints(galleryBreakpoints, breakpoints)}/>)}
+            <ResponsiveImage name={image} sizeModifiers={mergeBreakpoints(galleryBreakpoints, breakpoints)} />)}
 </section>
 <Photoswipe/>
