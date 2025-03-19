@@ -12,7 +12,7 @@ export enum MonthEnum {
     November,
     December
 }
-export interface MonthRange {
+export type MonthRange = {
     from: MonthEnum,
     to: MonthEnum
 }

@@ -6,14 +6,14 @@ export enum Visibility {
     PROD_ONLY,
 }
 
-export interface MenueItem {
+export type MenueItem = {
     href: string,
     name: string,
     visibility?: Visibility,
 
 }
 
-export interface SubMenu {
+export type SubMenu = {
     name: string,
     baseHref: string,
     items: MenueItem[],

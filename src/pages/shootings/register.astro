@@ -1,0 +1,12 @@
+---
+import { RegisterForShooting } from "../../solidjs/shooting/RegisterForShooting";
+import MinimalPage from "../../layouts/pages/MinimalPage.astro";
+import BaseHead from "../../layouts/BaseHead.astro";
+
+const title = "Anmeldung Fotoshooting";
+---
+<MinimalPage>
+  <BaseHead title={title}></BaseHead>
+  <h1>{title}</h1>
+  <RegisterForShooting client:load></RegisterForShooting>
+</MinimalPage>
