@@ -1,1 +1,0 @@
-export type LoginForm = { email: string, otp?: string }

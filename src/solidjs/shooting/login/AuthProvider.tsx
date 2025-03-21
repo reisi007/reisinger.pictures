@@ -1,8 +1,8 @@
 import { createContext, createEffect, createSignal, type JSX, onCleanup, onMount, useContext } from "solid-js";
 import { type OTPResponse, type RecordAuthResponse } from "pocketbase";
-import { usePocketbase } from "./PocketbaseProvider";
+import { usePocketbase } from "./PocketbaseProvider.tsx";
 
-export const AuthContext = createContext<{
+const AuthContext = createContext<{
   isLoggedIn: () => boolean
   isPending: () => boolean
   requestOtp: (email: string) => Promise<OTPResponse | undefined>

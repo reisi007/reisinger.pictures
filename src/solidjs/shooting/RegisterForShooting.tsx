@@ -1,12 +1,19 @@
-import { AuthProvider } from "./AuthProvider";
-import { PocketBaseProvider } from "./PocketbaseProvider";
-import { App } from "./App";
+import { AuthProvider } from "./login/AuthProvider.tsx";
+import { PocketBaseProvider } from "./login/PocketbaseProvider.tsx";
 
-export function RegisterForShooting() {
-  return <PocketBaseProvider url="https://backend.reisinger.pictures">
-    <AuthProvider>
-      <App />
-    </AuthProvider>
-  </PocketBaseProvider>;
+export function RegisterForShooting({ prefixes }: { prefixes: string[] }) {
+  return <>
+    <h3>Für Shooting anmelden</h3>
+    <PocketBaseProvider url="https://backend.reisinger.pictures">
+      <AuthProvider>
+        <RegisterForm prefixes={prefixes} />
+      </AuthProvider>
+    </PocketBaseProvider>
+  </>;
+}
 
+function RegisterForm({ prefixes }: { prefixes: string[] }) {
+  return <>
+    Form
+  </>;
 }

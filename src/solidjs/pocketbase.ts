@@ -1,6 +1,6 @@
 import { type RecordFullListOptions } from "pocketbase";
 import { type Accessor, createMemo, createResource, type ResourceReturn } from "solid-js";
-import { usePocketbase } from "./shooting/PocketbaseProvider";
+import { usePocketbase } from "./shooting/login/PocketbaseProvider.tsx";
 
 
 export function createPocketbaseResource<R>(collectionIdOrName: string, options?: RecordFullListOptions): [data: ResourceReturn<R[]>[0], isReady: Accessor<boolean>, ResourceReturn<R[]>[1]] {
@@ -12,9 +12,4 @@ export function createPocketbaseResource<R>(collectionIdOrName: string, options?
   const ready = createMemo(() => data.state === "ready");
 
   return [data, ready, first];
-}
-
-export enum ShootingEnvironment {
-  INDOOR = "Indoor",
-  OUTDOOR = "Outdoor"
 }

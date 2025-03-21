@@ -1,7 +1,7 @@
 import Client from "pocketbase";
 import { createContext, type JSX, useContext } from "solid-js";
 
-export const PocketBaseContext = createContext<Client>();
+const PocketBaseContext = createContext<Client>();
 
 type PocketBaseProviderProps = {
   url: string;
