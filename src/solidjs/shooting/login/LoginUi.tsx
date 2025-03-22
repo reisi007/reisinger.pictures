@@ -1,8 +1,8 @@
 import { createSignal, type Setter, type Signal } from "solid-js";
-import { createForm, email, required, type SubmitHandler } from "@modular-forms/solid";
-import type { LoginForm } from "./types.ts";
-import { StyledInput } from "../form/Input.tsx";
-import { useAuth } from "./AuthProvider.tsx";
+import { LoginSchema } from "./LoginSchemas";
+import { StyledInput } from "../form/Input";
+import { useAuth } from "./AuthProvider";
+import { createStyledForm, type StyledSubmitHandler } from "../form/Form";
 
 export function useLogin(otp: Signal<string | undefined>, setError: Setter<string | undefined>) {
   const [otpId, setOtpId] = otp;
@@ -26,34 +26,17 @@ export function useLogin(otp: Signal<string | undefined>, setError: Setter<strin
 }
 
 export function LoginUi() {
-  const [, { Form, Field }] = createForm<LoginForm>();
+  const { Form, Field } = createStyledForm(LoginSchema);
   const [error, setError] = createSignal<string | undefined>(undefined);
   const otp = createSignal<string | undefined>(undefined);
   const [otpId] = otp;
   const login = useLogin(otp, setError);
 
-  const handleLogin: SubmitHandler<LoginForm> = ({ email, otp }) => login(email, otp);
+  const handleLogin: StyledSubmitHandler<typeof LoginSchema> = ({ email, otp }) => login(email, otp);
   return <Form onSubmit={handleLogin}>
-    <Field name="email"
-           validate={[
-             required("Bitte trag deine E-Mail Adresse ein"),
-             email("Die E-Mail Adresse scheint nicht valide zu sein")
-           ]}
-    >
-      {(store, props) =>
-        <StyledInput store={store} props={props} label="E-Mail:" type="email" required={true} />
-      }
-    </Field>
+    <StyledInput field={Field} name="email" label="E-Mail:" type="email" required={true} />
     {otpId() !== undefined && <>
-      <Field name="otp"
-             validate={[
-               required("Bitte gib deinen One Time Passwort ein")
-             ]}
-      >
-        {(store, props) =>
-          <StyledInput store={store} props={props} label="Bitte gib den One Time Passwort, das du per E-Mail bekommen hast, hier ein:" />
-        }
-      </Field>
+      <StyledInput field={Field} name="otp" label="Bitte gib den One Time Passwort, das du per E-Mail bekommen hast, hier ein:" />
     </>}
     {error() && <small class="text-error my-2"> {error()}</small>}
     <div class="my-2 flex justify-evenly">

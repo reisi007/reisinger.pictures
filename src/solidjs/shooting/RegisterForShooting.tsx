@@ -1,5 +1,9 @@
-import { AuthProvider } from "./login/AuthProvider.tsx";
-import { PocketBaseProvider } from "./login/PocketbaseProvider.tsx";
+import { AuthProvider } from "./login/AuthProvider";
+import { PocketBaseProvider } from "./login/PocketbaseProvider";
+
+const RegisterForm = ({ prefixes }: { prefixes: string[] }) => <>
+  Form
+</>;
 
 export function RegisterForShooting({ prefixes }: { prefixes: string[] }) {
   return <>
@@ -9,11 +13,5 @@ export function RegisterForShooting({ prefixes }: { prefixes: string[] }) {
         <RegisterForm prefixes={prefixes} />
       </AuthProvider>
     </PocketBaseProvider>
-  </>;
-}
-
-function RegisterForm({ prefixes }: { prefixes: string[] }) {
-  return <>
-    Form
   </>;
 }
