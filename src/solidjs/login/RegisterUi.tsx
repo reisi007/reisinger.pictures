@@ -4,20 +4,19 @@ import { RegisterSchema } from "./LoginSchemas";
 import { StyledInput } from "../form/Input";
 import { usePocketbase } from "./PocketbaseProvider";
 import { createStyledForm, type StyledSubmitHandler } from "../form/Form";
-import { useAuth } from "./AuthProvider.tsx";
+import { useLogin } from "./LoginUi";
 
 export function useRegister(otp: Signal<string | undefined>, setError: Setter<string | undefined>) {
   const client = usePocketbase();
-  const { requestOtp, validateOtp } = useAuth();
   const [otpId, setOtpId] = otp;
+  const login = useLogin(otp, setError);
   return (data: InferInput<typeof RegisterSchema>) => {
-    const { email,  ...other } = data;
+    const { email, ...other } = data;
     setError(undefined);
     const tokenId = otpId();
-    const otp =  "otp" in data ? data.otp : undefined;
-    console.log("register", { email, otp, tokenId });
+    const otp = "otp" in data ? data.otp : undefined;
     if (tokenId !== undefined && otp !== undefined) {
-      return validateOtp(tokenId, otp);
+      return login(data);
     }
 
     return client.collection("users").create({
@@ -26,11 +25,7 @@ export function useRegister(otp: Signal<string | undefined>, setError: Setter<st
       password: "123456789",
       passwordConfirm: "123456789",
       ...other
-    }).then(async () => {
-      const result = await requestOtp(email);
-      setOtpId(result?.otpId);
-      setError(undefined);
-    }, () => {
+    }).then(async () => login(data), () => {
       setOtpId(undefined);
       setError("Der User kann nicht angelegt werden oder existiert bereits");
     });

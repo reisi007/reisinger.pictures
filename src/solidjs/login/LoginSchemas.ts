@@ -12,14 +12,14 @@ const LoginSecondStep = object({
   )
 });
 export const LoginSchema = union([
-  LoginSecondStep,
   object({
     email: pipe(
       string(),
       nonEmpty("Bitte trag deine E-Mail Adresse ein"),
       email("Die E-Mail Adresse scheint nicht valide zu sein")
     )
-  })
+  }),
+  LoginSecondStep
 ]);
 
 const RegisterFirstStep = object({

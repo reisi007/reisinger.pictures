@@ -4,7 +4,7 @@ import { useAuth } from "../login/AuthProvider";
 import { createStyledForm, type StyledSubmitHandler } from "../form/Form";
 import { StyledTextarea } from "../form/Textarea";
 import { usePocketbase } from "../login/PocketbaseProvider";
-import { LoginIsland } from "../login/Island.tsx";
+import { LoginIsland } from "../login/Island";
 
 const RegisterSchema = object({
   text: pipe(

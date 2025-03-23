@@ -1,6 +1,6 @@
 import { createContext, createEffect, createSignal, type JSX, onCleanup, onMount, useContext } from "solid-js";
 import { type OTPResponse, type RecordAuthResponse } from "pocketbase";
-import { usePocketbase } from "./PocketbaseProvider.tsx";
+import { usePocketbase } from "./PocketbaseProvider";
 
 const AuthContext = createContext<{
   isLoggedIn: () => boolean
@@ -61,10 +61,6 @@ export const AuthProvider = (props: { children: JSX.Element }) => {
 
   function isPending() {
     return userId() === UNSET_VALUE;
-  }
-
-  function isLoggedIn() {
-
   }
 
   return (

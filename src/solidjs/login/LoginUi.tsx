@@ -1,4 +1,5 @@
 import { createSignal, type Setter, type Signal } from "solid-js";
+import type { InferInput } from "valibot";
 import { LoginSchema } from "./LoginSchemas";
 import { StyledInput } from "../form/Input";
 import { useAuth } from "./AuthProvider";
@@ -7,8 +8,9 @@ import { createStyledForm, type StyledSubmitHandler } from "../form/Form";
 export function useLogin(otp: Signal<string | undefined>, setError: Setter<string | undefined>) {
   const [otpId, setOtpId] = otp;
   const { requestOtp, validateOtp } = useAuth();
-  return async (email: string, otp?: string) => {
-    console.log("login", { email, otp, otpId: otpId() });
+  return async (data: InferInput<typeof LoginSchema>) => {
+    const { email } = data;
+    const otp = "otp" in data ? data.otp : undefined;
     setError(undefined);
     const tokenId = otpId();
     if (tokenId !== undefined && otp !== undefined) {
@@ -30,7 +32,7 @@ export function LoginUi() {
   const [otpId] = otp;
   const login = useLogin(otp, setError);
 
-  const handleLogin: StyledSubmitHandler<typeof LoginSchema> = ({ email, otp }) => login(email, otp);
+  const handleLogin: StyledSubmitHandler<typeof LoginSchema> = (data) => login(data);
   return <Form onSubmit={handleLogin}>
     <StyledInput field={Field} name="email" label="E-Mail:" type="email" required={true} />
     {otpId() !== undefined && <>
