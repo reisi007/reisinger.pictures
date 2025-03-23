@@ -1,14 +1,14 @@
 import type { FieldElementProps, FieldPath, FieldValues, SubmitHandler } from "@modular-forms/solid";
 import { createForm, valiForm } from "@modular-forms/solid";
-import type { BaseSchema, BaseSchemaAsync, GenericSchema, GenericSchemaAsync, InferInput } from "valibot";
+import type { BaseSchema, BaseSchemaAsync, InferInput } from "valibot";
 import type { JSX } from "solid-js";
 
-export function createStyledForm<TSchema extends AnySchema>(schema: GenericSchema | GenericSchemaAsync) {
+export function createStyledForm<TSchema extends AnySchema>(schema: TSchema) {
   type TFieldValues = InferInput<TSchema>
   const form = createForm<TFieldValues>({
     validate: valiForm(schema)
   });
-  return form[1];
+  return { ...form[1], store: form[0] };
 }
 
 export type ModularField<TFieldName extends FieldPath<TFieldValues>, TFieldValues extends FieldValues> = (props: {
