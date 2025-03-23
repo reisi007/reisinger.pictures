@@ -40,8 +40,7 @@ export function LoginUi() {
     </>}
     {error() && <small class="text-error my-2"> {error()}</small>}
     <div class="my-2 flex justify-evenly">
-      <button data-action="login" type="submit">Anmelden</button>
-      <button data-action="register" type="submit">Registrieren</button>
+      <button type="submit">Anmelden</button>
     </div>
   </Form>;
 }

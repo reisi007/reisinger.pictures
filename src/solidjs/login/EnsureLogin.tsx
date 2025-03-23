@@ -1,9 +1,9 @@
 import type { JSX } from "solid-js";
-import { useAuth } from "./login/AuthProvider";
-import { LoginOrRegister } from "./login/LoginOrRegister";
+import { useAuth } from "./AuthProvider";
+import { LoginOrRegister } from "./LoginOrRegister";
 
 export function EnsureLogin({ children }: JSX.ElementChildrenAttribute) {
-  const { isLoggedIn, isPending,logout } = useAuth();
+  const { isLoggedIn, isPending, logout } = useAuth();
   return <> {!isPending() && <>
     {!isLoggedIn() && <LoginOrRegister />}
     {isLoggedIn() && <>

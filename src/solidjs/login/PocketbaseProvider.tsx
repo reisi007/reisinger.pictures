@@ -8,10 +8,20 @@ type PocketBaseProviderProps = {
   children: JSX.Element;
 }
 
-export const PocketBaseProvider = (props: PocketBaseProviderProps) => <PocketBaseContext.Provider value={new Client(props.url)}>{props.children}</PocketBaseContext.Provider>;
+export const PocketBaseProvider = (props: PocketBaseProviderProps) => (
+  <PocketBaseContext.Provider
+    value={new Client(props.url)}>{props.children}
+  </PocketBaseContext.Provider>
+);
 
 export const usePocketbase = () => {
   const context = useContext(PocketBaseContext);
   if (!context) throw new Error("usePocketbase must be used within a <PocketBaseProvider>");
   return context;
+};
+
+export const useCurrentUserId = () => {
+  const id = usePocketbase().authStore.record?.id;
+  if (id === undefined) throw Error("useCurrentUserId must be used within a <PocketBaseProvider>");
+  return id;
 };
