@@ -3,35 +3,38 @@ import type { InferInput } from "valibot";
 import { RegisterSchema } from "./LoginSchemas";
 import { StyledInput } from "../form/Input";
 import { usePocketbase } from "./PocketbaseProvider";
-import { useLogin } from "./LoginUi";
 import { createStyledForm, type StyledSubmitHandler } from "../form/Form";
+import { useAuth } from "./AuthProvider.tsx";
 
 export function useRegister(otp: Signal<string | undefined>, setError: Setter<string | undefined>) {
-  const [, setOtpId] = otp;
   const client = usePocketbase();
-  const login = useLogin(otp, setError);
-
+  const { requestOtp, validateOtp } = useAuth();
+  const [otpId, setOtpId] = otp;
   return (data: InferInput<typeof RegisterSchema>) => {
-    const { email, otp, ...other } = data;
+    const { email,  ...other } = data;
     setError(undefined);
-    setOtpId(undefined);
-    if (otp !== undefined) {
-      login(email, otp);
-      return;
+    const tokenId = otpId();
+    const otp =  "otp" in data ? data.otp : undefined;
+    console.log("register", { email, otp, tokenId });
+    if (tokenId !== undefined && otp !== undefined) {
+      return validateOtp(tokenId, otp);
     }
 
-    client.collection("users").create({
+    return client.collection("users").create({
       username: email,
       email,
       password: "123456789",
       passwordConfirm: "123456789",
       ...other
-    }).then(() => {
-      login(email, undefined);
+    }).then(async () => {
+      const result = await requestOtp(email);
+      setOtpId(result?.otpId);
+      setError(undefined);
     }, () => {
       setOtpId(undefined);
       setError("Der User kann nicht angelegt werden oder existiert bereits");
     });
+
   };
 }
 
@@ -42,25 +45,22 @@ export function RegisterUi() {
   const [otpId] = otp;
   const register = useRegister(otp, setError);
 
-  const firstStep = otpId() === undefined;
-  const secondStep = !firstStep;
-
   const handleLogin: StyledSubmitHandler<typeof RegisterSchema> = (data) => register(data);
 
+  const firstStep = () => otpId() === undefined;
   return <Form onSubmit={handleLogin}>
     <StyledInput field={Field} name="email" label="E-Mail:" type="email" required={true} />
-    {firstStep && <>
+    {firstStep() && <>
       <StyledInput field={Field} name="firstName" label="Vorname" required={true} />
       <StyledInput field={Field} name="lastName" label="Nachname" required={true} />
       <StyledInput field={Field} name="tel" label="Telefonnummer (+43 123 456 789)" type="tel" required={true} />
     </>}
-    {secondStep && <>
+    {!firstStep() && <>
       <StyledInput field={Field} name="otp" label="Bitte gib den One Time Passwort, das du per E-Mail bekommen hast, hier ein:" />
     </>}
     {error() && <small class="text-error my-2"> {error()}</small>}
     <div class="my-2 flex justify-evenly">
-      {firstStep && <button type="submit">Registrieren</button>}
-      {secondStep && <button type="submit">Anmelden</button>}
+      <button type="submit">Registrieren</button>
     </div>
   </Form>;
 }

@@ -7,20 +7,18 @@ import { createStyledForm, type StyledSubmitHandler } from "../form/Form";
 export function useLogin(otp: Signal<string | undefined>, setError: Setter<string | undefined>) {
   const [otpId, setOtpId] = otp;
   const { requestOtp, validateOtp } = useAuth();
-  return (email: string, otp?: string) => {
+  return async (email: string, otp?: string) => {
+    console.log("login", { email, otp, otpId: otpId() });
     setError(undefined);
     const tokenId = otpId();
     if (tokenId !== undefined && otp !== undefined) {
-      validateOtp(tokenId, otp)
-        .then(() => {
-          setError(undefined);
-          setOtpId(undefined);
-        });
+      await validateOtp(tokenId, otp);
+      setError(undefined);
+      setOtpId(undefined);
     } else {
-      requestOtp(email).then((data) => {
-        setError(undefined);
-        setOtpId(data?.otpId);
-      });
+      const data = await requestOtp(email);
+      setError(undefined);
+      setOtpId(data?.otpId);
     }
   };
 }

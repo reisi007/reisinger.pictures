@@ -2,14 +2,15 @@ import type { JSX } from "solid-js";
 import { useAuth } from "./AuthProvider";
 import { LoginOrRegister } from "./LoginOrRegister";
 
-export function EnsureLogin({ children }: JSX.ElementChildrenAttribute) {
+export function EnsureLogin(props: { children: JSX.Element }) {
   const { isLoggedIn, isPending, logout } = useAuth();
-  return <> {!isPending() && <>
+
+  return <div class="border p-4 rounded-xl"> {!isPending() && <>
     {!isLoggedIn() && <LoginOrRegister />}
-    {isLoggedIn() && <>
-      <button onClick={logout}>Abmelden</button>
-      {children}
-    </>}
+    {isLoggedIn() && <div class="flex flex-col">
+      <button class="mb-4 p-2 text-sm self-end" onClick={logout}>Abmelden</button>
+      {props.children}
+    </div>}
   </>}
-  </>;
+  </div>;
 }

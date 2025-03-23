@@ -1,37 +1,35 @@
 import { createContext, createEffect, createSignal, type JSX, onCleanup, onMount, useContext } from "solid-js";
 import { type OTPResponse, type RecordAuthResponse } from "pocketbase";
-import { usePocketbase } from "./PocketbaseProvider";
+import { usePocketbase } from "./PocketbaseProvider.tsx";
 
 const AuthContext = createContext<{
   isLoggedIn: () => boolean
   isPending: () => boolean
+  userId: () => string | undefined,
   requestOtp: (email: string) => Promise<OTPResponse | undefined>
   validateOtp: (otpId: string, otp: string) => Promise<RecordAuthResponse | undefined>
   logout: () => void
 }>();
 
-type AuthProviderProps = {
-  children: JSX.Element;
-}
 
 const UNSET_VALUE = "===UNSET===";
 
-export const AuthProvider = (props: AuthProviderProps) => {
+export const AuthProvider = (props: { children: JSX.Element }) => {
   const client = usePocketbase();
 
   if (!client) {
     throw new Error("useAuth must be used within a <PocketBaseProvider>");
   }
 
-  const [token, setToken] = createSignal<string | null>(UNSET_VALUE);
+  const [userId, setUserId] = createSignal<string | undefined>(UNSET_VALUE);
 
   createEffect(() => {
     const unsubscribe = client.authStore.onChange(auth => {
       if (auth) {
-        setToken(auth);
         sessionStorage.setItem("auth", client.authStore.exportToCookie());
+        setUserId(client.authStore.record?.id);
       } else {
-        setToken(null);
+        setUserId(undefined);
         sessionStorage.removeItem("auth");
       }
     });
@@ -40,9 +38,12 @@ export const AuthProvider = (props: AuthProviderProps) => {
 
   onMount(() => {
     const authData = sessionStorage.getItem("auth");
-    if (authData !== null)
+    if (authData !== null) {
       client.authStore.loadFromCookie(authData);
-    else setToken(null);
+      setUserId(client.authStore.record?.id);
+    } else {
+      setUserId(undefined);
+    }
   });
 
 
@@ -58,10 +59,19 @@ export const AuthProvider = (props: AuthProviderProps) => {
     return client?.collection("users")?.authWithOTP(otpId, otp);
   }
 
+  function isPending() {
+    return userId() === UNSET_VALUE;
+  }
+
+  function isLoggedIn() {
+
+  }
+
   return (
     <AuthContext.Provider value={{
-      isLoggedIn: () => token() !== null,
-      isPending: () => token() === UNSET_VALUE,
+      isLoggedIn: () => !isPending() && userId() !== undefined,
+      userId: () => isPending() ? undefined : userId(),
+      isPending,
       logout,
       requestOtp,
       validateOtp
@@ -73,6 +83,6 @@ export const AuthProvider = (props: AuthProviderProps) => {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("usePocketbase must be used within a <AuthProvider>");
+  if (context === undefined) throw new Error("useAuth must be used within a <PocketBaseProvider>");
   return context;
 }

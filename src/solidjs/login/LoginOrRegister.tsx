@@ -3,8 +3,10 @@ import { RegisterUi } from "./RegisterUi";
 
 export function LoginOrRegister() {
   return <>
-    <h2 class="mt-4">Registrieren oder anmelden</h2>
+    <h4 class="mt-4 -mb-2">Anmelden</h4>
     <LoginUi />
+
+    <h4 class="mt-4 -mb-2">Registrieren</h4>
     <RegisterUi />
   </>;
 }
