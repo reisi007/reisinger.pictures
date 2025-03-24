@@ -32,7 +32,7 @@ const { Content } = await render();
 
   <FeaturedTestimonials slug={slug} categoryTestimonials={categoryReviews} featuredTestimonials={reviewSlugs} />
 
-  <RegisterForShooting prefixes={[slug]} client:load></RegisterForShooting>
+  <RegisterForShooting client:load></RegisterForShooting>
 
   <div slot="postContact">
     <Gallery folder={`${slug}`} sorted={images} />
