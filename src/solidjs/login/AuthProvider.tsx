@@ -26,18 +26,18 @@ export const AuthProvider = (props: { children: JSX.Element }) => {
   createEffect(() => {
     const unsubscribe = client.authStore.onChange(auth => {
       if (auth) {
-        sessionStorage.setItem("auth", client.authStore.exportToCookie());
+        localStorage.setItem("auth", client.authStore.exportToCookie());
         setUserId(client.authStore.record?.id);
       } else {
         setUserId(undefined);
-        sessionStorage.removeItem("auth");
+        localStorage.removeItem("auth");
       }
     });
     onCleanup(() => unsubscribe());
   });
 
   onMount(() => {
-    const authData = sessionStorage.getItem("auth");
+    const authData = localStorage.getItem("auth");
     if (authData !== null) {
       client.authStore.loadFromCookie(authData);
       setUserId(client.authStore.record?.id);

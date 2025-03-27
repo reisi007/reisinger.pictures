@@ -7,7 +7,6 @@ import Gallery from "../../layouts/Gallery.astro";
 import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import { groupBy } from "../../utils";
 import Breadcrumbs from "../../layouts/Breadcrumbs.astro";
-import { RegisterForShooting } from "../../solidjs/shooting/RegisterForShooting";
 
 interface Props {
   entry: CollectionEntry<"areas">,
@@ -31,8 +30,6 @@ const { Content } = await render();
   <Content />
 
   <FeaturedTestimonials slug={slug} categoryTestimonials={categoryReviews} featuredTestimonials={reviewSlugs} />
-
-  <RegisterForShooting client:load></RegisterForShooting>
 
   <div slot="postContact">
     <Gallery folder={`${slug}`} sorted={images} />

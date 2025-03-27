@@ -1,0 +1,1 @@
+export type ShootingIdeenResponse = { id: string, title: string, description: string }
