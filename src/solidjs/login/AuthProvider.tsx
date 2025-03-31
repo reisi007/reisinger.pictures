@@ -1,6 +1,6 @@
 import { createContext, createEffect, createSignal, type JSX, onCleanup, onMount, useContext } from "solid-js";
 import { type OTPResponse, type RecordAuthResponse } from "pocketbase";
-import { usePocketbase } from "./PocketbaseProvider";
+import { createPocketbase } from "./PocketbaseProvider.tsx";
 
 const AuthContext = createContext<{
   isLoggedIn: () => boolean
@@ -15,7 +15,7 @@ const AuthContext = createContext<{
 const UNSET_VALUE = "===UNSET===";
 
 export const AuthProvider = (props: { children: JSX.Element }) => {
-  const client = usePocketbase();
+  const client = createPocketbase();
 
   if (!client) {
     throw new Error("useAuth must be used within a <PocketBaseProvider>");

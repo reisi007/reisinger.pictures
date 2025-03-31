@@ -62,12 +62,11 @@
           "error",
           "ignorePackages",
           {
-            "js": "never",
-            "jsx": "never",
-            "ts": "never",
-            "tsx": "never"
+            "ts": "always",
+            "tsx": "always"
           }
         ],
+        "prefer-destructuring": "off",
         "@typescript-eslint/no-shadow": "off",
         "@typescript-eslint/consistent-type-definitions": [
           "error",

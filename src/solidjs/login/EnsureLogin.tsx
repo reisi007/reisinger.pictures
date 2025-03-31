@@ -1,6 +1,6 @@
 import type { JSX } from "solid-js";
-import { useAuth } from "./AuthProvider";
-import { LoginOrRegister } from "./LoginOrRegister";
+import { useAuth } from "./AuthProvider.tsx";
+import { LoginOrRegister } from "./LoginOrRegister.tsx";
 
 export function EnsureLogin(props: { children: JSX.Element }) {
   const { isLoggedIn, isPending, logout } = useAuth();

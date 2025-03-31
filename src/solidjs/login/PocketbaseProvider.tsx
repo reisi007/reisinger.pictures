@@ -11,7 +11,7 @@ export const PocketBaseProvider = (props: {
   </PocketBaseContext.Provider>
 );
 
-export const usePocketbase = () => {
+export const createPocketbase = () => {
   const context = useContext(PocketBaseContext);
   if (context === undefined) throw new Error("usePocketbase must be used within a PocketBaseProvider");
   return context;

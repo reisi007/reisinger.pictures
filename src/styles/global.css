@@ -34,6 +34,7 @@
 }
 
 @layer base {
+
     [class*="mdi--"], [class*="material-symbols--"] {
         @apply iconify;
     }
@@ -86,7 +87,7 @@
         @apply p-4 my-4 bg-gray-50 border-l-4 border-gray-300 leading-relaxed italic
     }
 
-    p, .p {
+    p:not(.tailwind-disabled), .p {
         @apply p-4
     }
 
@@ -113,6 +114,7 @@
     td {
         @apply p-6 border text-center border-gray-500;
     }
+
 }
 
 @layer components {

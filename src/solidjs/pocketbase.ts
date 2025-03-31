@@ -1,13 +1,15 @@
 import { type RecordFullListOptions } from "pocketbase";
-import { type Accessor, createMemo, createResource, type ResourceReturn } from "solid-js";
-import { usePocketbase } from "./login/PocketbaseProvider";
+import { createResource, type ResourceReturn } from "solid-js";
+import { createPocketbase } from "./login/PocketbaseProvider.tsx";
 
-export function createPocketbaseResource<R>(collectionIdOrName: string, options?: RecordFullListOptions): [data: ResourceReturn<R[]>[0], isReady: Accessor<boolean>, ResourceReturn<R[]>[1]] {
-  const client = usePocketbase();
-  const [data, first] = createResource<R[]>(
+export function createPocketbaseResource<R>(collectionIdOrName: string, options?: RecordFullListOptions): ResourceReturn<R[]> {
+  const client = createPocketbase();
+  return createResource<R[]>(
     () => client.collection<R>(collectionIdOrName).getFullList(options)
   );
+}
 
-  const ready = createMemo(() => data.state === "ready");
-  return [data, ready, first];
+export function createFileUrl(record: { id: string }, filename: string, options?: { thumb: string }) {
+  const client = createPocketbase();
+  return client.files.getURL(record, filename, options);
 }

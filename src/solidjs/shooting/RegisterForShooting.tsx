@@ -1,13 +1,13 @@
 import { nonEmpty, object, pipe, string } from "valibot";
 import { createSignal } from "solid-js";
 import { reset } from "@modular-forms/solid";
-import { useAuth } from "../login/AuthProvider";
-import { createStyledForm, type StyledSubmitHandler } from "../form/Form";
-import { StyledTextarea } from "../form/Textarea";
-import { usePocketbase } from "../login/PocketbaseProvider";
-import { LoginIsland } from "../login/Island";
-import { createPocketbaseResource } from "../pocketbase";
-import type { ShootingIdeenResponse } from "../pocketbase.types";
+import { useAuth } from "../login/AuthProvider.tsx";
+import { createStyledForm, type StyledSubmitHandler } from "../form/Form.tsx";
+import { StyledTextarea } from "../form/Textarea.tsx";
+import { createPocketbase } from "../login/PocketbaseProvider.tsx";
+import { LoginIsland } from "../login/Island.tsx";
+import { createPocketbaseResource } from "../pocketbase.ts";
+import type { ShootingIdeenResponse } from "../pocketbase.types.ts";
 
 const RegisterSchema = object({
   text: pipe(
@@ -19,7 +19,7 @@ const RegisterSchema = object({
 const RegisterForm = () => {
   const { Field, Form, store } = createStyledForm(RegisterSchema);
 
-  const client = usePocketbase();
+  const client = createPocketbase();
   const [error, setError] = createSignal<string | undefined>(undefined);
   const { userId } = useAuth();
 
@@ -40,10 +40,10 @@ const RegisterForm = () => {
 };
 
 const ShootingIdeen = () => {
-  const [data, ready] = createPocketbaseResource<ShootingIdeenResponse>("shooting_ideen", {
+  const [data] = createPocketbaseResource<ShootingIdeenResponse>("shooting_ideen", {
     fields: "id,title,description"
   });
-  return <>{ready() && <ul>
+  return <>{data() !== undefined && <ul>
     {data()?.map(e => <li><b class="mr-1">{e.title}:</b> {e.description}</li>)}
   </ul>}</>;
 };

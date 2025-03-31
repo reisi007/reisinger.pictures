@@ -1,13 +1,13 @@
 import { createSignal, type Setter, type Signal } from "solid-js";
 import type { InferInput } from "valibot";
-import { RegisterSchema } from "./LoginSchemas";
-import { StyledInput } from "../form/Input";
-import { usePocketbase } from "./PocketbaseProvider";
-import { createStyledForm, type StyledSubmitHandler } from "../form/Form";
-import { useLogin } from "./LoginUi";
+import { RegisterSchema } from "./LoginSchemas.ts";
+import { StyledInput } from "../form/Input.tsx";
+import { createPocketbase } from "./PocketbaseProvider.tsx";
+import { createStyledForm, type StyledSubmitHandler } from "../form/Form.tsx";
+import { useLogin } from "./LoginUi.tsx";
 
 export function useRegister(otp: Signal<string | undefined>, setError: Setter<string | undefined>) {
-  const client = usePocketbase();
+  const client = createPocketbase();
   const [otpId, setOtpId] = otp;
   const login = useLogin(otp, setError);
   return (data: InferInput<typeof RegisterSchema>) => {
@@ -22,6 +22,7 @@ export function useRegister(otp: Signal<string | undefined>, setError: Setter<st
     return client.collection("users").create({
       username: email,
       email,
+      emailVisibility: true,
       password: "123456789",
       passwordConfirm: "123456789",
       ...other

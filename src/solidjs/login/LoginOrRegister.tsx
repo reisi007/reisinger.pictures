@@ -1,5 +1,5 @@
-import { LoginUi } from "./LoginUi";
-import { RegisterUi } from "./RegisterUi";
+import { LoginUi } from "./LoginUi.tsx";
+import { RegisterUi } from "./RegisterUi.tsx";
 
 export function LoginOrRegister() {
   return <>

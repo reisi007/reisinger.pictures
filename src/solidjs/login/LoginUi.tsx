@@ -1,9 +1,9 @@
 import { createSignal, type Setter, type Signal } from "solid-js";
 import type { InferInput } from "valibot";
-import { LoginSchema } from "./LoginSchemas";
-import { StyledInput } from "../form/Input";
-import { useAuth } from "./AuthProvider";
-import { createStyledForm, type StyledSubmitHandler } from "../form/Form";
+import { LoginSchema } from "./LoginSchemas.ts";
+import { StyledInput } from "../form/Input.tsx";
+import { useAuth } from "./AuthProvider.tsx";
+import { createStyledForm, type StyledSubmitHandler } from "../form/Form.tsx";
 
 export function useLogin(otp: Signal<string | undefined>, setError: Setter<string | undefined>) {
   const [otpId, setOtpId] = otp;
