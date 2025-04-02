@@ -1,9 +1,7 @@
 type BreakpointValues = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 type BreakpointValuesIncludeDefault = 'default' | BreakpointValues
 
-export type BreakPoints<T> = {
-  [key in BreakpointValuesIncludeDefault]: T;
-};
+export type BreakPoints<T> = Record<BreakpointValuesIncludeDefault, T>;
 
 export type NumericBreakpoints
   = Omit<BreakPoints<number>, 'default'>;
