@@ -1,44 +1,20 @@
 ---
-import HeaderLink from './HeaderLink.astro';
-import HeaderSubMenu from './HeaderSubMenu.astro';
-import {isSubMenu, type Menue, type MenueItem, type SubMenu, Visibility} from './Menue';
+import HeaderLink from "./HeaderLink.astro";
+import { type Menue } from "./Menue";
 
 interface Props {
-    menue: Menue,
-    baseHref?: string
+  menue: Menue,
+  baseHref?: string
 }
 
-const isDevMode = import.meta.env.MODE === 'development';
-
-function renderMenu(entry: MenueItem | SubMenu) {
-    const visibility = entry.visibility ?? Visibility.ALWAYS;
-    return visibility === Visibility.ALWAYS ||
-        (visibility === Visibility.DEV_ONLY && isDevMode) ||
-        (visibility === Visibility.PROD_ONLY && !isDevMode);
-}
-
-const {menue: rootMenue, baseHref: rootBaseHref = ''} = Astro.props;
+const { menue, baseHref: rootBaseHref = "" } = Astro.props;
 ---
-{rootMenue && rootMenue.length > 0 && rootMenue.map( entry => {
-    if (!renderMenu(entry))         {
-        return(
-        <></>
-            )
-        }
+{menue.map( entry => {
+  // Normal menu
+  const {href,name} = entry;
 
-    if (isSubMenu(entry)){
-        // Menu with submenu
-        const {baseHref,name,items} = entry;
-
-        return    (
-        <HeaderSubMenu name={name} href={baseHref}>
-            <Astro.self baseHref={baseHref} menue={items}></Astro.self>
-        </HeaderSubMenu>
-            );
-        }
-    // Normal menu
-         const {href,name} = entry;
-
-    return(
-    <HeaderLink href={rootBaseHref + href}>{name}</HeaderLink>);
-    })}
+  return (
+  <HeaderLink href={rootBaseHref + href}>{name}</HeaderLink>
+    );
+  }  )
+  }

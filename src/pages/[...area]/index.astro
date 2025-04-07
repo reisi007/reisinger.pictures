@@ -30,8 +30,5 @@ const { Content } = await render();
   <Content />
 
   <FeaturedTestimonials slug={slug} categoryTestimonials={categoryReviews} featuredTestimonials={reviewSlugs} />
-
-  <div slot="postContact">
-    <Gallery folder={`${slug}`} sorted={images} />
-  </div>
+  <Gallery folder={`${slug}`} sorted={images} />
 </MinimalPage>

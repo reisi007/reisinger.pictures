@@ -1,110 +1,48 @@
 ---
-import {SITE_TITLE} from '../consts';
-import type {Menue, MenueItem} from './Menue';
-import {Visibility} from './Menue';
-import RenderMenu from './Menue.astro';
-import ResponsiveImage from './ResponsiveImage.astro';
-import {ResponsiveImageLoading} from "./ResponsiveImageLoading";
+import { SITE_TITLE } from "../consts";
+import type { Menue } from "./Menue";
+import RenderMenu from "./Menue.astro";
+import ResponsiveImage from "./ResponsiveImage.astro";
+import { ResponsiveImageLoading } from "./ResponsiveImageLoading";
 
-const reviewItem: MenueItem = {name: 'Bewertungen', href: '/testimonials'};
-const overview: MenueItem = {name: 'Übersicht', href: ''};
-const images: MenueItem = {name: 'Bilder', href: '/images', visibility: Visibility.DEV_ONLY};
-const menuItems = [overview, images, reviewItem];
 
 const menue: Menue = [
-    {
-        name: 'Beauty',
-        baseHref: '/beauty',
-        items: menuItems,
-    }, {
-        name: 'Akt',
-        baseHref: '/akt',
-        items: [
-            ...menuItems,
-            {
-                name: 'Ablauf',
-                href: '/ablauf',
-            },
-        ],
-    }, {
-        name: 'Couples',
-        baseHref: '/couples',
-        items: menuItems,
-    }, {
-        name: 'Sport',
-        baseHref: '/sport',
-        items: [
-            menuItems[0],
-            menuItems[1],
-            {
-                name: 'ACSL',
-                href: '/acsl',
-            }, {
-                name: 'ACSL Bilder',
-                href: '/acsl/images',
-                visibility: Visibility.DEV_ONLY,
-            }, {
-                name: 'Black Wings Linz',
-                href: '/bwl',
-            }, {
-                name: 'BWL Bilder',
-                href: '/bwl/images',
-                visibility: Visibility.DEV_ONLY,
-            }, {
-                name: 'LASK',
-                href: '/lask',
-            }, {
-                name: 'LASK Bilder',
-                href: '/lask/images',
-                visibility: Visibility.DEV_ONLY,
-            }, {
-                name: 'ÖFB',
-                href: '/oefb',
-            }, {
-                name: 'ÖFB Bilder',
-                href: '/oefb/images',
-                visibility: Visibility.DEV_ONLY,
-            }, {
-                name: 'SteelVolleys Linz',
-                href: '/steelvolleys',
-            }, {
-                name: 'SteelVolleys Linz Bilder',
-                href: '/steelvolleys/images',
-                visibility: Visibility.DEV_ONLY,
-            }, {
-                name: 'SteelWings Linz',
-                href: '/swl',
-            }, {
-                name: 'SWL Bilder',
-                href: '/swl/images',
-                visibility: Visibility.DEV_ONLY,
-            },
-        ],
-    }, {
-        name: 'Tanz',
-        baseHref: '/tanz',
-        items: menuItems,
-    },
-    {
-        name: 'Videos',
-        href: '/videos/tanz',
-    }, {
-        name: 'Einblicke',
-        href: '/einblicke',
-    },{
-        name: 'Dein Fotoshooting',
-        href: '/shootings',
-    }
+  {
+    name: "Beauty",
+    href: "/beauty"
+  }, {
+    name: "Akt",
+    href: "/akt"
+  }, {
+    name: "Couples",
+    href: "/couples"
+  }, {
+    name: "Sport",
+    href: "/sport"
+  }, {
+    name: "Tanz",
+    href: "/tanz"
+  },
+  {
+    name: "Videos",
+    href: "/videos/tanz"
+  }, {
+    name: "Einblicke",
+    href: "/einblicke"
+  }, {
+    name: "Dein Fotoshooting",
+    href: "/shootings"
+  }
 ];
 ---
 <header class="container pb-6">
-    <nav class="grid sm:grid-cols-2">
-        <a href="/" class="mx-auto my-4 size-32">
-            <ResponsiveImage class="rounded-full" widths={[128]} name="logo" bg={false}
-                             alt={SITE_TITLE} loading={ResponsiveImageLoading.EAGER}></ResponsiveImage>
-        </a>
-        <div class="flex flex-wrap items-start justify-center sm:items-center">
-            <RenderMenu menue={menue}/>
-        </div>
-    </nav>
+  <nav class="grid sm:grid-cols-2">
+    <a href="/" class="mx-auto my-4 size-32">
+      <ResponsiveImage class="rounded-full" widths={[128]} name="logo" bg={false}
+                       alt={SITE_TITLE} loading={ResponsiveImageLoading.EAGER}></ResponsiveImage>
+    </a>
+    <div class="flex flex-wrap items-start justify-center sm:items-center">
+      <RenderMenu menue={menue} />
+    </div>
+  </nav>
 </header>
