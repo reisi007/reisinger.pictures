@@ -1,27 +1,89 @@
 ---
 import { SITE_TITLE } from "../consts";
-import type { Menue } from "./Menue";
-import RenderMenu from "./Menue.astro";
+import { isSubMenu, type Menue, type MenueItem, type SubMenu, Visibility } from "./Menue";
+import { Astronav, MenuItems, MenuIcon, Dropdown, DropdownItems, OpenIcon, CloseIcon } from "astro-navbar";
 import ResponsiveImage from "./ResponsiveImage.astro";
 import { ResponsiveImageLoading } from "./ResponsiveImageLoading";
+import HeaderLink from "./HeaderLink.astro";
 
+const reviewItem: MenueItem = { name: "Bewertungen", href: "/testimonials" };
+const overview: MenueItem = { name: "Übersicht", href: "" };
+const images: MenueItem = { name: "Bilder", href: "/images", visibility: Visibility.DEV_ONLY };
+const menuItems = [overview, images, reviewItem];
 
 const menue: Menue = [
   {
     name: "Beauty",
-    href: "/beauty"
+    baseHref: "/beauty",
+    items: menuItems
   }, {
     name: "Akt",
-    href: "/akt"
+    baseHref: "/akt",
+    items: [
+      ...menuItems,
+      {
+        name: "Ablauf",
+        href: "/ablauf"
+      }
+    ]
   }, {
     name: "Couples",
-    href: "/couples"
+    baseHref: "/couples",
+    items: menuItems
   }, {
     name: "Sport",
-    href: "/sport"
+    baseHref: "/sport",
+    items: [
+      menuItems[0],
+      menuItems[1],
+      {
+        name: "ACSL",
+        href: "/acsl"
+      }, {
+        name: "ACSL Bilder",
+        href: "/acsl/images",
+        visibility: Visibility.DEV_ONLY
+      }, {
+        name: "Black Wings Linz",
+        href: "/bwl"
+      }, {
+        name: "BWL Bilder",
+        href: "/bwl/images",
+        visibility: Visibility.DEV_ONLY
+      }, {
+        name: "LASK",
+        href: "/lask"
+      }, {
+        name: "LASK Bilder",
+        href: "/lask/images",
+        visibility: Visibility.DEV_ONLY
+      }, {
+        name: "ÖFB",
+        href: "/oefb"
+      }, {
+        name: "ÖFB Bilder",
+        href: "/oefb/images",
+        visibility: Visibility.DEV_ONLY
+      }, {
+        name: "SteelVolleys Linz",
+        href: "/steelvolleys"
+      }, {
+        name: "SteelVolleys Linz Bilder",
+        href: "/steelvolleys/images",
+        visibility: Visibility.DEV_ONLY
+      }, {
+        name: "SteelWings Linz",
+        href: "/swl"
+      }, {
+        name: "SWL Bilder",
+        href: "/swl/images",
+        visibility: Visibility.DEV_ONLY
+      }
+    ]
   }, {
     name: "Tanz",
-    href: "/tanz"
+    baseHref: "/tanz",
+    items: menuItems
   },
   {
     name: "Videos",
@@ -34,15 +96,76 @@ const menue: Menue = [
     href: "/shootings"
   }
 ];
+
+const isDevMode = import.meta.env.MODE === "development";
+
+function renderMenu(entry: MenueItem | SubMenu) {
+  const visibility = entry.visibility ?? Visibility.ALWAYS;
+  return visibility === Visibility.ALWAYS ||
+    (visibility === Visibility.DEV_ONLY && isDevMode) ||
+    (visibility === Visibility.PROD_ONLY && !isDevMode);
+}
 ---
 <header class="container pb-6">
+  <Astronav closeOnClick>
+    <div class="flex flex-col items-center w-full lg:w-auto justify-between">
+      <a href="/" class="mx-auto my-4 size-32">
+        <ResponsiveImage class="rounded-full" widths={[128]} name="logo" bg={false}
+                         alt={SITE_TITLE} loading={ResponsiveImageLoading.EAGER}></ResponsiveImage>
+      </a>
+      <div class="block lg:hidden">
+        <MenuIcon class="w-4 h-4 text-gray-800">
+          <OpenIcon><span class="mdi--menu text-2xl"></span></OpenIcon>
+          <CloseIcon><span class="mdi--menu-close text-2xl"></span></CloseIcon>
+        </MenuIcon>
+      </div>
+    </div>
+    <MenuItems class="hidden  lg:flex">
+      <div class="flex flex-col w-full lg:flex-row lg:gap-5 lg:justify-center items-center">
+        {
+          menue
+            .filter(e => renderMenu(e))
+            .map(item => {
+              if (isSubMenu(item)) {
+                return (
+                  <Dropdown class="group">
+                    <button class="flex items-center">
+                      <HeaderLink class="inline-flex items-center" href={item.baseHref}>
+                        {item.name}
+                        <span class="ml-1.5 mdi--menu-down group-open:rotate-180"></span>
+                      </HeaderLink>
+
+                    </button>
+                    <DropdownItems class="relative z-50">
+                      <div
+                        class="lg:absolute bg-white border shadow rounded top-2 px-2 py-6 flex flex-col gap-y-6">
+                        {item.items
+                          .filter(e => renderMenu(e))
+                          .map(e => (
+                            <a href={item.baseHref + e.href}>
+                              <HeaderLink href={e.href}>{e.name}</HeaderLink>
+                            </a>))}
+
+                      </div>
+                    </DropdownItems>
+                  </Dropdown>
+                );
+              } else
+                return (
+                  <a href={item.href} class="my-4">
+                    <HeaderLink href={item.href}>{item.name}</HeaderLink>
+                  </a>
+                );
+            })
+        }
+      </div>
+    </MenuItems>
+
+  </Astronav>
   <nav class="grid sm:grid-cols-2">
-    <a href="/" class="mx-auto my-4 size-32">
-      <ResponsiveImage class="rounded-full" widths={[128]} name="logo" bg={false}
-                       alt={SITE_TITLE} loading={ResponsiveImageLoading.EAGER}></ResponsiveImage>
-    </a>
+
     <div class="flex flex-wrap items-start justify-center sm:items-center">
-      <RenderMenu menue={menue} />
+
     </div>
   </nav>
 </header>
