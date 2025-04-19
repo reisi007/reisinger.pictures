@@ -50,14 +50,6 @@ const testimonials = defineCollection({
   })
 });
 
-const sport = defineCollection({
-  type: "content",
-  schema: z.object({
-    name: z.string(),
-    images: z.array(z.string())
-  })
-});
-
 const areas = defineCollection({
   type: "content",
   schema: z.object({
@@ -106,7 +98,6 @@ export const collections = {
   einblickeOverviews,
   shootingCards,
   simple,
-  sport,
   testimonials,
   videos
 };
