@@ -18,7 +18,7 @@ const {
   displayBorder = true,
   isLargeImageFullSize = false
 } = Astro.props;
-const largeImageClasses = isLargeImageFullSize ? "" : "32rem";
+const largeImageClasses = isLargeImageFullSize ? undefined : "32rem";
 const video: CollectionEntry<"videos"> | undefined = videoReference === undefined ? undefined : (await getEntry("videos", videoReference.id));
 const baseName = `testimonials/${slug}`;
 const smallName = `${baseName}/small`;
