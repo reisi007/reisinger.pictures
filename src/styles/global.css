@@ -79,6 +79,9 @@
         @apply object-contain;
     }
 
+    a, button, .button {
+        @apply cursor-pointer;
+    }
 
     li p {
         @apply inline pl-0
@@ -95,7 +98,6 @@
     td {
         @apply p-6 border text-center border-gray-500;
     }
-
 }
 
 @layer components {
@@ -107,10 +109,6 @@
 
         a:not(.black):not(.button) {
             @apply text-primary visited:text-primary-alternative font-logo underline hover:text-primary-accent;
-        }
-
-        a {
-            @apply cursor-pointer;
         }
 
         ul {
@@ -126,7 +124,7 @@
         }
 
         button, .button {
-            @apply cursor-pointer transition-colors duration-150 focus:ring disabled:opacity-75 disabled:bg-gray-600 disabled:text-gray-200;
+            @apply transition-colors duration-150 focus:ring disabled:opacity-75 disabled:bg-gray-600 disabled:text-gray-200;
         }
 
         button.primary, .button.primary {
@@ -154,13 +152,5 @@
 @layer utilities {
     .container {
         @apply w-full px-2 sm:px-0 sm:mx-auto sm:w-[540px] md:w-[720px] lg:w-[960px] xl:w-[1140px] 2xl:w-[86vw];
-    }
-
-    [data-type="dialog"] {
-        @apply hidden;
-
-        &[data-state="visible"] {
-            @apply flex;
-        }
     }
 }
