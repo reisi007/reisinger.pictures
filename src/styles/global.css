@@ -136,7 +136,7 @@
         }
     }
 
-    input, textarea {
+    input, textarea, select {
         @apply rounded-lg p-2 my-1 w-full border border-gray-600 inline-block;
     }
 

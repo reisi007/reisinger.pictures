@@ -23,7 +23,7 @@
     "@modular-forms/solid": "^0.25.1",
     "@playwright/test": "^1.53.1",
     "@solidjs/router": "^0.15.3",
-    "astro": "^5.10.1",
+    "astro": "^5.11.0",
     "astro-navbar": "^2.4.0",
     "dayjs": "^1.11.13",
     "photoswipe": "^5.4.4",
