@@ -1,0 +1,20 @@
+---
+import ResponsiveImage from "./ResponsiveImage.astro";
+import { getImageImportByName } from "../images/Images";
+interface Props {
+  name: string;
+  titel?: string;
+}
+const { name, titel } = Astro.props;
+const image = (await getImageImportByName(name)).default;
+const ratio = `${image.width}/${image.height}`;
+---
+<div class="relative rounded-2xl my-4 bg-gradient-to-r from-primary-alternative to-black">
+  <div class="mx-auto px-8" style={{
+    maxHeight: "80vh",
+    aspectRatio: ratio
+  }}>
+    <ResponsiveImage name={name} bg={false} />
+  </div>
+  <p class="text-center text-white font-light text-3xl pb-16">{titel}</p>
+</div>

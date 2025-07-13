@@ -1,5 +1,7 @@
 @import "tailwindcss" source("../../src");
 
+@source "../../src/content";
+
 @theme {
     --width-unlimited: 9999px;
     --font-logo: sans-serif;
@@ -19,6 +21,10 @@
 
     --color-gold: #EBE357;
     --color-error: #B12A2A;
+
+
+    --color-wood-a0: oklab(72.1% 0.029 0.075);
+    --color-wood-a10: oklab(43.5% 0.054 0.063);
 
     --color-brand-whatsapp: #25D366;
     --color-brand-facebook: #3B5998;
