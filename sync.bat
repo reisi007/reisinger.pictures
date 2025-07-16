@@ -1,1 +1,1 @@
-rclone sync E:\astro-reisinger.pictures\dist reisinger.pictures:httpdocs --transfers=64 --track-renames
+rclone sync E:\astro-reisinger.pictures\dist reisinger.pictures:httpdocs --transfers=64 --track-renames --progress
