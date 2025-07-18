@@ -22,10 +22,6 @@
     --color-gold: #EBE357;
     --color-error: #B12A2A;
 
-
-    --color-wood-a0: oklab(72.1% 0.029 0.075);
-    --color-wood-a10: oklab(43.5% 0.054 0.063);
-
     --color-brand-whatsapp: #25D366;
     --color-brand-facebook: #3B5998;
     --color-brand-instagram: #E1306C;
@@ -108,13 +104,17 @@
 
 @layer components {
     html, body {
-        @apply h-full
+        @apply h-full bg-primary text-onPrimary print:bg-white print:text-black;
+    }
+
+    select option {
+        @apply text-black;
     }
 
     .body {
 
         a:not(.black):not(.button) {
-            @apply text-primary visited:text-primary-alternative font-logo underline hover:text-primary-accent;
+            @apply print:text-primary text-onSecondary-alternative visited:text-primary-alternative font-logo underline hover:text-primary-accent;
         }
 
         ul {
@@ -134,7 +134,7 @@
         }
 
         button.primary, .button.primary {
-            @apply bg-primary text-onPrimary py-4 px-3 text-xl text-center border rounded-xl border-primary-alternative hover:bg-primary-alternative;
+            @apply bg-primary text-onPrimary py-4 px-3 text-xl text-center border rounded-xl print:border-primary-alternative border-white hover:bg-primary-alternative;
         }
 
         button:not(.primary):not(.styled):not(.pswp__button), .button:not(.primary):not(.styled):not(.pswp__button) {
@@ -143,7 +143,7 @@
     }
 
     input, textarea, select {
-        @apply rounded-lg p-2 my-1 w-full border border-gray-600 inline-block;
+        @apply rounded-lg p-2 my-1 w-full border print:border-gray-600 border-white/70 inline-block;
     }
 
     .required span::after {

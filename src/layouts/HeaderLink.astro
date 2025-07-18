@@ -9,9 +9,9 @@ const { pathname } = Astro.url;
 const subpath = pathname.match(/[^/]+/g);
 const isActive = href === pathname || href === `/${subpath?.[0]}`;
 ---
-<span class:list={[className, "black px-2 py-4 border-b-4 text-nowrap", {
+<span class:list={["inline-flex items-center black px-2 pb-4 border-b-4 text-nowrap", {
   "font-medium border-b-primary-alternative": isActive,
   "border-b-transparent": !isActive
-}]} {...props}>
+}, className]} {...props}>
   <slot />
 </span>

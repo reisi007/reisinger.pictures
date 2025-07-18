@@ -29,7 +29,7 @@ const { Content } = await render();
 ---
 
 <div data-slug={import.meta.env.DEV ? slug : undefined}
-     class:list={["relative flex flex-col h-full overflow-hidden", { "border-2 rounded-lg border-primary p-4": displayBorder }]}>
+     class:list={["relative flex flex-col h-full overflow-hidden", { "border-2 rounded-lg border-onPrimery p-4": displayBorder }]}>
   {source !== undefined && <a href={source} target="_blank" class:list={["absolute right-6 text-3xl", {
     "mdi--google": source.indexOf("g.co") > 0 || source.indexOf("goo.gl") > 0,
     "mdi--facebook": source.indexOf("facebook.com") > 0

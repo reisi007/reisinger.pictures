@@ -71,17 +71,5 @@ const styleObject: JSX.CSSProperties = { ...style, maxHeight: height };
       alt={alt}
       {...other}
     />
-
-    {bg &&
-      <Image data-bg class="absolute inset-0 -z-10 size-full object-cover blur-3xl"
-             src={image}
-             quality="low"
-             widths={[10]}
-             loading="lazy"
-             sizes="10px"
-             alt={alt}
-             format="avif"
-      />}
-
   </div>
 </div>

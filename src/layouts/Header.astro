@@ -110,7 +110,7 @@ function renderMenu(entry: MenueItem | SubMenu) {
   <Astronav closeOnClick>
     <div class="flex flex-col items-center w-full justify-between">
       <a href="/" class="mx-auto my-4 size-32">
-        <ResponsiveImage class="rounded-full" widths={[128]} name="logo" bg={false}
+        <ResponsiveImage class="rounded-full border-white border-2" widths={[128]} name="logo" bg={false}
                          alt={SITE_TITLE} loading={ResponsiveImageLoading.EAGER}></ResponsiveImage>
       </a>
       <div class="block md:hidden">
@@ -121,7 +121,7 @@ function renderMenu(entry: MenueItem | SubMenu) {
       </div>
     </div>
     <MenuItems class="hidden  md:flex">
-      <div class="flex flex-col w-full md:flex-row md:gap-5 md:justify-center items-center">
+      <div class="flex flex-col w-full md:flex-row gap-y-4 my-4 md:gap-5 md:justify-center items-center">
         {
           menue
             .filter(e => renderMenu(e))
@@ -129,21 +129,20 @@ function renderMenu(entry: MenueItem | SubMenu) {
               if (isSubMenu(item)) {
                 return (
                   <Dropdown class="group flex flex-col items-center">
-                    <button class="flex items-center">
-                      <HeaderLink class="inline-flex items-center" href={item.baseHref}>
+                    <button>
+                      <HeaderLink href={item.baseHref}>
                         {item.name}
                         <span class="ml-1.5 mdi--menu-down group-open:rotate-180"></span>
                       </HeaderLink>
-
                     </button>
                     <DropdownItems class="relative z-50">
                       <div
-                        class="md:absolute md:bg-white border-y md:border md:rounded md:top-2 px-2 py-6 flex flex-col items-center md:-translate-x-1/2 gap-y-6">
+                        class="md:absolute md:bg-onSecondary-alternative md:text-secondary-alternative border-y md:border md:rounded  flex flex-col items-center py-2 md:-translate-x-1/2">
                         {item.items
                           .filter(e => renderMenu(e))
                           .map(e => (
-                            <a href={item.baseHref + e.href}>
-                              <HeaderLink href={e.href}>{e.name}</HeaderLink>
+                            <a class="my-3" href={item.baseHref + e.href}>
+                              <HeaderLink class="!pb-0" href={e.href}>{e.name}</HeaderLink>
                             </a>))}
 
                       </div>
@@ -152,7 +151,7 @@ function renderMenu(entry: MenueItem | SubMenu) {
                 );
               } else
                 return (
-                  <a href={item.href} class="my-4">
+                  <a href={item.href} >
                     <HeaderLink href={item.href}>{item.name}</HeaderLink>
                   </a>
                 );
