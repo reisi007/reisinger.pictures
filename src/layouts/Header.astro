@@ -120,7 +120,7 @@ function renderMenu(entry: MenueItem | SubMenu) {
         </MenuIcon>
       </div>
     </div>
-    <MenuItems class="hidden  md:flex">
+    <MenuItems class="hidden bg-primary-alternative pt-4 pb-2 rounded-xl md:flex">
       <div class="flex flex-col w-full md:flex-row gap-y-4 my-4 md:gap-5 md:justify-center items-center">
         {
           menue
@@ -137,7 +137,7 @@ function renderMenu(entry: MenueItem | SubMenu) {
                     </button>
                     <DropdownItems class="relative z-50">
                       <div
-                        class="md:absolute md:bg-onSecondary-alternative md:text-secondary-alternative border-y md:border md:rounded  flex flex-col items-center py-2 md:-translate-x-1/2">
+                        class="md:absolute md:bg-onSecondary-alternative md:text-secondary-alternative border-y md:border md:rounded  flex flex-col items-center py-2 md:mt-2 md:-translate-x-1/2">
                         {item.items
                           .filter(e => renderMenu(e))
                           .map(e => (

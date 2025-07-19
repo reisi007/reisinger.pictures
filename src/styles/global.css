@@ -108,7 +108,11 @@
     }
 
     select option {
-        @apply text-black;
+        @apply bg-primary-alternative text-onPrimary-accent;
+    }
+
+    select option[disabled] {
+        @apply text-primary-alternative bg-gray-200 cursor-not-allowed;
     }
 
     .body {
