@@ -2,7 +2,6 @@
 import { type DataCollectionKey, getCollection } from "astro:content";
 
 const astroUrl = Astro.url;
-const sharedUrl = encodeURIComponent(astroUrl.toString());
 const { pathname } = astroUrl;
 const url = pathname.replace(/\/$/, "");
 

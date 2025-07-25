@@ -21,7 +21,7 @@ const menue: Menue = [
     items: [
       ...menuItems,
       {
-        name: "Ablauf",
+        name: "Shooting Leitfaden",
         href: "/ablauf"
       }
     ]
@@ -136,7 +136,7 @@ function renderMenu(entry: MenueItem | SubMenu) {
                     </button>
                     <DropdownItems class="relative z-50">
                       <div
-                        class="md:absolute md:bg-onSecondary-alternative md:text-secondary-alternative border-y md:border md:rounded  flex flex-col items-center py-2 md:mt-2 md:-translate-x-1/2">
+                        class="flex flex-col items-center border-y py-2 md:absolute md:mt-2 md:px-4 md:-translate-x-1/2 md:rounded md:border md:bg-onSecondary-alternative md:text-secondary-alternative">
                         {item.items
                           .filter(e => renderMenu(e))
                           .map(e => (
