@@ -53,9 +53,9 @@ const paddingTop = `min(${maxOptimizedHeight / maxOptimizedWidth * 100}% , ${hei
 const styleObject: JSX.CSSProperties = { ...style, maxHeight: height };
 ---
 <div data-name={name} style={styleObject}
-     class:list={["relative size-full ", height, clazz]}
+     class:list={["relative size-full ", clazz]}
 >
-  <div style={{paddingTop}} >
+  <div style={{ paddingTop }}>
     <Image
       format="avif"
       style={{ maxHeight: height }}
