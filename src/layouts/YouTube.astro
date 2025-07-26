@@ -1,15 +1,13 @@
 ---
-import type {CollectionEntry} from 'astro:content';
+import { OrientationEnum } from "../content/config";
 
-import {OrientationEnum} from '../content/config';
+interface Props { class?: string, ytid: string, title: string, orientation: OrientationEnum }
 
-type Props = CollectionEntry<'videos'>['data'] & { class?: string }
-
-const {ytid, title, orientation, class: clazz} = Astro.props;
+const { ytid, title, orientation, class: clazz } = Astro.props;
 ---
-<iframe loading="lazy" class:list={[clazz, 'size-full rounded-t-2xl max-h-[60vh]', {
-  'aspect-9/16': orientation === OrientationEnum.Vertical,
-  'aspect-video': orientation === OrientationEnum.Horizontal,
+<iframe loading="lazy" class:list={[clazz, "size-full rounded-t-2xl max-h-[60vh]", {
+  "aspect-9/16": orientation === OrientationEnum.Vertical,
+  "aspect-video": orientation === OrientationEnum.Horizontal
 }]} src={`https://www.youtube-nocookie.com/embed/${ytid}`}
         title={title}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

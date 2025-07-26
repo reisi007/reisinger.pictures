@@ -7,27 +7,28 @@ import Breadcrumbs from "../../../layouts/Breadcrumbs.astro";
 import MinimalPage from "../../../layouts/pages/MinimalPage.astro";
 
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
-  const overviewPages = (await getCollection("einblickeOverviews")).map(e => e.data);
+  const overviewPages = (await getCollection("einblickeOverviews"));
 
   const posts = (await getCollection("einblicke")).sort(
     (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
   );
 
-  return overviewPages.flatMap(({ title, slug }) => {
-    const relevantPosts = posts.filter(p => slug === "" || p.slug.startsWith(slug));
-    return paginate(relevantPosts, { pageSize: 12, params: { overview: slug }, props: { title } });
+  return overviewPages.flatMap((e) => {
+    const relevantPosts = posts.filter(p => e.slug === "/" || p.slug.startsWith(e.slug));
+    return paginate(relevantPosts, { pageSize: 12, params: { overview: e.slug }, props: {title: e.data.title, render: e.render} });
   });
 }
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
-const { page, title } = Astro.props;
+const { page, title, render,  } = Astro.props;
+const { Content } = await render();
 ---
 <MinimalPage>
   <BaseHead title={title} />
   <Breadcrumbs />
   <h1>{title}</h1>
+  <Content />
   <Einblicke page={page} />
-
 </MinimalPage>
 
 ---

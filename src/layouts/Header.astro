@@ -6,37 +6,45 @@ import { ResponsiveImageLoading } from "./ResponsiveImageLoading";
 import HeaderLink from "./HeaderLink.astro";
 
 const reviewItem: MenueItem = { name: "Bewertungen", href: "/testimonials" };
-const overview: MenueItem = { name: "Übersicht", href: "" };
 const images: MenueItem = { name: "Bilder", href: "/images", visibility: Visibility.DEV_ONLY };
-const menuItems = [overview, images, reviewItem];
+
 
 const menue: Menue = [
   {
-    name: "Beauty",
+    name: "Beauty-Fotoshooting",
     baseHref: "/beauty",
-    items: menuItems
+    items: [
+      { name: "Dein Fotoshooting", href: "" },
+      images,
+      reviewItem]
   }, {
-    name: "Akt",
+    name: "Akt-Fotoshooting",
     baseHref: "/akt",
     items: [
-      ...menuItems,
+      { name: "Alle Information", href: "" },
+      images,
+      reviewItem,
       {
         name: "Shooting Leitfaden",
         href: "/ablauf"
       }
     ]
   }, {
-    name: "Paar Shooting",
+    name: "Pärchen Fotos",
     baseHref: "/couples",
-    items: menuItems
+    items: [
+      { name: "Dein Erlebnis", href: "" },
+      images,
+      reviewItem]
+
   }, {
-    name: "Sport",
+    name: "Sport Events",
     baseHref: "/sport",
     items: [
-      menuItems[0],
-      menuItems[1],
+      { name: "Meine Sportarten", href: "" },
+      { name: "Meine Sportarten Bilder", href: "/images", visibility: Visibility.DEV_ONLY },
       {
-        name: "ACSL",
+        name: "ACSL - Austrian Collegue Sport League",
         href: "/acsl"
       }, {
         name: "ACSL Bilder",
@@ -50,14 +58,14 @@ const menue: Menue = [
         href: "/bwl/images",
         visibility: Visibility.DEV_ONLY
       }, {
-        name: "LASK",
+        name: "LASK - Linzer Allgemeiner Sportklub",
         href: "/lask"
       }, {
         name: "LASK Bilder",
         href: "/lask/images",
         visibility: Visibility.DEV_ONLY
       }, {
-        name: "ÖFB",
+        name: "ÖFB - Österreichischer Fußballbund",
         href: "/oefb"
       }, {
         name: "ÖFB Bilder",
@@ -80,19 +88,8 @@ const menue: Menue = [
       }
     ]
   }, {
-    name: "Tanz",
-    baseHref: "/tanz",
-    items: menuItems
-  },
-  {
-    name: "Videos",
-    href: "/videos/tanz"
-  }, {
-    name: "Einblicke",
+    name: "Einblicke in meine Fotoshootings",
     href: "/einblicke"
-  }, {
-    name: "Dein Fotoshooting",
-    href: "/shootings"
   }
 ];
 
@@ -115,7 +112,8 @@ function renderMenu(entry: MenueItem | SubMenu) {
       <div class="block md:hidden">
         <MenuIcon>
           <OpenIcon><span class="inline-flex items-center gap-x-2">Mehr entdecken<span class="mdi--menu text-3xl"></span></span></OpenIcon>
-          <CloseIcon><span class="inline-flex items-center gap-x-2">Menü schließen<span class="mdi--menu-close text-3xl"></span></span></CloseIcon>
+          <CloseIcon><span class="inline-flex items-center gap-x-2">Menü schließen<span class="mdi--menu-close text-3xl"></span></span>
+          </CloseIcon>
         </MenuIcon>
       </div>
     </div>
@@ -150,7 +148,7 @@ function renderMenu(entry: MenueItem | SubMenu) {
                 );
               } else
                 return (
-                  <a href={item.href} >
+                  <a href={item.href}>
                     <HeaderLink href={item.href}>{item.name}</HeaderLink>
                   </a>
                 );

@@ -1,25 +1,22 @@
 ---
-import {type CollectionEntry, getEntry} from 'astro:content';
+import {type CollectionEntry} from 'astro:content';
 
 import {tryGetImageImportByName} from '../images/Images';
 import {type NumericBreakpoints} from '../styles/Breakpoints';
 import ResponsiveImage from './ResponsiveImage.astro';
 import {type ReviewProps} from './Types';
-import YouTube from './YouTube.astro';
-
-
 
 type Props = CollectionEntry<'testimonials'> & { breakpoints?: NumericBreakpoints } & ReviewProps;
 
 const {
     slug,
-    data: {name, source, video: videoReference},
+    data: {name, source},
     render,
     breakpoints: breakPoints,
     displayLargeImage = true,
     displayBorder = true,
 } = Astro.props;
-const video: CollectionEntry<'videos'> | undefined = videoReference === undefined ? undefined : (await getEntry('videos', videoReference.id));
+
 const baseName = `testimonials/${slug}`;
 const smallName = `${baseName}/small`;
 const largeName = `${baseName}/large`;
@@ -46,12 +43,8 @@ const {Content} = await render();
                 <ResponsiveImage sizeModifiers={breakPoints} name={largeName}/>
             </div>
     }
-    {large === undefined && video !== undefined &&
-            <YouTube class="max-h-128!" {...video.data}/>
-    }
     <div class="grow basis-1"/>
     <div class="basis-1">
         <Content/>
     </div>
-
 </div>

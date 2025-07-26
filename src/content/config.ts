@@ -1,5 +1,4 @@
 import { defineCollection, reference, z } from "astro:content";
-import { file } from "astro/loaders";
 
 const einblicke = defineCollection({
   type: "content",
@@ -16,10 +15,9 @@ const einblicke = defineCollection({
 });
 
 const einblickeOverviews = defineCollection({
-  loader: file("src/content/einblickeOverviews.json"),
+  type: "content",
   schema: z.object({
-    title: z.string(),
-    slug: z.string()
+    title: z.string()
   })
 });
 
@@ -29,8 +27,7 @@ export enum ReviewType {
   Paare = "couples",
   Sport = "sport",
   Business = "business",
-  Tanz = "tanz",
-  VideoTanz = "videos/tanz"
+  Tanz = "tanz"
 }
 
 export enum OrientationEnum {
@@ -56,17 +53,6 @@ const areas = defineCollection({
     name: z.string(),
     testimonials: z.array(reference("testimonials")).optional(),
     images: z.array(z.string())
-  })
-});
-
-const videos = defineCollection({
-  type: "content",
-  schema: z.object({
-    ytid: z.string().length(11, "YouTube video ID should be 11 characters long"),
-    date: z.coerce.date(),
-    type: z.nativeEnum(ReviewType),
-    title: z.string(),
-    orientation: z.nativeEnum(OrientationEnum)
   })
 });
 
@@ -98,6 +84,5 @@ export const collections = {
   einblickeOverviews,
   shootingCards,
   simple,
-  testimonials,
-  videos
+  testimonials
 };
