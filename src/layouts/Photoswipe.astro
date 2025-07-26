@@ -6,7 +6,7 @@
 
     document.addEventListener('astro:page-load', () => {
         const lightbox = new PhotoSwipeLightbox({
-            gallery: 'section[data-gallery]',
+            gallery: 'section[data-images]',
             children: 'img:not([data-bg])',
             thumbSelector: 'img[data-bg]',
             pswpModule: () => import('photoswipe'),
