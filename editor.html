@@ -154,6 +154,7 @@
       const data = jsyaml.load(fileContent);
       if (data && (data.title === null || data.title === "" || typeof data.title === "undefined")) {
         fileNameEl.textContent = fileObj.relativePath;
+        referenceImage.alt = fileNameEl.textContent;
         titleInput.value = "";
 
         // Bild anzeigen, falls vorhanden
@@ -206,7 +207,7 @@
   }
 
   // Compress blob image to max 800px side, output Base64 for Gemini
-  async function getCompressedBase64(imgElement, mimeType = "image/jpeg", maxSide = 1024, quality = 0.5) {
+  async function getCompressedBase64(imgElement, maxSide = 1024, quality = 0.7) {
     const response = await fetch(imgElement.src);
     const blob = await response.blob();
     const img = await new Promise((resolve, reject) => {
@@ -237,34 +238,40 @@
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
     // Convert to Base64
-    const dataUrl = canvas.toDataURL(mimeType, quality);
+    const dataUrl = canvas.toDataURL("image/webp", quality);
     return dataUrl.split(",")[1];
   }
 
   // 2. Describe image using Gemini Vision API
   async function describeImageWithGemini(imgElement) {
     //   return new Promise(resolve => setTimeout(resolve, 10000)); // Uncomment this line to not call Gemini
-    const base64Content = await getCompressedBase64(imgElement, 0.5);
+    const base64Content = await getCompressedBase64(imgElement);
     try {
-      const result = await ai.models.generateContent({
+      const content = {
         model: "gemini-2.5-flash",
         contents: [{
           inlineData: {
-            mimeType: "image/jpeg",
+            mimeType: "image/webp",
             data: base64Content
           }
         },
           {
+            text: `Aus dem Pfad kann ein möglicher Kontext geschlossen werden: ${referenceImage.alt}`
+          }, {
             text:
-              "Beschreibe das Bild. Es soll als ALT Tag des Bildes verwendet werden. Gib nur die Beschreibung ohne Formatierung und keinen weiteren Text aus. Denke daran die Beschreibung zu SEO optimieren. Antworte unbedingt auf Deutsch. Denk daran, dass die Antwort nicht zu lange sein sollte."
+              "Die Black Wings Linz (BWL) sind eine Eishockey Mannschaft aus Linz und spielen in der Linz AG Eisarena. Ihre Heimdressen sind dunkel. Der LASK (ASK) ist ein Fußballverein mit hellen Dressen und spielt in der Raiffeisen Arena in Linz"
+          },
+          {
+            text:
+              "Beschreibe das Bild. Es soll als ALT Tag des Bildes verwendet werden. Gib nur die Beschreibung ohne Formatierung und keinen weiteren Text aus. Denke daran die Beschreibung zu SEO optimieren. Vermeide es unter allen umständen Stichworte zu benutzen, formuliere einen prägnanten Satz. Antworte unbedingt auf Deutsch. Denk daran, dass die Antwort nicht zu lange sein sollte. Beschreibe den Hintergrund bei Sportfotos nicht, außer es ist wichtig für den Gesamtkontext"
           }
         ]
-      });
+      };
+      const result = await ai.models.generateContent(content);
       // Extract the generated text
       console.log(result);
-      let caption = (result?.candidates[0]?.content?.parts[0]?.text).trim();
-      caption = caption.replace(/^["'\s]+|["'\s]+$/g, "");
-      return caption;
+      const caption = (result?.candidates[0]?.content?.parts[0]?.text).trim();
+      return caption.replace(/\.$/, "");
     } catch (err) {
       console.warn("Gemini Image Captioning Error:", err);
       return "Beschreibung fehlgeschlagen";
