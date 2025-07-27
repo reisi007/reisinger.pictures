@@ -1,4 +1,5 @@
 import { defineCollection, reference, z } from "astro:content";
+import { glob } from "astro/loaders";
 
 const einblicke = defineCollection({
   type: "content",
@@ -78,11 +79,19 @@ const shootingCards = defineCollection({
   })
 });
 
+const imageMetadata = defineCollection({
+  loader: glob({pattern: "**/*.yaml", base: "./src"}),
+  schema: z.object({
+    title: z.string().nullish(),
+  })
+})
+
 export const collections = {
   areas,
   einblicke,
   einblickeOverviews,
   shootingCards,
   simple,
-  testimonials
+  testimonials,
+  imageMetadata
 };

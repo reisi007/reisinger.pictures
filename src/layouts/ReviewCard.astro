@@ -18,7 +18,7 @@ const {
   isLargeImageFullSize = false
 } = Astro.props;
 const largeImageClasses = isLargeImageFullSize ? undefined : "32rem";
-const baseName = `testimonials/${slug}`;
+const baseName = `images/testimonials/${slug}`;
 const smallName = `${baseName}/small`;
 const largeName = `${baseName}/large`;
 const small = await tryGetImageImportByName(smallName);

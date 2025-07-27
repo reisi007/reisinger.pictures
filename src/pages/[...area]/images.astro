@@ -11,7 +11,7 @@ export async function getStaticPaths() {
   return (await getCollection("areas"))
     .map(entry => {
       const { slug: area, data: { images: rawImages } } = entry;
-      const images = rawImages.map((image) => `${area}/${image}`);
+      const images = rawImages.map((image) => `images/${area}/${image}`);
       return ({
         params: { area },
         props: { images, area }

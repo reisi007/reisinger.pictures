@@ -5,13 +5,14 @@ import { getImageImportByName } from "../images/Images";
 import type { NumericBreakpoints } from "../styles/Breakpoints";
 import { computeSizes, DEFAULT_IMAGE_SIZES, mergeBreakpoints } from "../styles/Breakpoints";
 import { ResponsiveImageLoading } from "./ResponsiveImageLoading";
+import { getEntry } from "astro:content";
+import type { ValidContentEntrySlug } from "astro:content";
 
 interface Props {
   name: string,
   class?: string,
   style?: JSX.CSSProperties,
   height?: string,
-  alt?: string,
   bg?: boolean,
   sizes?: string,
   widths?: number[],
@@ -21,7 +22,6 @@ interface Props {
 
 const {
   name,
-  alt = "",
   sizes,
   sizeModifiers,
   widths: widthsOverride,
@@ -42,6 +42,12 @@ const standaloneSizes: NumericBreakpoints = {
   "2xl": 1,
   "3xl": 1
 };
+
+const alt = (await getEntry("imageMetadata",name))?.data?.title ?? ""
+if (alt === "")
+  console.warn(
+    `Image "${name}" has no alt text. Please add a title to the image metadata in the content folder.`
+  )
 
 const computedSizes = computeSizes(mergeBreakpoints(standaloneSizes, sizeModifiers));
 const widths: number[] = (widthsOverride ?? DEFAULT_IMAGE_SIZES).filter(s => s <= image.width);

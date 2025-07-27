@@ -2,9 +2,6 @@ import type { ImageMetadata } from "astro";
 
 function computeKey(key: string) {
   let k = key.substring(5);
-  if (k.startsWith("images/")) {
-    k = k.substring(7);
-  }
   k = k.substring(0, k.indexOf("."));
   return k;
 }
