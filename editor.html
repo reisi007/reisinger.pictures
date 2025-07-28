@@ -283,8 +283,6 @@
         ]
       };
       const result = await ai.models.generateContent(content);
-      // Extract the generated text
-      console.log(result);
       const caption = (result?.candidates[0]?.content?.parts[0]?.text).trim();
       return caption.replace(/\.$/, "");
     } catch (err) {
