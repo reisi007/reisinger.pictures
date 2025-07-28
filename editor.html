@@ -58,6 +58,14 @@
       >
         Speichern und Nächste Datei
       </button>
+
+      <button
+        type="button"
+        id="redoDescriptionBtn"
+        class="bg-[#1a237e] hover:bg-[#3949ab] text-white py-2 px-4 rounded-md cursor-pointer text-base transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        KI-Bildbeschreibung wiederholen
+      </button>
     </form>
   </div>
 
@@ -133,6 +141,14 @@
     }
   });
 
+  // Add this after the DOM element declarations
+  const redoDescriptionBtn = document.getElementById("redoDescriptionBtn");
+
+  // Handle redo AI button click
+  redoDescriptionBtn.addEventListener("click", async () => {
+    referenceImage.onload();
+  });
+
   async function processNextFile() {
     if (filesToProcess.length === 0) {
       editorDiv.style.display = "none";
@@ -206,8 +222,7 @@
     }
   }
 
-  // Compress blob image to max 800px side, output Base64 for Gemini
-  async function getCompressedBase64(imgElement, maxSide = 1024, quality = 0.7) {
+  async function getCompressedBase64(imgElement, maxSide = 2024, quality = 0.7) {
     const response = await fetch(imgElement.src);
     const blob = await response.blob();
     const img = await new Promise((resolve, reject) => {
@@ -256,14 +271,15 @@
           }
         },
           {
-            text: `Aus dem Pfad kann ein möglicher Kontext geschlossen werden: ${referenceImage.alt}`
+            text:
+              `Aus dem Pfad des Bildes, das beschrieben werden soll kann potentiell ein möglicher Kontext geschlossen werden: ${referenceImage.alt}`
           }, {
             text:
-              "Die Black Wings Linz (BWL) sind eine Eishockey Mannschaft aus Linz und spielen in der Linz AG Eisarena. Ihre Heimdressen sind dunkel. Der LASK (ASK) ist ein Fußballverein mit hellen Dressen und spielt in der Raiffeisen Arena in Linz"
+              "Die Black Wings Linz (BWL) sind eine Eishockey Mannschaft aus Linz und spielen in der Linz AG Eisarena. Ihre Heimdressen sind dunkel. Der LASK (ASK) ist ein Fußballverein mit hellen Dressen und spielt in der Raiffeisen Arena in Linz. Nero steht für die Nero Summer Series Upper Austria und ist eine Serie an Vorbereitungsspielen, die in der Raiffeisen Arena stattfindet"
           },
           {
             text:
-              "Beschreibe das Bild. Es soll als ALT Tag des Bildes verwendet werden. Gib nur die Beschreibung ohne Formatierung und keinen weiteren Text aus. Denke daran die Beschreibung zu SEO optimieren. Vermeide es unter allen umständen Stichworte zu benutzen, formuliere einen prägnanten Satz. Antworte unbedingt auf Deutsch. Denk daran, dass die Antwort nicht zu lange sein sollte. Beschreibe den Hintergrund bei Sportfotos nicht, außer es ist wichtig für den Gesamtkontext"
+              "Beschreibe das Bild. Es soll als ALT Tag des Bildes verwendet werden. Gib nur die Beschreibung ohne Formatierung und keinen weiteren Text aus. Denke daran die Beschreibung zu SEO optimieren. Vermeide es unter allen umständen Stichworte zu benutzen. Antworte unbedingt auf Deutsch. Denk daran, dass die Antwort nicht zu lange sein sollte, eher ein Satz und nicht zwei sein soll. Erwähne nicht den Rasen in einem Stadion als Teil der Beschreibung, außer wenn der Rasen ein wichtiger Teil des Bildes ist."
           }
         ]
       };
@@ -273,8 +289,11 @@
       const caption = (result?.candidates[0]?.content?.parts[0]?.text).trim();
       return caption.replace(/\.$/, "");
     } catch (err) {
+      if (err.status === 429) {
+        return { type: "error", message: "Gemini API Rate Limit Exceeded" };
+      }
       console.warn("Gemini Image Captioning Error:", err);
-      return "Beschreibung fehlgeschlagen";
+      return { type: "error", message: "Beschreibung fehlgeschlagen" };
     }
   }
 
@@ -282,18 +301,20 @@
   referenceImage.onload = async () => {
     // Show progress
     autoDescribeProgress.classList.remove("hidden");
+    redoDescriptionBtn.disabled = true;
 
     try {
       const caption = await describeImageWithGemini(referenceImage);
-      if (caption && caption !== "Beschreibung fehlgeschlagen") {
-        titleInput.value = caption;
+      if (caption?.type === "error") {
+        titleInput.placeholder = caption.message;
       } else {
-        titleInput.placeholder = "Bildbeschreibung fehlgeschlagen!";
+        titleInput.value = caption;
       }
     } catch (e) {
       titleInput.placeholder = "Fehler bei automatischer Beschreibung.";
     }
     autoDescribeProgress.classList.add("hidden");
+    redoDescriptionBtn.disabled = false;
   };
 </script>
 </body>
