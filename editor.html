@@ -56,7 +56,7 @@
         type="submit"
         class="bg-[#1a237e] hover:bg-[#3949ab] text-white py-2 px-4 rounded-md cursor-pointer text-base transition-colors duration-150"
       >
-        Speichern und Nächste Datei
+        Speichern und nächste Datei laden
       </button>
 
       <button
@@ -209,7 +209,6 @@
           const writable = await targetFileHandle.createWritable();
           await writable.write(newYamlContent);
           await writable.close();
-          console.log(`Datei ${fileObj.relativePath} erfolgreich gespeichert.`);
           await processNextFile();
         };
       } else {
@@ -308,6 +307,7 @@
       if (caption?.type === "error") {
         titleInput.placeholder = caption.message;
       } else {
+        titleInput.placeholder = "";
         titleInput.value = caption;
       }
     } catch (e) {
