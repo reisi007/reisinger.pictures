@@ -6,7 +6,7 @@
   <title>Metadaten Editor</title>
   <!-- Tailwind CSS CDN (for demonstration, you should use a local build in production) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
   <!-- Add to <head> -->
   <script src="editor-api-key.js"></script>
 </head>
@@ -14,6 +14,7 @@
 <div id="container" class="container mx-auto p-5 bg-white rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.1)]">
   <h1 class="text-[#1a237e] text-3xl font-bold mb-4">Metadaten Editor</h1>
   <p class="mb-4">Wähle einen Ordner aus, um alle darin enthaltenen Bilder zu überprüfen und die fehlende Titel zu ergänzen.</p>
+  <p id="progressIndicator" class="mb-4 font-semibold text-[#3949ab]"></p>
   <button
     id="selectFolderBtn"
     class="bg-[#1a237e] hover:bg-[#3949ab] text-white py-2 px-4 rounded-md cursor-pointer text-base transition-colors duration-150 mb-4"
@@ -30,7 +31,7 @@
         id="referenceImage"
         src=""
         alt="Referenzbild"
-        class="max-w-full h-auto rounded my-4 mx-auto"
+        class="max-w-full h-auto rounded my-4 mx-auto object-contain"
         style="display: none; max-height: 25%; height: 400px"
       >
 
@@ -87,8 +88,8 @@
   const titleForm = document.getElementById("titleForm");
   const titleInput = document.getElementById("titleInput");
   const referenceImage = document.getElementById("referenceImage");
-  // Get progress indicator element
   const autoDescribeProgress = document.getElementById("autoDescribeProgress");
+  const progressIndicator = document.getElementById("progressIndicator");
 
   let directoryHandle = null;
   let filesToProcess = [];
@@ -127,6 +128,17 @@
     return files;
   }
 
+  function updateProgress() {
+    // Gesamte Anzahl ist die aktuelle + die Anzahl der verbleibenden im Stack (inkl. aktuellem)
+    const total = filesToProcess.length + (editorDiv.style.display === "block" ? 1 : 0);
+    const remaining = filesToProcess.length + (editorDiv.style.display === "block" ? 1 : 0);
+    if (remaining > 0) {
+      progressIndicator.textContent = `Noch ${remaining} Bild${remaining !== 1 ? "er" : ""} zu bearbeiten`;
+    } else {
+      progressIndicator.textContent = "";
+    }
+  }
+
   selectFolderBtn.addEventListener("click", async () => {
     try {
       directoryHandle = await window.showDirectoryPicker();
@@ -134,6 +146,7 @@
       filesToProcess = await collectYamlFilesInFolder(directoryHandle);
 
       selectFolderBtn.style.display = "none";
+      updateProgress(); // Hier aufrufen
       await processNextFile();
     } catch (err) {
       console.error("Fehler beim Auswählen des Ordners:", err);
@@ -153,11 +166,13 @@
     if (filesToProcess.length === 0) {
       editorDiv.style.display = "none";
       successMessageDiv.style.display = "block";
+      updateProgress();
       return;
     }
     const fileObj = filesToProcess.shift();
     let fileHandle = fileObj.handle;
     let fileContent = "";
+    updateProgress();
 
     if (fileObj.needsCreation) {
       fileContent = "title: \"\"\n";
@@ -299,13 +314,13 @@
     // Show progress
     autoDescribeProgress.classList.remove("hidden");
     redoDescriptionBtn.disabled = true;
+    titleInput.placeholder = "";
 
     try {
       const caption = await describeImageWithGemini(referenceImage);
       if (caption?.type === "error") {
         titleInput.placeholder = caption.message;
       } else {
-        titleInput.placeholder = "";
         titleInput.value = caption;
       }
     } catch (e) {
