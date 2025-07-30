@@ -19,6 +19,6 @@ const {title} = data;
 ---
 <MinimalPage>
     <Breadcrumbs/>
-    <BaseHead title={`Einstellungen für ein ${title} Shooting`}/>
+    <BaseHead title={`Einstellungen für ein ${title} Shooting`} slot="head" />
     <ShootingCard {...Astro.props}/>
 </MinimalPage>

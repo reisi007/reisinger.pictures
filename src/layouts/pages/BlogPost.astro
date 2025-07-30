@@ -13,7 +13,7 @@ const { title, description, pubDate, updated, heroImage } = Astro.props;
 ---
 
 <MinimalPage>
-  <BaseHead title={title} description={description} />
+  <BaseHead slot="head" title={title} description={description} />
   <Breadcrumbs />
   <article>
     <section class="mx-2 flex flex-col items-center">

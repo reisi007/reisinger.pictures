@@ -20,16 +20,20 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
 
   return overviewPages.flatMap((e) => {
     const relevantPosts = posts.filter(p => e.slug === "/" || p.slug.startsWith(e.slug.substring(1)));
-    return paginate(relevantPosts, { pageSize: 12, params: { overview: e.slug }, props: { title: e.data.title, render: e.render } });
+    return paginate(relevantPosts, {
+      pageSize: 12,
+      params: { overview: e.slug },
+      props: { title: e.data.title, render: e.render, slug: e.slug }
+    });
   });
 }
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
-const { page, title, render } = Astro.props;
+const { page, title, render, slug } = Astro.props;
 const { Content } = await render();
 ---
 <MinimalPage>
-  <BaseHead title={title} noIndex={true} />
+  <BaseHead title={title} noIndex={!(slug === "/" && page.url.prev === undefined)} slot="head" />
   <Breadcrumbs />
   <h1>{title}</h1>
   <Content />

@@ -32,7 +32,7 @@ const breakpoints: NumericBreakpoints = {
 };
 ---
 <MinimalPage>
-  <BaseHead title={title} author={name} />
+  <BaseHead title={title} author={name} slot="head" />
   <Breadcrumbs />
   <ReviewCard {...props} isLargeImageFullSize={true} breakpoints={breakpoints} />
 </MinimalPage>

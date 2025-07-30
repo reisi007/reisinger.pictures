@@ -25,7 +25,7 @@ const { Content } = await render();
 ---
 <MinimalPage>
   <Breadcrumbs />
-  <BaseHead title={name}></BaseHead>
+  <BaseHead title={name} slot="head" />
   <h1>{name}</h1>
   <Content />
 

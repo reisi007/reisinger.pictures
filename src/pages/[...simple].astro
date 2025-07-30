@@ -20,7 +20,7 @@ const {Content} = await render();
 ---
 
 <MinimalPage showContact={showContact}>
-    <BaseHead title={title} description={description} noIndex={!index}/>
+    <BaseHead title={title} description={description} noIndex={!index} slot="head" />
     <Breadcrumbs/>
     <h1>{title}</h1>
     <Content/>
