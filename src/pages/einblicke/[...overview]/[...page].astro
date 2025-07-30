@@ -29,7 +29,7 @@ const { page, title, render } = Astro.props;
 const { Content } = await render();
 ---
 <MinimalPage>
-  <BaseHead title={title} />
+  <BaseHead title={title} noIndex={true} />
   <Breadcrumbs />
   <h1>{title}</h1>
   <Content />

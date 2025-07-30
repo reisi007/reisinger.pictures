@@ -57,7 +57,7 @@ const title = `${dynamicTitle} - reisinger.pictures`;
   <meta property="twitter:image" content={`${Astro.site}${image}`} />
 
   {noIndex &&
-    <meta name="robots" content="noindex">}
+    <meta name="robots" content="noindex, follow">}
 
   <link rel="canonical" href={Astro.url} />
 </head>
