@@ -1,49 +1,49 @@
 ---
-import type {InferGetStaticPropsType} from 'astro';
-import {getCollection} from 'astro:content';
+import type { InferGetStaticPropsType } from "astro";
+import { getCollection } from "astro:content";
 
-import BaseHead from '../../layouts/BaseHead.astro';
-import MinimalPage from '../../layouts/pages/MinimalPage.astro';
+import BaseHead from "../../layouts/BaseHead.astro";
+import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import { groupBy, slugToName } from "../../utils";
 import ResponsiveImage from "../../layouts/ResponsiveImage.astro";
-import {tryGetImageImportByName} from "../../images/Images";
+import { tryGetImageImportNameByPossiblyRelativeName } from "../../images/Images";
 import Breadcrumbs from "../../layouts/Breadcrumbs.astro";
 
 export async function getStaticPaths() {
-    const testimonials = await getCollection('testimonials');
+  const testimonials = await getCollection("testimonials");
 
-    const pageData = groupBy(testimonials, e => e.data.type);
+  const pageData = groupBy(testimonials, e => e.data.type);
 
-    return Object.keys(pageData).flatMap((type) => {
-        const sortedReviews = pageData[type].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-        return {params: {area: type}, props: {reviews: sortedReviews, type}};
-    });
+  return Object.keys(pageData).flatMap((type) => {
+    const sortedReviews = pageData[type].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+    return { params: { area: type }, props: { reviews: sortedReviews, type } };
+  });
 }
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
-const {type, reviews} = Astro.props as Props;
-const name = slugToName(type)
+const { type, reviews } = Astro.props as Props;
+const name = slugToName(type);
 ---
 <MinimalPage>
-    <BaseHead title={`${name} Bewertungen`} slot="head" />
-    <Breadcrumbs/>
-    <h1 class="mb-8">{name} Bewertungen</h1>
-    <div class="mx-2 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4">
-        {reviews.map(async e => {
-            const baseName = `images/testimonials/${e.slug}`;
-            const smallName = `${baseName}/small`;
-            const small = await tryGetImageImportByName(smallName);
-            return <span class="mx-auto size-32">
+  <BaseHead title={`${name} Bewertungen`} slot="head" />
+  <Breadcrumbs />
+  <h1 class="mb-8">{name} Bewertungen</h1>
+  <div class="mx-2 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4">
+    {reviews.map(async e => {
+      const baseName = `images/testimonials/${e.slug}`;
+      const smallName = `${baseName}/small`;
+      const small = tryGetImageImportNameByPossiblyRelativeName(smallName);
+      return <span class="mx-auto size-32">
                 {small && <a href={`/testimonials/${e.slug}`} aria-label={e.data.name}>
-                    <ResponsiveImage class="rounded-full" sizes="128px" widths={[128]} bg={false} name={smallName}/>
+                  <ResponsiveImage class="rounded-full" sizes="128px" widths={[128]} bg={false} name={smallName} />
                 </a>}
-                {!small && <a href={`/testimonials/${e.slug}`}
-                              class="black table-cell size-32 rounded-full border border-black bg-black text-center align-middle text-xl text-white">
-                    {e.data.name}
+        {!small && <a href={`/testimonials/${e.slug}`}
+                      class="black table-cell size-32 rounded-full border border-black bg-black text-center align-middle text-xl text-white">
+          {e.data.name}
 
-                </a>}
-            </span>
-        })}
-    </div>
+        </a>}
+            </span>;
+    })}
+  </div>
 </MinimalPage>

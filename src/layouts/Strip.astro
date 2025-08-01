@@ -1,16 +1,16 @@
 ---
-import '../styles/gallery.css';
+import "../styles/gallery.css";
 
-import {getImageImportNameByFolder} from '../images/Images';
-import ImageStrip from './ImageStrip.astro';
+import { getImageImportNameByFolder } from "../images/Images";
+import ImageStrip from "./ImageStrip.astro";
 
 interface Props {
-    folder: string,
-    sorted: string[]
+  folder: string | string[],
+  sorted: string[]
 }
 
-const {folder, sorted} = Astro.props;
-const images = getImageImportNameByFolder(folder, sorted);
+const { folder, sorted } = Astro.props;
+const images = getImageImportNameByFolder(typeof folder === "string" ? [folder] : folder, sorted);
 ---
-<ImageStrip images={images}/>
+<ImageStrip images={images} />
 

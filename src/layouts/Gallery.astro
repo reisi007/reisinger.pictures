@@ -4,7 +4,7 @@ import ImageGallery from "./ImageGallery.astro";
 import type { BreakPoints } from "../styles/Breakpoints";
 
 interface Props {
-  folder: string,
+  folder: string | string[],
   limit?: number,
   moreLink?: string,
   sorted: string[],
@@ -13,7 +13,7 @@ interface Props {
 }
 
 const { folder, limit, moreLink, sorted, className, breakpoints } = Astro.props;
-const images = getImageImportNameByFolder(folder, sorted);
+const images = getImageImportNameByFolder(typeof folder === "string" ? [folder] : folder, sorted);
 
 const showMore = moreLink !== undefined && limit !== undefined && images.length > limit;
 

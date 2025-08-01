@@ -14,29 +14,50 @@ const IMAGES: Record<string, () => Promise<{
       default: ImageMetadata
     }>("/src/**/*.{jpeg,jpg,png,gif,svg,webp}")).map(([k, v]) => [computeKey(k), v]));
 
-export function tryGetImageImportByName(name?: string) {
-  if (!name) {
+export function tryGetImageImportNameByPossiblyRelativeName(possiblyRelativeName?: string) {
+  if (!possiblyRelativeName) {
     return undefined;
   }
-  const image = IMAGES[name];
-  return image ? image() : undefined;
+  try {
+    const absoluteName = getImageImportNameByFolder([], [possiblyRelativeName])[0];
+
+    const doesImageExist = IMAGES[absoluteName] !== undefined;
+    return doesImageExist ? absoluteName : undefined;
+  } catch (e) {
+    return undefined;
+  }
 }
 
-export async function getImageImportByName(name?: string) {
-  const image = await tryGetImageImportByName(name);
-  if (!image) {
+export function tryGetImageByAbsoluteName(name?: string) {
+  if (name === undefined)
+    return undefined;
+  const image = IMAGES[name];
+  return image === undefined ? undefined : image();
+}
+
+export function getImageImportNameByPossiblyRelativeName(name?: string) {
+  const image = tryGetImageImportNameByPossiblyRelativeName(name);
+  if (image === undefined) {
     throw new Error(`"${name}" does not exist`);
   }
-
   return image;
 }
 
+const DEFAULT_FOLDER_NAMES = ["images/testimonials", "content/einblicke", "content/simple"];
 
-export function getImageImportNameByFolder(root: string, sortedImages: string[]) {
-  const folderPicture = Object.keys(IMAGES).filter(i => i.startsWith(root));
-  return sortedImages.map(rawName => {
-    const name = `${root  }/${  rawName}`;
-    return folderPicture.find(i => i === name);
-  })
-    .filter(e => e !== undefined) as string[];
+export function getImageImportNameByFolder(root: string[], imageNames: string[]): string[] {
+  return imageNames.map(name => {
+      const imageCandidate = [
+        ...DEFAULT_FOLDER_NAMES, // relative from default fdlder names
+        ...root, // absolute root folders
+        ...DEFAULT_FOLDER_NAMES.flatMap(dn => root.map(e => `${dn}/${e}`)) // relative root folders
+      ]
+        .map(e => `${e}/${name}`) // relative file name
+        .concat(name) // absolute file name
+        .find(e => IMAGES[e] !== undefined);
+      if (imageCandidate === undefined)
+        throw new Error(`Could not find image "${name}"!`);
+      return imageCandidate;
+    }
+  );
 }

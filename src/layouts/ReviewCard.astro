@@ -1,7 +1,7 @@
 ---
 import { type CollectionEntry } from "astro:content";
 
-import { tryGetImageImportByName } from "../images/Images";
+import { tryGetImageImportNameByPossiblyRelativeName } from "../images/Images";
 import { type NumericBreakpoints } from "../styles/Breakpoints";
 import ResponsiveImage from "./ResponsiveImage.astro";
 import { type ReviewProps } from "./Types";
@@ -21,8 +21,8 @@ const largeImageClasses = isLargeImageFullSize ? undefined : "32rem";
 const baseName = `images/testimonials/${slug}`;
 const smallName = `${baseName}/small`;
 const largeName = `${baseName}/large`;
-const small = await tryGetImageImportByName(smallName);
-const large = await tryGetImageImportByName(largeName);
+const small =  tryGetImageImportNameByPossiblyRelativeName(smallName);
+const large =  tryGetImageImportNameByPossiblyRelativeName(largeName);
 const { Content } = await render();
 ---
 

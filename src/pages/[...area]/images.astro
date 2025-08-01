@@ -6,12 +6,13 @@ import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import BaseHead from "../../layouts/BaseHead.astro";
 import ImageGallery from "../../layouts/ImageGallery.astro";
 import { slugToName } from "../../utils";
+import { getImageImportNameByFolder } from "../../images/Images";
 
 export async function getStaticPaths() {
   return (await getCollection("areas"))
     .map(entry => {
       const { slug: area, data: { images: rawImages } } = entry;
-      const images = rawImages.map((image) => `images/${area}/${image}`);
+      const images = getImageImportNameByFolder([`images/${area}`], rawImages);
       return ({
         params: { area },
         props: { images, area }

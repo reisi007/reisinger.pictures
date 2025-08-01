@@ -1,41 +1,45 @@
 ---
 import ResponsiveImage from "./ResponsiveImage.astro";
-import {type NumericBreakpoints} from "../styles/Breakpoints";
+import { type NumericBreakpoints } from "../styles/Breakpoints";
 import Slider from "./Slider.astro";
-import {getImageImportByName} from "../images/Images";
+import { getImageImportNameByPossiblyRelativeName, tryGetImageByAbsoluteName } from "../images/Images";
 
 interface Props {
-    images: string[];
+  images: string[];
 }
-const {images} = Astro.props;
+const { images } = Astro.props;
 
 export const breakpoints: NumericBreakpoints = {
-    'sm': 2,
-    'md': 3,
-    'lg': 3,
-    'xl': 3,
-    '2xl': 3,
-    '3xl': 4,
+  "sm": 2,
+  "md": 3,
+  "lg": 3,
+  "xl": 3,
+  "2xl": 3,
+  "3xl": 4
 };
 ---
 <div class="z-10 mx-4 flex  items-center">
-    <section data-gallery="strip"
-             class="z-10 my-4 box-border flex h-60 w-full items-center justify-start overflow-hidden whitespace-nowrap rounded-lg border-x border-gray-800 bg-gray-800 xl:h-96">
-        <div class="mx-2 h-52 xl:h-80">
-            {
-                images.map(async name => {
-                        const image = (await getImageImportByName(name)).default;
-                        const aspectRatio = `${image.width}/${image.height}`;
-                        return (
-                                <div class="mx-4 inline-block h-52 xl:h-80">
-                                    <ResponsiveImage style={{aspectRatio}} bg={false} name={name} sizeModifiers={breakpoints}
-                                    />
-                                </div>);
-                    }
-                )
+  <section data-gallery="strip"
+           class="z-10 my-4 box-border flex h-60 w-full items-center justify-start overflow-hidden whitespace-nowrap rounded-lg border-x border-gray-800 bg-gray-800 xl:h-96">
+    <div class="mx-2 h-52 xl:h-80">
+      {
+        images.map(async name => {
+            const absoluteImageName = tryGetImageByAbsoluteName(getImageImportNameByPossiblyRelativeName(name));
+            if (absoluteImageName === undefined) {
+              throw new Error(`Image "${name}" not found`);
             }
-        </div>
-    </section>
-    <Slider/>
+            const image = (await absoluteImageName).default;
+            const aspectRatio = `${image.width}/${image.height}`;
+            return (
+              <div class="mx-4 inline-block h-52 xl:h-80">
+                <ResponsiveImage style={{ aspectRatio }} bg={false} name={name} sizeModifiers={breakpoints}
+                />
+              </div>);
+          }
+        )
+      }
+    </div>
+  </section>
+  <Slider />
 </div>
 

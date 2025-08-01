@@ -1,7 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import { type JSX } from "astro/jsx-runtime";
-import { getImageImportByName } from "../images/Images";
+import { getImageImportNameByPossiblyRelativeName, tryGetImageByAbsoluteName } from "../images/Images";
 import type { NumericBreakpoints } from "../styles/Breakpoints";
 import { computeSizes, DEFAULT_IMAGE_SIZES, mergeBreakpoints } from "../styles/Breakpoints";
 import { ResponsiveImageLoading } from "./ResponsiveImageLoading";
@@ -31,7 +31,10 @@ const {
   ...other
 } = Astro.props;
 
-const image = (await getImageImportByName(name)).default;
+const absoluteName = getImageImportNameByPossiblyRelativeName(name);
+const imagePromise = tryGetImageByAbsoluteName(absoluteName);
+if (imagePromise === undefined) throw new Error(`Image "${name}" not found.`);
+const image = (await imagePromise).default;
 
 const standaloneSizes: NumericBreakpoints = {
   "sm": 1,
@@ -42,9 +45,9 @@ const standaloneSizes: NumericBreakpoints = {
   "3xl": 1
 };
 
-const alt = (await getEntry("imageMetadata", name))?.data?.title ?? "";
+const alt = (await getEntry("imageMetadata", absoluteName))?.data?.title ?? "";
 if (alt === "")
-  throw new Error(`Image "${name}" has no alt text. Please add a title to the image metadata in the content folder.`);
+  throw new Error(`Image "${absoluteName}" has no alt text. Please add a title to the image metadata in the content folder.`);
 
 const computedSizes = computeSizes(mergeBreakpoints(standaloneSizes, sizeModifiers));
 const widths: number[] = (widthsOverride ?? DEFAULT_IMAGE_SIZES).filter(s => s <= image.width);
