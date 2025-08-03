@@ -36,9 +36,12 @@
 }
 
 @layer base {
-
     [class*="mdi--"], [class*="material-symbols--"] {
         @apply iconify;
+    }
+
+    h1, .h1, h2, .h2, h3, .h3 {
+        @apply text-primary-alternative
     }
 
     h1, .h1 {
@@ -104,21 +107,24 @@
 
 @layer components {
     html, body {
-        @apply h-full bg-primary text-onPrimary print:bg-white print:text-black;
+        @apply h-full bg-onPrimary  text-black;
     }
 
     select option {
-        @apply bg-primary-alternative text-onPrimary-accent;
+        @apply text-primary-alternative bg-white;
     }
 
     select option[disabled] {
-        @apply text-primary-alternative bg-gray-200 cursor-not-allowed;
+        @apply text-primary-alternative/50 bg-white cursor-not-allowed;
+    }
+
+    input,select,textarea {
+        @apply bg-secondary text-onSecondary font-medium;
     }
 
     .body {
-
         a:not(.black):not(.button) {
-            @apply print:text-primary text-onSecondary-alternative visited:text-primary-alternative font-logo underline hover:text-primary-accent;
+            @apply text-primary visited:text-primary-alternative font-logo underline hover:text-primary-accent;
         }
 
         ul {
@@ -147,7 +153,7 @@
     }
 
     input, textarea, select {
-        @apply rounded-lg p-2 my-1 w-full border print:border-gray-600 border-white/70 inline-block;
+        @apply rounded-lg p-2 my-1 w-full border border-gray-600  inline-block;
     }
 
     .required span::after {
@@ -156,6 +162,10 @@
 
     .socialLink {
         @apply mb-1 mr-1 border-2 duration-200 inline-flex items-center ease-in-out transition p-1 rounded-lg text-2xl text-onPrimary border-primary bg-primary hover:bg-primary-alternative hover:border-primary-alternative
+    }
+
+    .astronav-items {
+        @apply border-primary-alternative border-y-2 pt-4 pb-2
     }
 }
 

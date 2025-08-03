@@ -105,8 +105,12 @@ function renderMenu(entry: MenueItem | SubMenu) {
 <header class="pb-6">
   <Astronav closeOnClick>
     <div class="flex flex-col items-center w-full justify-between">
-      <a href="/" class="mx-auto my-4 size-32">
-        <ResponsiveImage class="rounded-full border-white border-2" widths={[128]} name="images/logo" bg={false} loading={ResponsiveImageLoading.EAGER}></ResponsiveImage>
+      <a href="/" class="mx-auto my-4">
+        <div class="mx-auto size-32">
+        <ResponsiveImage class="rounded-full" widths={[128]} name="images/logo" bg={false}
+                         loading={ResponsiveImageLoading.EAGER}></ResponsiveImage>
+          </div>
+        <p class="text-2xl font-extralight text-primary-alternative"> reisinger.pictures | Fotograf Florian Reisinger</p>
       </a>
       <div class="block md:hidden">
         <MenuIcon>
@@ -116,7 +120,7 @@ function renderMenu(entry: MenueItem | SubMenu) {
         </MenuIcon>
       </div>
     </div>
-    <MenuItems class="hidden bg-primary-alternative pt-4 pb-2 md:flex">
+    <MenuItems class="hidden md:flex">
       <div class="flex flex-col w-full md:flex-row gap-y-4 my-4 md:gap-5 md:justify-center items-center">
         {
           menue
