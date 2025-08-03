@@ -4,10 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Metadaten Editor</title>
-  <!-- Tailwind CSS CDN (for demonstration, you should use a local build in production) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
-  <!-- Add to <head> -->
   <script src="editor-api-key.js"></script>
 </head>
 <body class="font-sans m-10 bg-[#f4f7f9] text-[#333]">
@@ -77,9 +74,10 @@
 </div>
 
 <script type="module">
-  import { GoogleGenAI } from "https://cdn.jsdelivr.net/npm/@google/genai@1.11/+esm";
+  import { GoogleGenAI } from "https://cdn.jsdelivr.net/npm/@google/genai@1/+esm";
+  import jsyaml from "https://cdn.jsdelivr.net/npm/js-yaml@4/+esm";
 
-  const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY, model: "gemini-2.5-flash" }); // Or another Gemini Vision model);
+  const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY, model: "gemini-2.5-flash" });
 
   const selectFolderBtn = document.getElementById("selectFolderBtn");
   const editorDiv = document.getElementById("editor");
@@ -94,59 +92,77 @@
   let directoryHandle = null;
   let filesToProcess = [];
 
-  // Rekursive Funktion, um YAML-Dateien inkl. Subordner zu sammeln
-  async function collectYamlFilesInFolder(folderHandle, files = [], relativePath = "") {
+  async function readYaml(yamlHandle) {
+    const yamlFile = await yamlHandle.getFile();
+    return jsyaml.load(await yamlFile.text());
+  }
+
+
+  async function collectMarkdownContent(folderHandle) {
+    if (folderHandle === null) return "";
+    let content = "";
     for await (const entry of folderHandle.values()) {
-      if (entry.kind === "file" && entry.name.endsWith(".yaml")) {
-        files.push({
-          handle: entry,
-          parentHandle: folderHandle,
-          relativePath: relativePath + entry.name
-        });
-      } else if (entry.kind === "file" && entry.name.endsWith(".jpg")) {
-        const yamlFileName = entry.name.replace(/\.jpg$/, ".yaml");
-        let yamlExists = false;
+      if (entry.kind === "file" && (entry.name.endsWith(".md") || entry.name.endsWith(".mdx"))) {
         try {
-          await folderHandle.getFileHandle(yamlFileName, { "mode": "read" });
-          yamlExists = true;
+          const fileHandle = await folderHandle.getFileHandle(entry.name, { "mode": "read" });
+          const file = await fileHandle.getFile();
+          content += await file.text() + "\n";
         } catch (e) {
-          yamlExists = false;
+          // ignore errors reading individual files
         }
-        if (!yamlExists) {
-          files.push({
-            handle: null,
-            parentHandle: folderHandle,
-            relativePath: relativePath + yamlFileName,
-            needsCreation: true,
-            associatedJpgName: entry.name
-          });
+      }
+    }
+    return content.trim();
+  }
+
+  // Rekursive Funktion, um YAML-Dateien inkl. Subordner zu sammeln
+  async function collectYamlFilesInFolder(folderHandle, parentFolderHandle, files = [], relativePath = "") {
+    for await (const entry of folderHandle.values()) {
+      if (entry.kind === "file" && entry.name.endsWith(".jpg")) {
+        const yamlFileName = entry.name.replace(/\.jpg$/, ".yaml");
+
+        let yamlHandle = null;
+        try {
+          yamlHandle = await folderHandle.getFileHandle(yamlFileName, { "mode": "read" });
+          const data = await readYaml(yamlHandle);
+          if (data && typeof data.title === "string" && data.title.trim().length > 0) {
+            continue;
+          }
+        } catch (e) {
+          // ignore
         }
+        const item = {
+          handle: yamlHandle,
+          parentHandle: folderHandle,
+          relativePath: relativePath + yamlFileName,
+          associatedJpgName: entry.name,
+          context: await collectMarkdownContent(parentFolderHandle) + await collectMarkdownContent(folderHandle)
+        };
+        files.push(item);
       } else if (entry.kind === "directory") {
-        await collectYamlFilesInFolder(entry, files, relativePath + entry.name + "/");
+        await collectYamlFilesInFolder(entry, folderHandle, files, relativePath + entry.name + "/");
       }
     }
     return files;
   }
 
+
   function updateProgress() {
     // Gesamte Anzahl ist die aktuelle + die Anzahl der verbleibenden im Stack (inkl. aktuellem)
-    const total = filesToProcess.length + (editorDiv.style.display === "block" ? 1 : 0);
     const remaining = filesToProcess.length + (editorDiv.style.display === "block" ? 1 : 0);
     if (remaining > 0) {
       progressIndicator.textContent = `Noch ${remaining} Bild${remaining !== 1 ? "er" : ""} zu bearbeiten`;
     } else {
-      progressIndicator.textContent = "";
+      progressIndicator.textContent = "Letztes Bild zu bearbeiten";
     }
   }
 
   selectFolderBtn.addEventListener("click", async () => {
     try {
       directoryHandle = await window.showDirectoryPicker();
-      filesToProcess = [];
       filesToProcess = await collectYamlFilesInFolder(directoryHandle);
-
       selectFolderBtn.style.display = "none";
-      updateProgress(); // Hier aufrufen
+      updateProgress();
       await processNextFile();
     } catch (err) {
       console.error("Fehler beim Auswählen des Ordners:", err);
@@ -154,47 +170,46 @@
     }
   });
 
-  // Add this after the DOM element declarations
-  const redoDescriptionBtn = document.getElementById("redoDescriptionBtn");
 
-  // Handle redo AI button click
+  const redoDescriptionBtn = document.getElementById("redoDescriptionBtn");
   redoDescriptionBtn.addEventListener("click", async () => {
     referenceImage.onload();
   });
 
+  function displaySuccessMessage() {
+    editorDiv.style.display = "none";
+    successMessageDiv.style.display = "block";
+    updateProgress();
+  }
+
+  function assertYamlFileHandle(fileHandle) {
+    const valid = fileHandle.name.toLowerCase().endsWith(".yaml");
+    if (!valid) {
+      throw new Error(`Invalid file type: ${fileHandle.name}. Only .yaml files are allowed`);
+    }
+  }
+
   async function processNextFile() {
     if (filesToProcess.length === 0) {
-      editorDiv.style.display = "none";
-      successMessageDiv.style.display = "block";
-      updateProgress();
+      displaySuccessMessage();
       return;
     }
     const fileObj = filesToProcess.shift();
-    let fileHandle = fileObj.handle;
-    let fileContent = "";
+    const context = fileObj.context;
+    const needsCreation = fileObj.handle === null;
+
     updateProgress();
 
-    if (fileObj.needsCreation) {
-      fileContent = "title: \"\"\n";
-    } else {
-      const file = await fileHandle.getFile();
-      fileContent = await file.text();
-    }
-
     try {
-      const data = jsyaml.load(fileContent);
+      const data = needsCreation ? {} : readYaml(fileObj.handle);
       if (data && (data.title === null || data.title === "" || typeof data.title === "undefined")) {
         fileNameEl.textContent = fileObj.relativePath;
-        referenceImage.alt = fileNameEl.textContent;
+        referenceImage.alt = "Pfad zum Bild: " + fileNameEl.textContent + (context !== null ? ". Inhalt des Artikels als weiterer Hinweis: "
+          + context : "");
         titleInput.value = "";
 
         // Bild anzeigen, falls vorhanden
-        let imageName;
-        if (fileObj.needsCreation) {
-          imageName = fileObj.associatedJpgName;
-        } else {
-          imageName = fileHandle.name.replace(/\.yaml$/, ".jpg");
-        }
+        let imageName = fileObj.associatedJpgName;
 
         try {
           const imageHandle = await fileObj.parentHandle.getFileHandle(imageName, { "mode": "read" });
@@ -212,14 +227,18 @@
           event.preventDefault();
           data.title = titleInput.value;
           const newYamlContent = jsyaml.dump(data);
-          let targetFileHandle = fileHandle;
+          let targetFileHandle = fileObj.handle;
 
-          if (fileObj.needsCreation) {
+          if (needsCreation) {
             targetFileHandle = await fileObj.parentHandle.getFileHandle(
               fileObj.relativePath.split("/").pop(),
               { create: true }
             );
           }
+
+
+
+          assertYamlFileHandle(targetFileHandle);
 
           const writable = await targetFileHandle.createWritable();
           await writable.write(newYamlContent);
@@ -248,21 +267,12 @@
 
     // Determine new dimensions keeping aspect ratio with max side
     let { width, height } = img;
-    if (width > height && width > maxSide) {
-      height *= maxSide / width;
-      width = maxSide;
-    } else if (height > width && height > maxSide) {
-      width *= maxSide / height;
-      height = maxSide;
-    } else if (width > maxSide) {
-      // In case they are equal and large
-      width = height = maxSide;
-    }
+
 
     // Draw to canvas
     const canvas = document.createElement("canvas");
-    canvas.width = Math.round(width);
-    canvas.height = Math.round(height);
+    canvas.width = width;
+    canvas.height = height;
     const ctx = canvas.getContext("2d");
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
@@ -273,7 +283,7 @@
 
   // 2. Describe image using Gemini Vision API
   async function describeImageWithGemini(imgElement) {
-    //   return new Promise(resolve => setTimeout(resolve, 10000)); // Uncomment this line to not call Gemini
+    // return new Promise(resolve => setTimeout(resolve, 100)); // Uncomment this line to not call Gemini
     const base64Content = await getCompressedBase64(imgElement);
     try {
       const content = {

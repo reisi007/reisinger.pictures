@@ -36,6 +36,16 @@ const imagePromise = tryGetImageByAbsoluteName(absoluteName);
 if (imagePromise === undefined) throw new Error(`Image "${name}" not found.`);
 const image = (await imagePromise).default;
 
+const alt = (await getEntry("imageMetadata", absoluteName))?.data?.title ?? "";
+if (alt === "") {
+  const message = `Image "${absoluteName}" has no alt text. Please add a title to the image metadata in the content folder.`;
+
+  if (import.meta.env.MODE === "development")
+    console.warn(message);
+  else
+    throw new Error(message);
+}
+
 const standaloneSizes: NumericBreakpoints = {
   "sm": 1,
   "md": 1,
@@ -44,10 +54,6 @@ const standaloneSizes: NumericBreakpoints = {
   "2xl": 1,
   "3xl": 1
 };
-
-const alt = (await getEntry("imageMetadata", absoluteName))?.data?.title ?? "";
-if (alt === "")
-  throw new Error(`Image "${absoluteName}" has no alt text. Please add a title to the image metadata in the content folder.`);
 
 const computedSizes = computeSizes(mergeBreakpoints(standaloneSizes, sizeModifiers));
 const widths: number[] = (widthsOverride ?? DEFAULT_IMAGE_SIZES).filter(s => s <= image.width);
