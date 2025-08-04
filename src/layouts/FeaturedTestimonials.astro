@@ -9,7 +9,7 @@ interface Props {
   categoryTestimonials: CollectionEntry<"testimonials">[]
 }
 
-const {  featuredTestimonials, categoryTestimonials, slug } = Astro.props;
+const { featuredTestimonials, categoryTestimonials, slug } = Astro.props;
 ---
 {featuredTestimonials &&
 <>
@@ -17,8 +17,8 @@ const {  featuredTestimonials, categoryTestimonials, slug } = Astro.props;
     <>
       <ReviewCards slugs={featuredTestimonials}></ReviewCards>
       {categoryTestimonials.length > 2 &&
-        <div class="my-4 flex flex-col items-center">
-          <a href={`/${slug}/testimonials`} class="button primary md:w-1/2">Alle {categoryTestimonials.length} Bewertungen lesen</a>
+        <div class="flex justify-center mt-6">
+          <a class="btn btn-primary " href={`/${slug}/testimonials`}>Alle {categoryTestimonials.length} Bewertungen lesen</a>
         </div>
       }
     </>}

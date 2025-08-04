@@ -6,13 +6,13 @@ import type { NumericBreakpoints } from "../styles/Breakpoints";
 import { computeSizes, DEFAULT_IMAGE_SIZES, mergeBreakpoints } from "../styles/Breakpoints";
 import { ResponsiveImageLoading } from "./ResponsiveImageLoading";
 import { getEntry } from "astro:content";
+import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
 
 interface Props {
   name: string,
   class?: string,
   style?: JSX.CSSProperties,
   height?: string,
-  bg?: boolean,
   sizes?: string,
   widths?: number[],
   loading?: ResponsiveImageLoading,
@@ -46,41 +46,22 @@ if (alt === "") {
     throw new Error(message);
 }
 
-const standaloneSizes: NumericBreakpoints = {
-  "sm": 1,
-  "md": 1,
-  "lg": 1,
-  "xl": 1,
-  "2xl": 1,
-  "3xl": 1
-};
-
-const computedSizes = computeSizes(mergeBreakpoints(standaloneSizes, sizeModifiers));
+const computedSizes = computeSizes(mergeBreakpoints(GALLERY_BREAKPOINTS[GalleryLayout.Full], sizeModifiers));
 const widths: number[] = (widthsOverride ?? DEFAULT_IMAGE_SIZES).filter(s => s <= image.width);
 
 const maxOptimizedWidth = widths[widths.length - 1];
 const maxOptimizedHeight = maxOptimizedWidth * image.height / image.width;
-
-const paddingTop = `min(${maxOptimizedHeight / maxOptimizedWidth * 100}% , ${height})`;
-const styleObject: JSX.CSSProperties = { ...style, maxHeight: height };
 ---
-<div data-name={name} style={styleObject}
-     class:list={["relative size-full ", clazz]}
->
-  <div style={{ paddingTop }}>
-    <Image
-      format="avif"
-      style={{ maxHeight: height }}
-      class:list={["top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 absolute z-20  object-fit", clazz]}
-      quality="med"
-      loading={loading}
-      widths={widths}
-      sizes={sizes ?? computedSizes}
-      data-pswp-width={maxOptimizedWidth}
-      data-pswp-height={maxOptimizedHeight}
-      src={image}
-      alt={alt}
-      {...other}
-    />
-  </div>
-</div>
+<Image
+  format="avif"
+  class={clazz}
+  quality="med"
+  loading={loading}
+  widths={widths}
+  sizes={sizes ?? computedSizes}
+  data-pswp-width={maxOptimizedWidth}
+  data-pswp-height={maxOptimizedHeight}
+  src={image}
+  alt={alt}
+  {...other}
+/>

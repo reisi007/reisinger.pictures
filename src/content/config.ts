@@ -11,7 +11,7 @@ const einblicke = defineCollection({
     // Transform string to Date object
     pubDate: z.coerce.date(),
     updated: z.coerce.date().optional(),
-    heroImage: z.string().optional()
+    heroImage: z.string()
   })
 });
 
@@ -52,6 +52,7 @@ const areas = defineCollection({
   type: "content",
   schema: z.object({
     name: z.string(),
+    priority: z.number().optional().default(9999),
     testimonials: z.array(reference("testimonials")).optional(),
     images: z.array(z.string())
   })

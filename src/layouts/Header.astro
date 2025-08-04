@@ -1,9 +1,7 @@
 ---
 import { isSubMenu, type Menue, type MenueItem, type SubMenu, Visibility } from "./Menue";
-import { Astronav, MenuItems, MenuIcon, Dropdown, DropdownItems, OpenIcon, CloseIcon } from "astro-navbar";
 import ResponsiveImage from "./ResponsiveImage.astro";
 import { ResponsiveImageLoading } from "./ResponsiveImageLoading";
-import HeaderLink from "./HeaderLink.astro";
 
 const reviewItem: MenueItem = { name: "Bewertungen", href: "/testimonials" };
 const images: MenueItem = { name: "Bilder", href: "/images", visibility: Visibility.DEV_ONLY };
@@ -95,69 +93,55 @@ const menue: Menue = [
 
 const isDevMode = import.meta.env.MODE === "development";
 
-function renderMenu(entry: MenueItem | SubMenu) {
+function isMenuVisible(entry: MenueItem | SubMenu) {
   const visibility = entry.visibility ?? Visibility.ALWAYS;
   return visibility === Visibility.ALWAYS ||
     (visibility === Visibility.DEV_ONLY && isDevMode) ||
     (visibility === Visibility.PROD_ONLY && !isDevMode);
 }
 ---
-<header class="pb-6">
-  <Astronav closeOnClick>
-    <div class="flex flex-col items-center w-full justify-between">
-      <a href="/" class="mx-auto my-4">
-        <div class="mx-auto size-32">
-        <ResponsiveImage class="rounded-full" widths={[128]} name="images/logo" bg={false}
-                         loading={ResponsiveImageLoading.EAGER}></ResponsiveImage>
-          </div>
-        <p class="text-2xl font-extralight text-primary-alternative"> reisinger.pictures | Fotograf Florian Reisinger</p>
-      </a>
-      <div class="block md:hidden">
-        <MenuIcon>
-          <OpenIcon><span class="inline-flex items-center gap-x-2">Mehr entdecken<span class="mdi--menu text-3xl"></span></span></OpenIcon>
-          <CloseIcon><span class="inline-flex items-center gap-x-2">Menü schließen<span class="mdi--menu-close text-3xl"></span></span>
-          </CloseIcon>
-        </MenuIcon>
-      </div>
-    </div>
-    <MenuItems class="hidden md:flex">
-      <div class="flex flex-col w-full md:flex-row gap-y-4 my-4 md:gap-5 md:justify-center items-center">
-        {
-          menue
-            .filter(e => renderMenu(e))
-            .map(item => {
-              if (isSubMenu(item)) {
-                return (
-                  <Dropdown class="group flex flex-col items-center">
-                    <button>
-                      <HeaderLink href={item.baseHref}>
-                        {item.name}
-                        <span class="ml-1.5 mdi--menu-down group-open:rotate-180"></span>
-                      </HeaderLink>
-                    </button>
-                    <DropdownItems class="relative z-50">
-                      <div
-                        class="flex flex-col items-center border-y py-2 md:absolute md:mt-2 md:px-4 md:-translate-x-1/2 md:rounded md:border md:bg-onSecondary-alternative md:text-secondary-alternative">
-                        {item.items
-                          .filter(e => renderMenu(e))
-                          .map(e => (
-                            <a class="my-3" href={item.baseHref + e.href}>
-                              <HeaderLink class="!pb-0" href={e.href}>{e.name}</HeaderLink>
-                            </a>))}
+<header class="py-4">
+  <a class="container" href="/">
+    <ResponsiveImage class="size-32 rounded-full mx-auto" widths={[128]} name="images/logo"
+                     loading={ResponsiveImageLoading.EAGER}></ResponsiveImage>
+    <p class="text-center text-xl font-extralight py-4"> reisinger.pictures | Florian Reisinger</p>
+  </a>
 
-                      </div>
-                    </DropdownItems>
-                  </Dropdown>
-                );
-              } else
-                return (
-                  <a href={item.href}>
-                    <HeaderLink href={item.href}>{item.name}</HeaderLink>
-                  </a>
-                );
-            })
-        }
-      </div>
-    </MenuItems>
-  </Astronav>
+  <ul class="menu border-y-primary border-y-2 w-full my-4 py-4 lg:menu-horizontal bg-base-200 justify-center">
+    {
+      menue
+        .filter(e => isMenuVisible(e))
+        .map(item => {
+          if (isSubMenu(item)) {
+            return (
+              <li>
+                <details>
+                  <summary>
+                    {item.name}
+                  </summary>
+                  <ul class="flex flex-col gap-y-4">
+                    {item.items
+                      .filter(e => isMenuVisible(e))
+                      .map(e => (
+                        <li>
+                          <a href={item.baseHref + e.href}>
+                            {e.name}
+                          </a>
+                        </li>
+                      ))}
+                  </ul>
+                </details>
+              </li>
+            );
+          } else
+            return (
+              <li>
+                <a href={item.href}>
+                  {item.name}
+                </a>
+              </li>
+            );
+        })
+    }
+  </ul>
 </header>

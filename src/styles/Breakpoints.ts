@@ -1,4 +1,4 @@
-type BreakpointValues = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
+type BreakpointValues = 'sm' | 'md' | 'lg' | 'xl' | '2xl' ;
 type BreakpointValuesIncludeDefault = 'default' | BreakpointValues
 
 export type BreakPoints<T> = Record<BreakpointValuesIncludeDefault, T>;
@@ -12,7 +12,6 @@ export const TAILWIND_BREAKPOINTS: Omit<BreakPoints<string>, 'default'> = {
   lg: '1024px',
   xl: '1280px',
   '2xl': '1536px',
-  '3xl': '2304px',
 };
 
 export const CONTAINER_SIZES: Omit<BreakPoints<string>, 'default'> = {
@@ -21,7 +20,6 @@ export const CONTAINER_SIZES: Omit<BreakPoints<string>, 'default'> = {
   lg: '960px',
   xl: '1140px',
   '2xl': '1320px',
-  '3xl': '2048px',
 };
 
 export function computeSizes(sizes: NumericBreakpoints) {
@@ -37,6 +35,5 @@ export function mergeBreakpoints(a: NumericBreakpoints, b?: Partial<NumericBreak
     lg: (a.lg ?? 1) * (b?.lg ?? 1),
     xl: (a.xl ?? 1) * (b?.xl ?? 1),
     '2xl': (a['2xl'] ?? 1) * (b?.['2xl'] ?? 1),
-    '3xl': (a['3xl'] ?? 1) * (b?.['3xl'] ?? 1),
   };
 }

@@ -1,5 +1,4 @@
 export type ReviewProps = {
-    displayLargeImage?: boolean,
-    displayBorder?: boolean,
-    largeImageStyles?: string,
+  displayLargeImage?: boolean,
+  largeImageStyles?: string,
 }

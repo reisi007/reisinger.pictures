@@ -13,12 +13,12 @@ if (imagePromise === undefined) {
 const image = (await imagePromise).default;
 const ratio = `${image.width}/${image.height}`;
 ---
-<div class="relative rounded-2xl my-4 bg-gradient-to-r from-primary-alternative to-black">
-  <div class="mx-auto px-8" style={{
+<div>
+  <div style={{
     maxHeight: "80vh",
     aspectRatio: ratio
   }}>
-    <ResponsiveImage name={name} bg={false} />
+    <ResponsiveImage name={name} />
   </div>
-  <p class="text-center text-white font-light text-3xl pb-16">{titel}</p>
+  <p>{titel}</p>
 </div>

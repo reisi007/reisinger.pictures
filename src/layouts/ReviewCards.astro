@@ -1,26 +1,17 @@
 ---
-import {getEntry} from 'astro:content';
-
-import type {NumericBreakpoints} from '../styles/Breakpoints';
+import { getEntry } from "astro:content";
 import ReviewCard from "./ReviewCard.astro";
-import {type ReviewProps} from "./Types";
+import { type ReviewProps } from "./Types";
 
 type  Props = { slugs: string[], class?: string } & ReviewProps
-const {slugs, class: clazz, ...reviewProps} = Astro.props;
+const { slugs, class: clazz, ...reviewProps } = Astro.props;
 const r = await Promise.all(slugs
-    .filter(e => e !== undefined)
-    .map(e => getEntry("testimonials", e))
-    .filter(e => e !== undefined));
-const breakpoints: NumericBreakpoints = {
-    'sm': 1,
-    'md': 1,
-    'lg': 1,
-    'xl': 2,
-    '2xl': 2,
-    '3xl': 2,
-};
+  .filter(e => e !== undefined)
+  .map(e => getEntry("testimonials", e))
+  .filter(e => e !== undefined));
+
 ---
-<div class:list={[{'mx-2 grid xl:grid-cols-2 xl:gap-x-4 gap-y-4': r.length > 1}, clazz]}>
-    {r.map((e) =>
-            <ReviewCard breakpoints={breakpoints} {...e} {...reviewProps}/>)}
+<div class:list={[{ "mx-2 grid xl:grid-cols-2 xl:gap-x-4 gap-y-4": r.length > 1 }, clazz]}>
+  {r.map((e) =>
+    <ReviewCard {...e} {...reviewProps} />)}
 </div>

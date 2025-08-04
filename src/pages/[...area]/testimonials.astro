@@ -29,21 +29,32 @@ const name = slugToName(type);
   <BaseHead title={`${name} Bewertungen`} slot="head" />
   <Breadcrumbs />
   <h1 class="mb-8">{name} Bewertungen</h1>
-  <div class="mx-2 grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4">
+  <div class="mx-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
     {reviews.map(async e => {
       const baseName = `images/testimonials/${e.slug}`;
       const smallName = `${baseName}/small`;
       const small = tryGetImageImportNameByPossiblyRelativeName(smallName);
-      return <span class="mx-auto size-32">
-                {small && <a href={`/testimonials/${e.slug}`} aria-label={e.data.name}>
-                  <ResponsiveImage class="rounded-full" sizes="128px" widths={[128]} bg={false} name={smallName} />
-                </a>}
-        {!small && <a href={`/testimonials/${e.slug}`}
-                      class="black table-cell size-32 rounded-full border border-black bg-black text-center align-middle text-xl text-white">
-          {e.data.name}
-
-        </a>}
-            </span>;
+      return <>
+          {
+            small &&
+            <div class="avatar">
+              <a href={`/testimonials/${e.slug}`} aria-label={e.data.name}>
+              <ResponsiveImage class="rounded-full !size-32" sizes="128px" widths={[128]} name={smallName} />
+                </a>
+            </div>
+          }
+          {
+            !small &&
+            <div class="avatar avatar-placeholder">
+              <div class="size-32 bg-neutral text-neutral-content rounded-full">
+                <a class=" " href={`/testimonials/${e.slug}`}
+                >
+                  {e.data.name}
+                </a>
+              </div>
+            </div>
+          }
+        </>;
     })}
   </div>
 </MinimalPage>

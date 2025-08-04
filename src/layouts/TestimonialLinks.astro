@@ -9,8 +9,8 @@ const grouped = groupBy(testimoinials, e => e.data.type);
 
 const categories: ReviewType[] = [ReviewType.Beauty, ReviewType.Akt, ReviewType.Paare, ReviewType.Tanz];
 ---
-<div class="grid md:grid-cols-2 xl:grid-cols-4">
-  {categories.map(category => (<a class="button m-2" href={`/${category}/testimonials`}>
+<div>
+  {categories.map(category => (<a href={`/${category}/testimonials`}>
     {grouped[category].length} {slugToName(category)} Bewertungen
   </a>))}
 </div>

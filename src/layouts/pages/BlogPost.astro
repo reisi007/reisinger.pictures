@@ -16,20 +16,21 @@ const { title, description, pubDate, updated, heroImage } = Astro.props;
   <BaseHead slot="head" title={title} description={description} />
   <Breadcrumbs />
   <article>
-    <section class="mx-2 flex flex-col items-center">
-      <h1 class="mb-2">{title}</h1>
-      <span>Veröffentlicht am  <FormattedDate date={pubDate} />
+    <section>
+      <h1>{title}</h1>
+      <div class="text-center">Veröffentlicht am
+        <FormattedDate date={pubDate} />
         {updated &&
           <>- aktualisiert am
             <FormattedDate date={updated} />
           </>
-        }</span>
+        }</div>
       {heroImage &&
-        <div class="size-full py-4">
+        <div>
           <ResponsiveImage name={heroImage} height="32rem" />
         </div>}
     </section>
-    <hr class="mx-auto h-0.5 w-3/4 border-0  bg-white sm:w-2/3" />
+    <hr />
     <slot />
   </article>
 </MinimalPage>

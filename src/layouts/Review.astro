@@ -2,19 +2,16 @@
 import { type CollectionEntry } from "astro:content";
 
 import { tryGetImageByAbsoluteName, tryGetImageImportNameByPossiblyRelativeName } from "../images/Images";
-import { type NumericBreakpoints } from "../styles/Breakpoints";
 import ResponsiveImage from "./ResponsiveImage.astro";
 import { type ReviewProps } from "./Types";
 
-type Props = CollectionEntry<"testimonials"> & { breakpoints?: NumericBreakpoints } & ReviewProps;
+type Props = CollectionEntry<"testimonials"> & ReviewProps;
 
 const {
   slug,
   data: { name, source },
   render,
-  breakpoints: breakPoints,
   displayLargeImage = true,
-  displayBorder = true
 } = Astro.props;
 
 const baseName = `testimonials/${slug}`;
@@ -26,26 +23,25 @@ const large = await tryGetImageByAbsoluteName(tryGetImageImportNameByPossiblyRel
 const { Content } = await render();
 ---
 
-<div data-slug={import.meta.env.DEV ? slug : undefined}
-     class:list={["relative flex flex-col h-full", { "border-2 rounded-lg border-primary p-4": displayBorder }]}>
+<div data-slug={import.meta.env.DEV ? slug : undefined}>
   {source !== undefined && <a href={source} target="_blank" class:list={["absolute right-6 text-3xl", {
     "mdi--google": source.indexOf("g.co") > 0 || source.indexOf("goo.gl") > 0,
     "mdi--facebook": source.indexOf("facebook.com") > 0
   }]}>
   </a>}
   {small !== undefined &&
-    <div class="mx-auto size-32">
-      <ResponsiveImage class="rounded-full" sizes="128px" widths={[128]} bg={false} name={smallName} />
+    <div>
+      <ResponsiveImage sizes="128px" widths={[128]} name={smallName} />
     </div>}
-  <h4 class="py-4">{name}</h4>
-  <div class="grow basis-1" />
+  <h4>{name}</h4>
+  <div />
   {displayLargeImage && large !== undefined &&
-    <div class="max-h-128 ">
-      <ResponsiveImage sizeModifiers={breakPoints} name={largeName} />
+    <div>
+      <ResponsiveImage name={largeName} />
     </div>
   }
-  <div class="grow basis-1" />
-  <div class="basis-1">
+  <div />
+  <div>
     <Content />
   </div>
 </div>

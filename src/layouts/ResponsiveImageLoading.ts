@@ -1,4 +1,4 @@
 export enum ResponsiveImageLoading {
-    LAZY = 'lazy',
-    EAGER = 'eager',
+  LAZY = "lazy",
+  EAGER = "eager",
 }

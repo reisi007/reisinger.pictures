@@ -2,49 +2,43 @@
 import { type CollectionEntry } from "astro:content";
 
 import { tryGetImageImportNameByPossiblyRelativeName } from "../images/Images";
-import { type NumericBreakpoints } from "../styles/Breakpoints";
 import ResponsiveImage from "./ResponsiveImage.astro";
 import { type ReviewProps } from "./Types";
 
-type Props = CollectionEntry<"testimonials"> & { breakpoints?: NumericBreakpoints, isLargeImageFullSize?: boolean } & ReviewProps;
+type Props = CollectionEntry<"testimonials"> & ReviewProps;
 
 const {
   slug,
   data: { name, source },
   render,
-  breakpoints: breakPoints,
-  displayLargeImage = true,
-  displayBorder = true,
-  isLargeImageFullSize = false
+  displayLargeImage = true
 } = Astro.props;
-const largeImageClasses = isLargeImageFullSize ? undefined : "32rem";
 const baseName = `images/testimonials/${slug}`;
 const smallName = `${baseName}/small`;
 const largeName = `${baseName}/large`;
-const small =  tryGetImageImportNameByPossiblyRelativeName(smallName);
-const large =  tryGetImageImportNameByPossiblyRelativeName(largeName);
+const small = tryGetImageImportNameByPossiblyRelativeName(smallName);
+const large = tryGetImageImportNameByPossiblyRelativeName(largeName);
 const { Content } = await render();
 ---
 
-<div data-slug={import.meta.env.DEV ? slug : undefined}
-     class:list={["relative flex flex-col h-full overflow-hidden", { "border-2 rounded-lg border-onPrimery p-4": displayBorder }]}>
+<div data-slug={import.meta.env.DEV ? slug : undefined} class="card bg-base-300 shadow-sm">
+  {small !== undefined &&
+    <div class="pt-8">
+      <figure class="avatar size-32 mx-auto">
+        <ResponsiveImage class="rounded-full " sizes="128px" widths={[128]} name={smallName} />
+      </figure>
+    </div>}
+  <h4 class="card-title">{name}</h4>
+  {displayLargeImage && large !== undefined &&
+    <ResponsiveImage name={largeName} />
+  }
+  <div />
+  <div class="card-body">
+    <Content />
+  </div>
   {source !== undefined && <a href={source} target="_blank" class:list={["absolute right-6 text-3xl", {
     "mdi--google": source.indexOf("g.co") > 0 || source.indexOf("goo.gl") > 0,
     "mdi--facebook": source.indexOf("facebook.com") > 0
   }]}>
   </a>}
-  {small !== undefined &&
-    <div class="mx-auto size-32">
-      <ResponsiveImage class="rounded-full" sizes="128px" widths={[128]} bg={false} name={smallName} />
-    </div>}
-  <span class="h4 py-4">{name}</span>
-  <div class="grow basis-1" />
-  {displayLargeImage && large !== undefined &&
-    <ResponsiveImage height={largeImageClasses} sizeModifiers={breakPoints} name={largeName} />
-  }
-  <div class="grow basis-1" />
-  <div class="basis-1">
-    <Content />
-  </div>
-
 </div>

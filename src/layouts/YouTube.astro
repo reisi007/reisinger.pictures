@@ -1,7 +1,12 @@
 ---
 import { OrientationEnum } from "../content/config";
 
-interface Props { class?: string, ytid: string, title: string, orientation: OrientationEnum }
+interface Props {
+  class?: string,
+  ytid: string,
+  title: string,
+  orientation: OrientationEnum
+}
 
 const { ytid, title, orientation, class: clazz } = Astro.props;
 ---

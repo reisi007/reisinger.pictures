@@ -1,32 +1,32 @@
 ---
-import type {CollectionEntry} from "astro:content";
+import type { CollectionEntry } from "astro:content";
 
-type Props = CollectionEntry<'shootingCards'>;
+type Props = CollectionEntry<"shootingCards">;
 
-const {render, data} = Astro.props;
+const { render, data } = Astro.props;
 
-const {title, shutterSpeed, fStop, iso, expComp} = data;
-const {Content} = await render();
+const { title, shutterSpeed, fStop, iso, expComp } = data;
+const { Content } = await render();
 
 const rows: string[][] = [
-    ["Verschlusszeit", shutterSpeed],
-    ["Blende", fStop],
-    ["ISO", iso],
-    (expComp === undefined ? undefined : ["Belichtungskorrektur", expComp]),
+  ["Verschlusszeit", shutterSpeed],
+  ["Blende", fStop],
+  ["ISO", iso],
+  (expComp === undefined ? undefined : ["Belichtungskorrektur", expComp])
 ].filter(e => e !== undefined);
 ---
 
-<div class="@container flex flex-col max-h-[80vh] text-onPrimary size-full bg-primary rounded-2xl px-4 py-8">
-    <h1>Einstellungen für <b>{title}</b> Fotos</h1>
-    <ul>
-        {rows.map(([k, v]) => (
-                <li class="flex bg-onPrimary text-primary font-hand my-6 rounded-3xl mx-auto px-8 py-4 items-center w-full @sm:w-3/4 @mx:w-2/3">
-                    <span class="text-2xl grow overflow-hidden text-ellipsis">{k}</span>
-                    <span class="grow"/>
-                    <span class="font-[cursive] font-bold text-black text-2xl text-nowrap">{v}</span>
-                </li>))}
-    </ul>
-    <div class="flex flex-col grow items-center justify-center p-2 @sm:p-4 bg-onPrimary text-black font-hand rounded-3xl text-xl mx-auto w-full @sm:w-3/4 @mx:w-2/3">
-        <Content/>
-    </div>
+<div>
+  <h1>Einstellungen für <b>{title}</b> Fotos</h1>
+  <ul>
+    {rows.map(([k, v]) => (
+      <li>
+        <span>{k}</span>
+        <span />
+        <span>{v}</span>
+      </li>))}
+  </ul>
+  <div>
+    <Content />
+  </div>
 </div>

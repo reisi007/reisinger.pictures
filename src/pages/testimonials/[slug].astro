@@ -4,7 +4,6 @@ import { getCollection } from "astro:content";
 import BaseHead from "../../layouts/BaseHead.astro";
 import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import ReviewCard from "../../layouts/ReviewCard.astro";
-import type { NumericBreakpoints } from "../../styles/Breakpoints";
 import Breadcrumbs from "../../layouts/Breadcrumbs.astro";
 
 export async function getStaticPaths() {
@@ -21,18 +20,9 @@ const props = Astro.props as Props;
 const { data } = props;
 const { name } = data;
 const title = `Bewertung von ${name}`;
-
-const breakpoints: NumericBreakpoints = {
-  "sm": 1,
-  "md": 1,
-  "lg": 1,
-  "xl": 1,
-  "2xl": 1,
-  "3xl": 1
-};
 ---
 <MinimalPage>
   <BaseHead title={title} author={name} slot="head" />
   <Breadcrumbs />
-  <ReviewCard {...props} isLargeImageFullSize={true} breakpoints={breakpoints} />
+  <ReviewCard {...props} />
 </MinimalPage>

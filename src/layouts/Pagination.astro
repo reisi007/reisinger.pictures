@@ -6,25 +6,10 @@ interface Props {
 }
 
 const { page } = Astro.props;
-const { url, lastPage, currentPage } = page;
+const { url } = page;
 const { prev, next } = url;
 ---
-{lastPage > 1 &&
-<div class="my-3 flex justify-center">
-  <div class="grid grid-cols-3 place-items-center gap-x-1">
-    <a href={prev}
-       class:list={["col-start-1 border-2 hover:border-primary-accent border-primary-alternative flex items-center justify-center size-8 rounded-full", { "hidden": !prev }]}>
-      <span class="mdi--arrow-left" />
-    </a>
-
-    <span class="col-start-2 mx-1 whitespace-pre">
-            {currentPage.toString().padStart(2, " ")} / {lastPage.toString().padEnd(2, " ")}
-        </span>
-
-    <a href={next}
-       class:list={["col-start-3 border-2 hover:border-primary-accent border-primary-alternative flex items-center justify-center size-8 rounded-full", { "hidden": !next }]}>
-      <span class="mdi--arrow-right" />
-    </a>
-  </div>
+<div class="join grid grid-cols-2">
+  <button class="join-item btn btn-outline" disabled={prev === undefined}><a href={prev}> Vorherige Seite</a></button>
+  <button class="join-item btn btn-outline" disabled={next === undefined}><a href={next}> Nächste Seite</a></button>
 </div>
-  }

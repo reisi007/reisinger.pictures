@@ -1,11 +1,11 @@
 ---
 
 ---
-<h3 class="mt-4">Kontaktformular</h3>
-<form method="POST" action="https://form.reisinger.pictures" class="container grid md:grid-cols-2">
-  <label class="required md:pr-1">
-    <span>Art der Anfrage</span>
-    <select name="subject_prefix" required class="w-full">
+<h3>Kontaktformular</h3>
+<form method="POST" action="https://form.reisinger.pictures" class="flex flex-col w-full max-w-lg mx-auto gap-y-2">
+  <label class="form-control w-full">
+    <span class="label">Art der Anfrage</span>
+    <select name="subject_prefix" required class="select select-primary w-full">
       <option value="" selected disabled>Bitte wähle eine Option</option>
       <option value="BEAUTY">Beauty Shooting</option>
       <option value="AKT">Akt Shooting</option>
@@ -15,26 +15,26 @@
       <option value="">Andere Anfrage</option>
     </select>
   </label>
-  <label class="required md:pl-1">
-    <span>Name</span>
-    <input type="text" name="name" required />
+  <label class="form-control w-full">
+    <span class="label required">Name</span>
+    <input type="text" name="name" required class="input input-primary w-full" />
   </label>
-  <label class="required md:pr-1">
-    <span>Email</span>
-    <input type="email" name="email" required />
+  <label class="form-control w-full">
+    <span class="label required">Email</span>
+    <input type="email" name="email" required class="input input-primary w-full" />
   </label>
-  <label class="md:ml-1">
-    <span>Telefonnummer</span>
-    <input type="tel" name="phone" />
+  <label class="form-control w-full">
+    <span class="label">Telefonnummer</span>
+    <input type="tel" name="phone" class="input input-primary w-full" />
   </label>
 
-  <label class="required md:col-span-2">
-    <span>Nachricht</span>
-    <textarea name="message" rows="6" required></textarea>
+  <label class="form-control w-full">
+    <span class="label required">Nachricht</span>
+    <textarea name="message" rows="6" required class="textarea textarea-primary w-full"></textarea>
   </label>
-  <label class="hidden">
-    <input type="checkbox" name="dsgvo" /> Do not check
+  <label class="label required hidden">
+    <input type="checkbox" name="dsgvo" class="checkbox checkbox-primary" /> Do not check
   </label>
   <input type="hidden" name="honeypot" value="6786c25a-b4fc-800d-b3c6-fa0d36f41154" />
-  <button class="primary md:col-span-2" type="submit">Abschicken</button>
+  <button type="submit" class="btn btn-primary w-full mt-1">Abschicken</button>
 </form>

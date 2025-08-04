@@ -1,3 +1,3 @@
 export enum BoxLayoutType {
-    INFO = "info"
+  INFO = "info"
 }

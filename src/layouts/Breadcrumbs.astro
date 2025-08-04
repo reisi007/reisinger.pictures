@@ -49,19 +49,19 @@ const collectionKeys = Object.entries(contentPrefixConfig)
 const matchingContent = (await Promise.all(
     collectionKeys
       .flatMap(async k => (await getCollection(k))
-            .map(e => {
-                let path = contentPrefixConfig[k];
-                if (path.length > 0)
-                  path = `/${  path}`;
-                const slug = getSlug(e);
-                if (slug)
-                  path += `/${slug}`;
-                return ({
-                  path,
-                  name: titleOrUndefined(e.data) ?? toName(slug)
-                });
-              }
-            )
+        .map(e => {
+            let path = contentPrefixConfig[k];
+            if (path.length > 0)
+              path = `/${path}`;
+            const slug = getSlug(e);
+            if (slug)
+              path += `/${slug}`;
+            return ({
+              path,
+              name: titleOrUndefined(e.data) ?? toName(slug)
+            });
+          }
+        )
       )
   )
 );
@@ -72,13 +72,14 @@ const matchingUrls = matchingContent.flatMap(k => k)
   .sort(({ path: a }, { path: b }) => a.length - b.length);
 ---
 
-  {url !== "" &&
-    <div class="p flex flex-col md:flex-row items-center">
-      <a aria-label="Startseite" href="/" class="text-lg inline-flex items-center black"><span class="text-2xl mr-2 material-symbols--home"/> Startseite</a>
-      {matchingUrls.map(({ name, path }) => (
-        <>
-          <span class="mx-1 py-1 md:my-0 material-symbols--chevron-right text-sm"></span>
-          <a class="black underline text-lg" href={path}>{name}</a>
-        </>
-      ))}
-    </div>}
+{url !== "" &&
+<div class="breadcrumbs">
+  <ul>
+    <li><a aria-label="Startseite" href="/"><span class="mdi--home" /> Startseite</a></li>
+    {matchingUrls.map(({ name, path }) => (
+      <li>
+        <a href={path}>{name}</a>
+      </li>
+    ))}
+  </ul>
+</div>}

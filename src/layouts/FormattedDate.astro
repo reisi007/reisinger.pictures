@@ -3,15 +3,15 @@ interface Props {
   date: Date;
 }
 
-const {date} = Astro.props;
+const { date } = Astro.props;
 ---
 
-<time class="inline" datetime={date.toISOString()}>
+<time datetime={date.toISOString()}>
   {
-    date.toLocaleDateString('de-AT', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    date.toLocaleDateString("de-AT", {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
     }).trim()
   }
 </time>
