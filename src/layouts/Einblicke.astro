@@ -21,7 +21,7 @@ const { data: posts } = page;
   {
     posts.map((post) =>
       (
-        <div class="card bg-base-200 shadow-sm">
+        <a href={`/einblicke/${post.slug}/`} class="card bg-base-200 shadow-sm hover:shadow-xl transition-shadow no-underline">
           <figure>
             <ResponsiveImage class="max-h-96" sizeModifiers={GALLERY_BREAKPOINTS[GalleryLayout.Overview]} name={post.data.heroImage} />
           </figure>
@@ -31,11 +31,10 @@ const { data: posts } = page;
               <FormattedDate date={post.data.updated ?? post.data.pubDate} />
             </p>
             <div class="card-actions justify-center">
-              <a href={`/einblicke/${post.slug}/`} class="btn btn-primary">Jetzt lesen</a>
+              <span class="btn btn-primary">Jetzt lesen</span>
             </div>
           </div>
-
-        </div>
+        </a>
       ))
   }
 </section>

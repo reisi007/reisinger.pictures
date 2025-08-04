@@ -19,7 +19,7 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
   );
 
   return overviewPages.flatMap((e) => {
-    const relevantPosts = posts.filter(p => e.slug === "/" || p.slug.startsWith(e.slug.substring(1)));
+    const relevantPosts = posts.filter(p => e.slug === "/" || p.slug.startsWith(e.slug));
     return paginate(relevantPosts, {
       pageSize: 12,
       params: { overview: e.slug },
