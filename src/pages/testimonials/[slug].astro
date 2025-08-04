@@ -5,6 +5,8 @@ import BaseHead from "../../layouts/BaseHead.astro";
 import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import ReviewCard from "../../layouts/ReviewCard.astro";
 import Breadcrumbs from "../../layouts/Breadcrumbs.astro";
+import SocialImage from "../../layouts/SocialImage.astro";
+import { tryGetImageImportNameByPossiblyRelativeName } from "../../images/Images";
 
 export async function getStaticPaths() {
   return (await getCollection("testimonials")).map(r => ({
@@ -16,13 +18,16 @@ export async function getStaticPaths() {
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
-const props = Astro.props as Props;
-const { data } = props;
+const props = Astro.props;
+const { data, slug } = props;
 const { name } = data;
 const title = `Bewertung von ${name}`;
+const socialImage = tryGetImageImportNameByPossiblyRelativeName(`${slug}/large`);
 ---
 <MinimalPage>
-  <BaseHead title={title} author={name} slot="head" />
+  <BaseHead title={title} author={name} slot="head">
+    <SocialImage name={socialImage} />
+  </BaseHead>
   <Breadcrumbs />
   <ReviewCard {...props} />
 </MinimalPage>

@@ -6,6 +6,7 @@ import FormattedDate from "../FormattedDate.astro";
 import ResponsiveImage from "../ResponsiveImage.astro";
 import MinimalPage from "./MinimalPage.astro";
 import Breadcrumbs from "../Breadcrumbs.astro";
+import SocialImage from "../SocialImage.astro";
 
 type Props = CollectionEntry<"einblicke">["data"];
 
@@ -13,7 +14,9 @@ const { title, description, pubDate, updated, heroImage } = Astro.props;
 ---
 
 <MinimalPage>
-  <BaseHead slot="head" title={title} description={description} />
+  <BaseHead slot="head" title={title} description={description}>
+    <SocialImage name={heroImage} />
+  </BaseHead>
   <Breadcrumbs />
   <article>
     <section>

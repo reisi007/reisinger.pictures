@@ -10,7 +10,7 @@ interface Props {
 
 const { images, layout = GalleryLayout.Presentation } = Astro.props;
 ---
-<section data-gallery={layout === GalleryLayout.Presentation ? "" : layout}>
+<section data-gallery={layout}>
   {images.map((image, idx) => {
     const isLast = idx === images.length - 1;
     return (

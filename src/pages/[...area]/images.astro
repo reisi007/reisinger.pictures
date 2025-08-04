@@ -12,7 +12,7 @@ export async function getStaticPaths() {
   return (await getCollection("areas"))
     .map(entry => {
       const { slug: area, data: { images: rawImages } } = entry;
-      const images = getImageImportNameByFolder([`images/${area}`], rawImages);
+      const images = getImageImportNameByFolder(rawImages, [`images/${area}`]);
       return ({
         params: { area },
         props: { images, area }

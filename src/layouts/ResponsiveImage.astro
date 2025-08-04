@@ -5,8 +5,8 @@ import { getImageImportNameByPossiblyRelativeName, tryGetImageByAbsoluteName } f
 import type { NumericBreakpoints } from "../styles/Breakpoints";
 import { computeSizes, DEFAULT_IMAGE_SIZES, mergeBreakpoints } from "../styles/Breakpoints";
 import { ResponsiveImageLoading } from "./ResponsiveImageLoading";
-import { getEntry } from "astro:content";
 import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
+import { getAltFromAbsoluteName } from "./image.utils";
 
 interface Props {
   name: string,
@@ -35,17 +35,7 @@ const absoluteName = getImageImportNameByPossiblyRelativeName(name);
 const imagePromise = tryGetImageByAbsoluteName(absoluteName);
 if (imagePromise === undefined) throw new Error(`Image "${name}" not found.`);
 const image = (await imagePromise).default;
-
-const alt = (await getEntry("imageMetadata", absoluteName))?.data?.title ?? "";
-if (alt === "") {
-  const message = `Image "${absoluteName}" has no alt text. Please add a title to the image metadata in the content folder.`;
-
-  if (import.meta.env.MODE === "development")
-    console.warn(message);
-  else
-    throw new Error(message);
-}
-
+const alt = await getAltFromAbsoluteName(absoluteName);
 const computedSizes = computeSizes(mergeBreakpoints(GALLERY_BREAKPOINTS[GalleryLayout.Full], sizeModifiers));
 const widths: number[] = (widthsOverride ?? DEFAULT_IMAGE_SIZES).filter(s => s <= image.width);
 

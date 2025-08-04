@@ -19,7 +19,7 @@ export function tryGetImageImportNameByPossiblyRelativeName(possiblyRelativeName
     return undefined;
   }
   try {
-    const absoluteName = getImageImportNameByFolder([], [possiblyRelativeName])[0];
+    const absoluteName = getImageImportNameByFolder([possiblyRelativeName], [])[0];
 
     const doesImageExist = IMAGES[absoluteName] !== undefined;
     return doesImageExist ? absoluteName : undefined;
@@ -43,9 +43,9 @@ export function getImageImportNameByPossiblyRelativeName(name?: string) {
   return image;
 }
 
-const DEFAULT_FOLDER_NAMES = ["images/testimonials", "content/einblicke", "content/simple"];
+const DEFAULT_FOLDER_NAMES = ["images/testimonials", "content/einblicke", "content/simple","images"];
 
-export function getImageImportNameByFolder(root: string[], imageNames: string[]): string[] {
+export function getImageImportNameByFolder(imageNames: string[], root: string[]=[]): string[] {
   return imageNames.map(name => {
       const imageCandidate = [
         ...DEFAULT_FOLDER_NAMES, // relative from default fdlder names

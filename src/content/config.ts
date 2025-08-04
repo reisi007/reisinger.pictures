@@ -43,7 +43,6 @@ const testimonials = defineCollection({
     type: z.nativeEnum(ReviewType),
     date: z.coerce.date(),
     rating: z.number().optional(),
-    video: reference("videos").optional(),
     source: z.string().url("Must be a valid URL").optional()
   })
 });
@@ -54,7 +53,8 @@ const areas = defineCollection({
     name: z.string(),
     priority: z.number().optional().default(9999),
     testimonials: z.array(reference("testimonials")).optional(),
-    images: z.array(z.string())
+    images: z.array(z.string()),
+    heroImage: z.string().optional(),
   })
 });
 
@@ -65,18 +65,8 @@ const simple = defineCollection({
     description: z.string().optional(),
     keywords: z.array(z.string()).optional(),
     showContact: z.boolean().optional(),
-    index: z.boolean().optional()
-  })
-});
-
-const shootingCards = defineCollection({
-  type: "content",
-  schema: z.object({
-    title: z.string(),
-    shutterSpeed: z.string(),
-    fStop: z.string(),
-    iso: z.string().default("AUTO"),
-    expComp: z.string().optional()
+    index: z.boolean().optional(),
+    heroImage: z.string().optional(),
   })
 });
 
@@ -91,7 +81,6 @@ export const collections = {
   areas,
   einblicke,
   einblickeOverviews,
-  shootingCards,
   simple,
   testimonials,
   imageMetadata

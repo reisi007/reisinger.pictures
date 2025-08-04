@@ -1,0 +1,33 @@
+---
+import { getImage } from "astro:assets";
+import { getImageImportNameByPossiblyRelativeName, tryGetImageByAbsoluteName } from "../images/Images";
+import { getAltFromAbsoluteName } from "./image.utils";
+type Props = { name?: string }
+
+const { name } = Astro.props;
+
+if (name === undefined) return;
+
+const absoluteName = getImageImportNameByPossiblyRelativeName(name);
+const socialImage = tryGetImageByAbsoluteName(absoluteName);
+if (socialImage === undefined) throw new Error(`Image "${name}" not found`);
+const alt = await getAltFromAbsoluteName(absoluteName);
+
+const imageInfo = await getImage({
+  src: socialImage,
+  format: "webp",
+  width: 1200,
+  height: 630,
+  fit: "cover"
+});
+
+const { src, options } = imageInfo;
+const fullSrc = Astro.site + src;
+const { width, height, format } = options;
+---
+<meta property="og:image" content={fullSrc} />
+<meta property="og:image:width" content={`${width}`} />
+<meta property="og:image:height" content={`${height}`} />
+<meta property="og:image:type" content={format} />
+<meta property="twitter:image" content={fullSrc} />
+<meta property="twitter:image:alt" content={alt} />
