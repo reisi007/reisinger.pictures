@@ -6,8 +6,9 @@ import BaseHead from "../../layouts/BaseHead.astro";
 import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import { groupBy, slugToName } from "../../utils";
 import ResponsiveImage from "../../layouts/ResponsiveImage.astro";
-import { tryGetImageImportNameByPossiblyRelativeName } from "../../images/Images";
+import { tryGetImageNameByName } from "../../images/Images";
 import Breadcrumbs from "../../layouts/Breadcrumbs.astro";
+import SocialImage from "../../layouts/SocialImage.astro";
 
 export async function getStaticPaths() {
   const testimonials = await getCollection("testimonials");
@@ -22,25 +23,32 @@ export async function getStaticPaths() {
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
-const { type, reviews } = Astro.props as Props;
+const { type, reviews } = Astro.props;
+const heroImage = reviews.map(e => `${e.slug}/large`)
+  .map(e => tryGetImageNameByName(e, []))
+  .find(e => e !== undefined);
+
 const name = slugToName(type);
 ---
 <MinimalPage>
-  <BaseHead title={`${name} Bewertungen`} slot="head" />
+  <BaseHead title={`${name} Bewertungen`} slot="head">
+    <SocialImage name={heroImage} />
+  </BaseHead>
   <Breadcrumbs />
   <h1 class="mb-8">{name} Bewertungen</h1>
   <div class="mx-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
     {reviews.map(async e => {
       const baseName = `images/testimonials/${e.slug}`;
       const smallName = `${baseName}/small`;
-      const small = tryGetImageImportNameByPossiblyRelativeName(smallName);
-      return <>
+      const small = tryGetImageNameByName(smallName, []);
+      return;
+        <>
           {
             small &&
             <div class="avatar">
               <a href={`/testimonials/${e.slug}`} aria-label={e.data.name}>
-              <ResponsiveImage class="rounded-full !size-32" sizes="128px" widths={[128]} name={smallName} />
-                </a>
+                <ResponsiveImage class="rounded-full !size-32" sizes="128px" widths={[128]} name={smallName} />
+              </a>
             </div>
           }
           {

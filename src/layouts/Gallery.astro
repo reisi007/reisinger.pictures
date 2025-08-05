@@ -1,5 +1,5 @@
 ---
-import { getImageImportNameByFolder } from "../images/Images";
+import { getImageNamesByNames } from "../images/Images";
 import ImageGallery from "./ImageGallery.astro";
 import { GalleryLayout } from "./GalleryLayout";
 
@@ -10,7 +10,7 @@ interface Props {
 }
 
 const { folder, sorted, layout } = Astro.props;
-const images = getImageImportNameByFolder(sorted, typeof folder === "string" ? [folder] : folder);
+const images = getImageNamesByNames(sorted, typeof folder === "string" ? [folder] : folder);
 ---
 {images.length > 0 &&
 <ImageGallery images={images} layout={layout} />}

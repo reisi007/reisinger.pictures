@@ -7,28 +7,19 @@ interface Props {
   author?: string;
 }
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-
 const {
-  title: dynamicTitle,
+  title,
   description,
   noIndex = false,
   keywords,
   author = "Florian Reisinger"
 } = Astro.props;
-
-const title = `${dynamicTitle} - reisinger.pictures`;
 ---
 <head>
-  <!-- Global Metadata -->
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="generator" content={Astro.generator} />
-  <!-- Canonical URL -->
-  <link rel="canonical" href={canonicalURL} />
   <link rel="sitemap" href="/sitemap-index.xml" />
 
-  <!-- Primary Meta Tags -->
   <title>{title}</title>
   <meta name="title" content={title} />
   {description &&
@@ -39,7 +30,6 @@ const title = `${dynamicTitle} - reisinger.pictures`;
   {keywords && keywords.length > 0 &&
     <meta name="keywords" content={keywords.join(",")} />}
 
-  <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content={Astro.url} />
   <meta property="og:title" content={title} />
@@ -48,7 +38,6 @@ const title = `${dynamicTitle} - reisinger.pictures`;
   {description &&
     <meta property="og:description" content={description} />}
 
-  <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image" />
   <meta property="twitter:url" content={Astro.url} />
   <meta property="twitter:title" content={title} />
@@ -59,6 +48,5 @@ const title = `${dynamicTitle} - reisinger.pictures`;
     <meta name="robots" content="noindex, follow">}
 
   <link rel="canonical" href={Astro.url} />
-  <slot/>
+  <slot />
 </head>
-<!-- End Matomo Code -->

@@ -1,7 +1,6 @@
 ---
 import { type CollectionEntry } from "astro:content";
-
-import { tryGetImageImportNameByPossiblyRelativeName } from "../images/Images";
+import { tryGetImageNameByName } from "../images/Images";
 import ResponsiveImage from "./ResponsiveImage.astro";
 import { type ReviewProps } from "./Types";
 
@@ -16,8 +15,8 @@ const {
 const baseName = `images/testimonials/${slug}`;
 const smallName = `${baseName}/small`;
 const largeName = `${baseName}/large`;
-const small = tryGetImageImportNameByPossiblyRelativeName(smallName);
-const large = tryGetImageImportNameByPossiblyRelativeName(largeName);
+const small = tryGetImageNameByName(smallName, []);
+const large = tryGetImageNameByName(largeName, []);
 const { Content } = await render();
 ---
 

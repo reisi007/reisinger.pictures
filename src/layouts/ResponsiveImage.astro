@@ -1,7 +1,6 @@
 ---
 import { Image } from "astro:assets";
-import { type JSX } from "astro/jsx-runtime";
-import { getImageImportNameByPossiblyRelativeName, tryGetImageByAbsoluteName } from "../images/Images";
+import { getImageNameByName, getImageByName } from "../images/Images";
 import type { NumericBreakpoints } from "../styles/Breakpoints";
 import { computeSizes, DEFAULT_IMAGE_SIZES, mergeBreakpoints } from "../styles/Breakpoints";
 import { ResponsiveImageLoading } from "./ResponsiveImageLoading";
@@ -11,7 +10,6 @@ import { getAltFromAbsoluteName } from "./image.utils";
 interface Props {
   name: string,
   class?: string,
-  style?: JSX.CSSProperties,
   height?: string,
   sizes?: string,
   widths?: number[],
@@ -24,17 +22,12 @@ const {
   sizes,
   sizeModifiers,
   widths: widthsOverride,
-  height = "80vh",
   loading = ResponsiveImageLoading.LAZY,
-  class: clazz,
-  style,
-  ...other
+  class: classNames
 } = Astro.props;
 
-const absoluteName = getImageImportNameByPossiblyRelativeName(name);
-const imagePromise = tryGetImageByAbsoluteName(absoluteName);
-if (imagePromise === undefined) throw new Error(`Image "${name}" not found.`);
-const image = (await imagePromise).default;
+const absoluteName = getImageNameByName(name);
+const image = (await getImageByName(absoluteName)).default;
 const alt = await getAltFromAbsoluteName(absoluteName);
 const computedSizes = computeSizes(mergeBreakpoints(GALLERY_BREAKPOINTS[GalleryLayout.Full], sizeModifiers));
 const widths: number[] = (widthsOverride ?? DEFAULT_IMAGE_SIZES).filter(s => s <= image.width);
@@ -44,7 +37,7 @@ const maxOptimizedHeight = maxOptimizedWidth * image.height / image.width;
 ---
 <Image
   format="avif"
-  class={clazz}
+  class={classNames}
   quality="med"
   loading={loading}
   widths={widths}
@@ -53,5 +46,4 @@ const maxOptimizedHeight = maxOptimizedWidth * image.height / image.width;
   data-pswp-height={maxOptimizedHeight}
   src={image}
   alt={alt}
-  {...other}
 />

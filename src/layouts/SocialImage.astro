@@ -1,16 +1,19 @@
 ---
 import { getImage } from "astro:assets";
-import { getImageImportNameByPossiblyRelativeName, tryGetImageByAbsoluteName } from "../images/Images";
+import { getImageByName, getImageNameByName } from "../images/Images";
 import { getAltFromAbsoluteName } from "./image.utils";
-type Props = { name?: string }
 
-const { name } = Astro.props;
+interface Props {
+  name?: string,
+  folder?: string
+}
+
+const { name, folder } = Astro.props;
 
 if (name === undefined) return;
 
-const absoluteName = getImageImportNameByPossiblyRelativeName(name);
-const socialImage = tryGetImageByAbsoluteName(absoluteName);
-if (socialImage === undefined) throw new Error(`Image "${name}" not found`);
+const absoluteName = getImageNameByName(name, folder === undefined ? [] : [folder]);
+const socialImage = getImageByName(absoluteName);
 const alt = await getAltFromAbsoluteName(absoluteName);
 
 const imageInfo = await getImage({

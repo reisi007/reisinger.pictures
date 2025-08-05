@@ -5,14 +5,16 @@ import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import BaseHead from "../../layouts/BaseHead.astro";
 import ImageGallery from "../../layouts/ImageGallery.astro";
 import { slugToName } from "../../utils";
-import { getImageImportNameByFolder } from "../../images/Images";
+import { getImageNamesByNames } from "../../images/Images";
 import { GalleryLayout } from "../../layouts/GalleryLayout";
 
 export async function getStaticPaths() {
+  const isDevMode = import.meta.env.MODE === "development";
+  if (!isDevMode) return [];
   return (await getCollection("areas"))
     .map(entry => {
       const { slug: area, data: { images: rawImages } } = entry;
-      const images = getImageImportNameByFolder(rawImages, [`images/${area}`]);
+      const images = getImageNamesByNames(rawImages, [`images/${area}`]);
       return ({
         params: { area },
         props: { images, area }
@@ -25,7 +27,6 @@ type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 const { area, images } = Astro.props as Props;
 
 const name = slugToName(area);
-
 ---
 <MinimalPage>
   <BaseHead title={name} noIndex={true} slot="head" />

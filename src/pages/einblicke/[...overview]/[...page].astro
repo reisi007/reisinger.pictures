@@ -5,6 +5,7 @@ import Einblicke from "../../../layouts/Einblicke.astro";
 import BaseHead from "../../../layouts/BaseHead.astro";
 import Breadcrumbs from "../../../layouts/Breadcrumbs.astro";
 import MinimalPage from "../../../layouts/pages/MinimalPage.astro";
+import SocialImage from "../../../layouts/SocialImage.astro";
 
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
   const overviewPages = (await getCollection("einblickeOverviews"));
@@ -31,9 +32,13 @@ type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 const { page, title, render, slug } = Astro.props;
 const { Content } = await render();
+const { data: posts } = page;
+const { heroImage } = posts[0].data;
 ---
 <MinimalPage>
-  <BaseHead title={title} noIndex={!(slug === "/" && page.url.prev === undefined)} slot="head" />
+  <BaseHead title={title} noIndex={!(slug === "/" && page.url.prev === undefined)} slot="head">
+    <SocialImage name={heroImage} />
+  </BaseHead>
   <Breadcrumbs />
   <h1>{title}</h1>
   <Content />
