@@ -4,7 +4,6 @@ import { getCollection } from "astro:content";
 import BaseHead from "../../layouts/BaseHead.astro";
 import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import ReviewCard from "../../layouts/ReviewCard.astro";
-import Breadcrumbs from "../../layouts/Breadcrumbs.astro";
 import SocialImage from "../../layouts/SocialImage.astro";
 import { tryGetImageNameByName } from "../../images/Images";
 
@@ -28,6 +27,5 @@ const socialImage = tryGetImageNameByName(`${slug}/large`, []);
   <BaseHead title={title} author={name} slot="head">
     <SocialImage name={socialImage} />
   </BaseHead>
-  <Breadcrumbs />
   <ReviewCard {...props} />
 </MinimalPage>

@@ -72,7 +72,7 @@ const matchingUrls = matchingContent.flatMap(k => k)
 ---
 
 {url !== "" &&
-<div class="breadcrumbs">
+<div class="breadcrumbs not-prose">
   <ul>
     <li><a aria-label="Startseite" href="/"><span class="mdi--home" /> Startseite</a></li>
     {matchingUrls.map(({ name, path }) => (

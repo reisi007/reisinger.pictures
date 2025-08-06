@@ -2,6 +2,7 @@ import { defineCollection, reference, z } from "astro:content";
 import { glob } from "astro/loaders";
 
 const einblicke = defineCollection({
+  //loader: glob({pattern: "**/*.mdx", base: "./src/content/einblicke"}),
   type: "content",
   // Type-check frontmatter using a schema
   schema: z.object({

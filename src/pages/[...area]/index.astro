@@ -6,7 +6,6 @@ import FeaturedTestimonials from "../../layouts/FeaturedTestimonials.astro";
 import Gallery from "../../layouts/Gallery.astro";
 import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import { groupBy } from "../../utils";
-import Breadcrumbs from "../../layouts/Breadcrumbs.astro";
 import SocialImage from "../../layouts/SocialImage.astro";
 
 interface Props {
@@ -25,13 +24,12 @@ const reviewSlugs: string[] | undefined = testimonials?.map(e => e.id);
 const { Content } = await render();
 ---
 <MinimalPage>
-  <Breadcrumbs />
-
   <BaseHead title={name} slot="head">
     <SocialImage name={heroImage} folder={`images/${slug}`} />
   </BaseHead>
 
   <h1>{name}</h1>
+
   <Content />
 
   <FeaturedTestimonials slug={slug} categoryTestimonials={categoryReviews} featuredTestimonials={reviewSlugs} />

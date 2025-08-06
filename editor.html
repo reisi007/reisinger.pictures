@@ -4,76 +4,66 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Metadaten Editor</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/editor.css" />
   <script src="editor-api-key.js"></script>
 </head>
-<body >
-<div id="container" >
-  <h1 >Metadaten Editor</h1>
-  <p >Wähle einen Ordner aus, um alle darin enthaltenen Bilder zu überprüfen und die fehlende Titel zu ergänzen.</p>
-  <p id="progressIndicator" ></p>
-  <button
-    id="selectFolderBtn"
+<body class="p-10">
+<div class="card bg-base-100 shadow-xl max-w-4xl mx-auto">
+  <div class="card-body">
+    <h1 class="card-title text-3xl">Metadaten Editor</h1>
+    <p>Wähle einen Ordner aus, um alle darin enthaltenen Bilder zu überprüfen und die fehlende Titel zu ergänzen.</p>
+    <p id="progressIndicator" class="font-semibold text-info"></p>
+    <div class="card-actions">
+      <button id="selectFolderBtn" class="btn btn-primary">Ordner auswählen</button>
+    </div>
 
-  >
-    Ordner auswählen
-  </button>
+    <div id="editor" class="hidden mt-5">
+      <p class="file-info italic text-sm mb-2">
+        Bearbeite Datei: <b id="fileName"></b>
+      </p>
+      <form id="titleForm">
+        <img
+          id="referenceImage"
+          alt="Referenzbild"
+          class="max-w-full h-auto rounded my-4 mx-auto object-contain"
+          style="display: none; max-height: 400px"
+        >
 
-  <div id="editor" >
-    <p >
-      Bearbeite Datei: <b id="fileName"></b>
-    </p>
-    <form id="titleForm">
-      <img
-        id="referenceImage"
-        src=""
-        alt="Referenzbild"
+        <div id="autoDescribeProgress" class="flex items-center gap-2 my-2">
+          <span class="loading loading-spinner text-primary"></span>
+          <span>Bild wird automatisch beschrieben…</span>
+        </div>
 
-        style="display: none; max-height: 25%; height: 400px"
-      >
+        <label for="titleInput" class="block font-medium">Titel:</label>
+        <textarea rows="3"
+                  id="titleInput"
+                  required
+                  class="textarea textarea-bordered w-full text-base mb-4"
+        ></textarea>
 
-      <div
-        id="autoDescribeProgress"
+        <div class="card-actions">
+          <button type="submit" class="btn btn-primary">Speichern und nächste Datei laden</button>
+          <button type="button" id="redoDescriptionBtn" class="btn btn-secondary" disabled>KI-Bildbeschreibung wiederholen</button>
+        </div>
+      </form>
+    </div>
 
-      >
-        <svg  fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <circle  cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path  fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+    <div id="successMessage" class="hidden">
+      <div role="alert" class="alert alert-success">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span>Bild wird automatisch beschrieben…</span>
+        <div>
+          <h2 class="text-2xl font-bold">Alle Dateien wurden erfolgreich verarbeitet!</h2>
+          <p>Es gibt keine weiteren YAML-Dateien ohne Titel in diesem Ordner.</p>
+        </div>
       </div>
-
-      <label for="titleInput" >Titel:</label>
-      <textarea rows="3"
-                id="titleInput"
-                required
-
-      ></textarea>
-
-      <button
-        type="submit"
-
-      >
-        Speichern und nächste Datei laden
-      </button>
-
-      <button
-        type="button"
-        id="redoDescriptionBtn"
-
-      >
-        KI-Bildbeschreibung wiederholen
-      </button>
-    </form>
-  </div>
-
-  <div id="successMessage" >
-    <h2 > Alle Dateien wurden erfolgreich verarbeitet!</h2>
-    <p>Es gibt keine weiteren YAML-Dateien ohne Titel in diesem Ordner.</p>
+    </div>
   </div>
 </div>
 
 <script type="module">
+  // The existing JavaScript code remains unchanged
   import { GoogleGenAI } from "https://cdn.jsdelivr.net/npm/@google/genai@1/+esm";
   import jsyaml from "https://cdn.jsdelivr.net/npm/js-yaml@4/+esm";
 
@@ -115,31 +105,36 @@
     return content.trim();
   }
 
+  const EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"];
+
   // Rekursive Funktion, um YAML-Dateien inkl. Subordner zu sammeln
   async function collectYamlFilesInFolder(folderHandle, parentFolderHandle, files = [], relativePath = "") {
     for await (const entry of folderHandle.values()) {
-      if (entry.kind === "file" && entry.name.endsWith(".jpg")) {
-        const yamlFileName = entry.name.replace(/\.jpg$/, ".yaml");
-
-        let yamlHandle = null;
-        try {
-          yamlHandle = await folderHandle.getFileHandle(yamlFileName, { "mode": "read" });
-          const data = await readYaml(yamlHandle);
-          if (data && typeof data.title === "string" && data.title.trim().length > 0) {
-            continue;
+      for (const ext of EXTENSIONS) {
+        if (entry.kind === "file" && entry.name.endsWith(ext)) {
+          const yamlFileName = entry.name.replace(new RegExp(`${ext.replace(".", "\.")}`), ".yaml");
+          let yamlHandle = null;
+          try {
+            yamlHandle = await folderHandle.getFileHandle(yamlFileName, { "mode": "read" });
+            const data = await readYaml(yamlHandle);
+            if (data && typeof data.title === "string" && data.title.trim().length > 0) {
+              continue;
+            }
+          } catch (e) {
+            // ignore
           }
-        } catch (e) {
-          // ignore
+          const item = {
+            handle: yamlHandle,
+            parentHandle: folderHandle,
+            relativePath: relativePath + yamlFileName,
+            associatedJpgName: entry.name,
+            context: await collectMarkdownContent(parentFolderHandle) + await collectMarkdownContent(folderHandle)
+          };
+          files.push(item);
+
         }
-        const item = {
-          handle: yamlHandle,
-          parentHandle: folderHandle,
-          relativePath: relativePath + yamlFileName,
-          associatedJpgName: entry.name,
-          context: await collectMarkdownContent(parentFolderHandle) + await collectMarkdownContent(folderHandle)
-        };
-        files.push(item);
-      } else if (entry.kind === "directory") {
+      }
+      if (entry.kind === "directory") {
         await collectYamlFilesInFolder(entry, folderHandle, files, relativePath + entry.name + "/");
       }
     }
@@ -178,6 +173,7 @@
 
   function displaySuccessMessage() {
     editorDiv.style.display = "none";
+    progressIndicator.style.display = "none";
     successMessageDiv.style.display = "block";
     updateProgress();
   }
@@ -237,7 +233,6 @@
           }
 
 
-
           assertYamlFileHandle(targetFileHandle);
 
           const writable = await targetFileHandle.createWritable();
@@ -265,11 +260,7 @@
       image.src = URL.createObjectURL(blob);
     });
 
-    // Determine new dimensions keeping aspect ratio with max side
     let { width, height } = img;
-
-
-    // Draw to canvas
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
@@ -283,7 +274,7 @@
 
   // 2. Describe image using Gemini Vision API
   async function describeImageWithGemini(imgElement) {
-    // return new Promise(resolve => setTimeout(resolve, 100)); // Uncomment this line to not call Gemini
+    //  return new Promise(resolve => setTimeout(resolve, 100)); // Uncomment this line to not call Gemini
     const base64Content = await getCompressedBase64(imgElement);
     try {
       const content = {

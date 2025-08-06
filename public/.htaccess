@@ -1,23 +1,10 @@
 RewriteEngine On
-RewriteRule ^paare/?(.*)$ /couples/$1 [R=301,L]
-RewriteRule ^gymnastics/?(.*)$ /turnen/$1 [R=301,L]
-RewriteRule ^(.+)/images/? /$1 [R=301,L]
-RewriteRule ^shootings/tfp/?$ /shootings/ [R=301,L]
-RewriteRule ^([^/]+)/reviews(?:/\d+)?/?$ /$1/testimonials [R=301,L]
-RewriteRule ^akt/boudoir-ablauf/?$ /akt/ablauf [R=301,L]
-RewriteRule ^fotoshooting$ /shootings [R=301,L]
-RewriteRule ^einblicke/aerobic/$ /einblicke/turnen/ [R=301,L]
-RewriteRule ^(akt|beauty|couples)/(\d+)/?$ /$1 [R=301,L]
-RewriteRule ^turnen(/[^/]+)?/?$ /einblicke/turnen/pbs [R=302,L]
-RewriteRule ^einblicke/pbs /einblicke/turnen/pbs [R=302,L]
-RewriteRule ^einblicke/boudoir-fine-art /einblicke/akt/boudoir-fine-art [R=302,L]
-RewriteRule ^einblicke/milchbad /einblicke/akt/milchbad [R=302,L]
-RewriteRule ^einblicke/milchbad-2 /einblicke/akt/milchbad-2 [R=302,L]
-RewriteRule ^einblicke/bundesliga/2023-24/ask-ska /einblicke/sport/bundesliga/2023-24/ask-ska [R=302,L]
-RewriteRule ^einblicke/oefb/aut-pol-2024 /einblicke/sport/oefb/aut-pol-2024 [R=302,L]
-RewriteRule ^einblicke/oefb/aut-sco-2025 /einblicke/sport/oefb/aut-sco-2025 [R=302,L]
-RewriteRule ^einblicke/nero2024 /einblicke/sport/nero2024 [R=302,L]
-RewriteRule ^einblicke/eishockey/2023-24/qf2-bwl-rbs /einblicke/sport/eishockey/2023-24/qf2-bwl-rbs [R=302,L]
-RewriteRule ^einblicke/acsl-basketball-halbfinale-2024 /einblicke/sport/acsl/basketball-halbfinale-2024 [R=302,L]
-RewriteRule ^sport/\d/?$ /sport [R=301,L]
-RewriteRule ^shootings/?$ / [R=301,L]
+RewriteRule ^einblicke/sport/bundesliga/(.*) /einblicke/sport/fussball/bundesliga/$1 [R=302,L]
+RewriteRule ^einblicke/oefb/(.*) /einblicke/sport/fussball/oefb/$1 [R=302,L]
+RewriteRule ^einblicke/(sport/)?nero(\d+) /einblicke/sport/fussball/nero$2 [R=302,L]
+RewriteRule ^einblicke/sport/eishockey/20(.*) /einblicke/sport/eishockey/ice/20$1
+RewriteRule ^einblicke/pflasterspektakel2024 /einblicke/events/2024/pflasterspektakel
+RewriteRule ^einblicke/klangwolke-2024 /einblicke/events/2024/klangwolke
+RewriteRule ^einblicke/schneider-motorsport-2024 /einblicke/events/2024/schneider-motorsport
+RewriteRule ^einblicke/budapest-2024 /einblicke/trips/2024/budapest
+RewriteRule ^einblicke/r1 /einblicke/reviews/r1

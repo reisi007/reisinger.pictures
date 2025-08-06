@@ -7,7 +7,6 @@ import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import { groupBy, slugToName } from "../../utils";
 import ResponsiveImage from "../../layouts/ResponsiveImage.astro";
 import { tryGetImageNameByName } from "../../images/Images";
-import Breadcrumbs from "../../layouts/Breadcrumbs.astro";
 import SocialImage from "../../layouts/SocialImage.astro";
 
 export async function getStaticPaths() {
@@ -34,14 +33,13 @@ const name = slugToName(type);
   <BaseHead title={`${name} Bewertungen`} slot="head">
     <SocialImage name={heroImage} />
   </BaseHead>
-  <Breadcrumbs />
   <h1 class="mb-8">{name} Bewertungen</h1>
   <div class="mx-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
     {reviews.map(async e => {
-      const baseName = `images/testimonials/${e.slug}`;
+      const baseName = `/${e.slug}`;
       const smallName = `${baseName}/small`;
       const small = tryGetImageNameByName(smallName, []);
-      return;
+      return (
         <>
           {
             small &&
@@ -62,7 +60,7 @@ const name = slugToName(type);
               </div>
             </div>
           }
-        </>;
+        </>);
     })}
   </div>
 </MinimalPage>

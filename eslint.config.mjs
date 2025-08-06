@@ -71,7 +71,7 @@ export default defineConfig([{
     "import/no-unresolved": "off"
   }
 }, {
-  files: ["**/*.mjs"],
+  files: ["*.mjs"],
 
   rules: {
     "no-console": "off",

@@ -12,7 +12,7 @@ const {
   render,
   displayLargeImage = true
 } = Astro.props;
-const baseName = `images/testimonials/${slug}`;
+const baseName = `/${slug}`;
 const smallName = `${baseName}/small`;
 const largeName = `${baseName}/large`;
 const small = tryGetImageNameByName(smallName, []);

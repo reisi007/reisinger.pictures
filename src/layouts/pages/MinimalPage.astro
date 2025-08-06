@@ -8,6 +8,7 @@ import { ClientRouter } from "astro:transitions";
 
 import Footer from "../Footer.astro";
 import Header from "../Header.astro";
+import Breadcrumbs from "../Breadcrumbs.astro";
 
 interface Props {
   showContact?: boolean;
@@ -30,6 +31,7 @@ const footerProps = Astro.props;
 <body>
 <Header />
 <main class="container prose max-w-none">
+  <Breadcrumbs></Breadcrumbs>
   <slot />
 </main>
 <Footer {...footerProps}>

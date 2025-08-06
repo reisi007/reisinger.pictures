@@ -3,7 +3,6 @@ import type { InferGetStaticPropsType, PaginateFunction } from "astro";
 import { getCollection } from "astro:content";
 import Einblicke from "../../../layouts/Einblicke.astro";
 import BaseHead from "../../../layouts/BaseHead.astro";
-import Breadcrumbs from "../../../layouts/Breadcrumbs.astro";
 import MinimalPage from "../../../layouts/pages/MinimalPage.astro";
 import SocialImage from "../../../layouts/SocialImage.astro";
 
@@ -21,6 +20,7 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
 
   return overviewPages.flatMap((e) => {
     const relevantPosts = posts.filter(p => e.slug === "/" || p.slug.startsWith(e.slug));
+    if (relevantPosts.length === 0) return [];
     return paginate(relevantPosts, {
       pageSize: 12,
       params: { overview: e.slug },
@@ -39,7 +39,6 @@ const { heroImage } = posts[0].data;
   <BaseHead title={title} noIndex={!(slug === "/" && page.url.prev === undefined)} slot="head">
     <SocialImage name={heroImage} />
   </BaseHead>
-  <Breadcrumbs />
   <h1>{title}</h1>
   <Content />
   <Einblicke page={page} />

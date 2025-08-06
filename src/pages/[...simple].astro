@@ -1,30 +1,28 @@
 ---
-import {type CollectionEntry, getCollection} from 'astro:content';
+import { type CollectionEntry, getCollection } from "astro:content";
 
-import BaseHead from '../layouts/BaseHead.astro';
-import MinimalPage from '../layouts/pages/MinimalPage.astro';
-import Breadcrumbs from "../layouts/Breadcrumbs.astro";
+import BaseHead from "../layouts/BaseHead.astro";
+import MinimalPage from "../layouts/pages/MinimalPage.astro";
 import SocialImage from "../layouts/SocialImage.astro";
 
 export async function getStaticPaths() {
-    const posts = await getCollection('simple');
-    return posts.map((post) => ({
-        params: {simple: post.slug},
-        props: post,
-    }));
+  const posts = await getCollection("simple");
+  return posts.map((post) => ({
+    params: { simple: post.slug },
+    props: post
+  }));
 }
-type Props = CollectionEntry<'simple'>;
+type Props = CollectionEntry<"simple">;
 
-const {render, data} = Astro.props;
-const {title, description,heroImage ,showContact, index = true} = data;
-const {Content} = await render();
+const { render, data } = Astro.props;
+const { title, description, heroImage, showContact, index = true } = data;
+const { Content } = await render();
 ---
 
 <MinimalPage showContact={showContact}>
-    <BaseHead title={title} description={description} noIndex={!index} slot="head">
-<SocialImage name={heroImage}/>
-    </BaseHead>
-    <Breadcrumbs/>
-    <h1>{title}</h1>
-    <Content/>
+  <BaseHead title={title} description={description} noIndex={!index} slot="head">
+    <SocialImage name={heroImage} />
+  </BaseHead>
+  <h1>{title}</h1>
+  <Content />
 </MinimalPage>

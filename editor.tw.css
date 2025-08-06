@@ -1,16 +1,6 @@
-@import "tailwindcss" source("../../src");
+@import "tailwindcss";
 
-@source "../../src/content";
-
-@theme {
-    --color-brand-whatsapp: #25D366;
-    --color-brand-facebook: #3B5998;
-    --color-brand-instagram: #E1306C;
-    --color-brand-podcast: #8940FA;
-    --color-brand-messenger: #00C6FF;
-}
-
-@plugin "@tailwindcss/typography";
+@source not "src";
 
 @plugin "daisyui/theme" {
     name: "reisinger-light";
@@ -74,68 +64,4 @@
 
 @plugin "daisyui" {
     themes: reisinger-light --default, reisinger-dark --prefers-dark;
-}
-
-@plugin "@iconify/tailwind4" {
-    prefixes: mdi, material-symbols;
-}
-
-@layer base {
-    [class*="mdi--"], [class*="material-symbols--"] {
-        @apply iconify;
-    }
-
-    img {
-        @apply max-h-[80vh] object-contain;
-    }
-
-    h1, h2, h3, h4 {
-        @apply text-center;
-    }
-
-    .avatar, .card-title {
-        @apply items-center justify-center;
-    }
-
-    .menu details {
-        @apply z-10
-    }
-
-    .card figure {
-        @apply !my-0
-    }
-
-    .card hr {
-        @apply !mx-2
-    }
-
-    .required.label::after {
-        @apply content-["_*"] text-error;
-    }
-
-    section[data-gallery] {
-        @apply cursor-pointer w-full grid items-center;
-    }
-
-    section[data-gallery="11122"] {
-        @apply xl:grid-cols-2 gap-x-4 gap-y-8
-    }
-
-    section[data-gallery="44488"] {
-        @apply grid-cols-4 xl:grid-cols-8 gap-x-2 gap-y-4
-    }
-
-    section[data-gallery="11122"] img {
-        @apply md:last:odd:col-span-2;
-    }
-
-    .breadcrumbs ul {
-        @apply flex-wrap
-    }
-}
-
-@layer utilities {
-    .container {
-        @apply w-full px-4 sm:px-2 sm:mx-auto sm:w-[540px] md:w-[720px] lg:w-[960px] xl:w-[1140px] 2xl:w-[1320px];
-    }
 }

@@ -6,19 +6,21 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro check && astro build",
+    "editor:css": "tailwindcss -i ./editor.tw.css -o ./editor.css --watch",
     "postbuild": "node clean_output.mjs",
     "preview": "astro preview",
     "pretest": "npx playwright install",
     "test": "playwright test",
     "test:local": "playwright test",
     "test:prod": "cross-env BASE_URL=https://reisinger.pictures playwright test",
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix"
+    "lint": "eslint src *.mjs",
+    "lint:fix": "eslint src *.mjs --fix"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
     "@astrojs/mdx": "^4.3.3",
     "@astrojs/sitemap": "^3.4.2",
+    "@tailwindcss/cli": "^4.1.11",
     "astro": "^5.12.8",
     "dayjs": "^1.11.13",
     "photoswipe": "^5.4.4",
