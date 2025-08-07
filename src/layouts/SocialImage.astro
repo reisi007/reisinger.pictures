@@ -1,7 +1,7 @@
 ---
 import { getImage } from "astro:assets";
 import { getImageByName, getImageNameByName } from "../images/Images";
-import { getAltFromAbsoluteName } from "./image.utils";
+import { getMetadataFromAbsoluteName } from "./image.utils";
 
 interface Props {
   name?: string,
@@ -14,7 +14,7 @@ if (name === undefined) return;
 
 const absoluteName = getImageNameByName(name, folder === undefined ? [] : [folder]);
 const socialImage = getImageByName(absoluteName);
-const alt = await getAltFromAbsoluteName(absoluteName);
+const alt = (await getMetadataFromAbsoluteName(absoluteName))?.title;
 
 const imageInfo = await getImage({
   src: socialImage,

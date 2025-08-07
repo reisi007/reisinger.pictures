@@ -7,7 +7,10 @@ interface Props {
 
 const { page } = Astro.props;
 const { url } = page;
-const { prev, next } = url;
+const { prev: rPrev, next: rNext } = url;
+
+const prev = rPrev?.replace(/[/]{2,}/, "/");
+const next = rNext?.replace(/[/]{2,}/, "/");
 ---
 <div class="join grid grid-cols-2">
   <button class="join-item btn btn-outline" disabled={prev === undefined}><a href={prev}> Vorherige Seite</a></button>

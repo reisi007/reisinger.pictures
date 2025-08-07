@@ -75,6 +75,7 @@ const imageMetadata = defineCollection({
   loader: glob({pattern: "**/*.yaml", base: "./src"}),
   schema: z.object({
     title: z.string().nullish(),
+    darkInvert: z.boolean().default(false)
   })
 })
 
