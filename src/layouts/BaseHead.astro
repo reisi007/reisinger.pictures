@@ -14,6 +14,9 @@ const {
   keywords,
   author = "Florian Reisinger"
 } = Astro.props;
+
+const { href, pathname } = Astro.url;
+const url = pathname === "/" ? href.substring(0, href.length - 1) : href;
 ---
 <head>
   <meta charset="utf-8" />
@@ -31,15 +34,14 @@ const {
     <meta name="keywords" content={keywords.join(",")} />}
 
   <meta property="og:type" content="website" />
-  <meta property="og:url" content={Astro.url} />
+  <meta property="og:url" content={url} />
   <meta property="og:title" content={title} />
   <meta property="og:locale" content="de_AT" />
   <meta property="article:author" content={author} />
   {description &&
     <meta property="og:description" content={description} />}
 
-  <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:url" content={Astro.url} />
+  <meta property="twitter:url" content={url} />
   <meta property="twitter:title" content={title} />
   {description &&
     <meta property="twitter:description" content={description} />}
@@ -47,6 +49,6 @@ const {
   {noIndex &&
     <meta name="robots" content="noindex, follow">}
 
-  <link rel="canonical" href={Astro.url} />
+  <link rel="canonical" href={url} />
   <slot />
 </head>
