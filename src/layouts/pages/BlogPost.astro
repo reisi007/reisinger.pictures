@@ -6,10 +6,11 @@ import FormattedDate from "../FormattedDate.astro";
 import ResponsiveImage from "../ResponsiveImage.astro";
 import MinimalPage from "./MinimalPage.astro";
 import SocialImage from "../SocialImage.astro";
+import Published from "../Published.astro";
 
 type Props = CollectionEntry<"einblicke">["data"];
 
-const { title, description, pubDate, updated, heroImage } = Astro.props;
+const { title, description, heroImage,...dates } = Astro.props;
 ---
 
 <MinimalPage>
@@ -19,13 +20,7 @@ const { title, description, pubDate, updated, heroImage } = Astro.props;
   <article>
     <section>
       <h1>{title}</h1>
-      <div class="text-center">Veröffentlicht am
-        <FormattedDate date={pubDate} />
-        {updated &&
-          <>- aktualisiert am
-            <FormattedDate date={updated} />
-          </>
-        }</div>
+      <Published {...dates} />
       {heroImage &&
         <div>
           <ResponsiveImage name={heroImage} height="32rem" />

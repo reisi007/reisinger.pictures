@@ -68,6 +68,8 @@ const simple = defineCollection({
     showContact: z.boolean().optional(),
     index: z.boolean().optional(),
     heroImage: z.string().optional(),
+    pubDate: z.coerce.date().optional(),
+    updated: z.coerce.date().optional(),
   })
 });
 
