@@ -90,7 +90,7 @@
     }
 
     h1, h2, h3, h4 {
-        @apply text-center;
+        @apply text-center break-words;
     }
 
     .avatar, .card-title {
