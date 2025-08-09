@@ -1,0 +1,53 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import MinimalPage from "../../layouts/pages/MinimalPage.astro";
+import BaseHead from "../../layouts/BaseHead.astro";
+import Published from "../../layouts/Published.astro";
+import FormattedDate from "../../layouts/FormattedDate.astro";
+export async function getStaticPaths() {
+  const posts = await getCollection("agbs");
+
+  // Sort posts by pubDate in descending order to find the latest one.
+  const sortedPosts = posts.toSorted(
+    (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
+  );
+
+
+  return sortedPosts.map((post, idx) => {
+    console.log(post.slug);
+    return {
+      params: { abgs: `agb/${post.slug}` },
+      props: {
+        current: post,
+        older: sortedPosts.filter((_, i) => i !== idx)
+      }
+    };
+  });
+}
+
+interface Props {
+  current: CollectionEntry<"agbs">,
+  older: CollectionEntry<"agbs">[],
+}
+const title = "Allgemeine Geschäftsbedingungen (AGB) für Fotoshootings";
+const { current, older } = Astro.props;
+const { Content } = await current.render();
+console.log({ older });
+---
+<MinimalPage>
+  <BaseHead title={title} slot="head" />
+  <h1>{title}</h1>
+  <Published {...current.data} />
+  {older.length > 0 && (
+    <>
+      <h4> Andere Versionen </h4>
+      <ul>
+        {older.map((post) => (
+          <li><a href={"agb" + post.slug}>
+            AGBs gültig ab
+            <FormattedDate date={post.data.pubDate} />
+          </a></li>))}
+      </ul>
+    </>)}
+  <Content />
+</MinimalPage>

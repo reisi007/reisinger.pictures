@@ -1,6 +1,6 @@
 ---
 import FormattedDate from "./FormattedDate.astro";
-type Props = { pubDate?: Date, updated?: Date };
+interface Props { pubDate?: Date, updated?: Date }
 
 const { pubDate, updated } = Astro.props;
 ---

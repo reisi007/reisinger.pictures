@@ -55,7 +55,7 @@ const areas = defineCollection({
     priority: z.number().optional().default(9999),
     testimonials: z.array(reference("testimonials")).optional(),
     images: z.array(z.string()),
-    heroImage: z.string().optional(),
+    heroImage: z.string().optional()
   })
 });
 
@@ -69,19 +69,27 @@ const simple = defineCollection({
     index: z.boolean().optional(),
     heroImage: z.string().optional(),
     pubDate: z.coerce.date().optional(),
-    updated: z.coerce.date().optional(),
+    updated: z.coerce.date().optional()
+  })
+});
+
+const agbs = defineCollection({
+  type: "content",
+  schema: z.object({
+    pubDate: z.coerce.date()
   })
 });
 
 const imageMetadata = defineCollection({
-  loader: glob({pattern: "**/*.yaml", base: "./src"}),
+  loader: glob({ pattern: "**/*.yaml", base: "./src" }),
   schema: z.object({
     title: z.string().nullish(),
     darkInvert: z.boolean().default(false)
   })
-})
+});
 
 export const collections = {
+   agbs,
   areas,
   einblicke,
   einblickeOverviews,

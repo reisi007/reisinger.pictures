@@ -25,7 +25,7 @@ const imageInfo = await getImage({
 });
 
 const { src, options } = imageInfo;
-const fullSrc = Astro.url.href.replace(/(\w[/]).+/,"$1") + src.substring(1);
+const fullSrc = Astro.url.href.replace(/(\w\/).+/,"$1") + src.substring(1);
 const { width, height, format } = options;
 ---
 <meta property="og:image" content={fullSrc} />
