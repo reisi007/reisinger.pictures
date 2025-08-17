@@ -62,7 +62,7 @@ async function extractUniqueLinksFromFileWithJSDOM(filePath, absoluteUrl) {
     const htmlContent = await readFile(filePath, "utf-8");
     const dom = new JSDOM(htmlContent);
     const { document } = dom.window;
-    const hIds = Array.from(document.querySelectorAll("h1[id], h2[id], h3[id], h4[id]"))
+    const hIds = Array.from(document.querySelectorAll("[id]"))
       .map(element => `${absoluteUrl}#${encodeURIComponent(element.getAttribute("id"))}`);
     const aLinks = Array.from(document.querySelectorAll("a[href]"))
       .map(element => element.getAttribute("href")).map(e => e.includes("#") ? absoluteUrl + e : e);

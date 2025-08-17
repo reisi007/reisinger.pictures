@@ -9,22 +9,25 @@ const posts = (await getCollection("einblicke"))
 
     return Math.max(bData.pubDate.valueOf(), bData.updated?.valueOf() ?? Number.MIN_VALUE) - Math.max(aData.pubDate.valueOf(), aData.updated?.valueOf() ?? Number.MIN_VALUE);
   })
-  .slice(0, 3);
+  .slice(0, 5);
 ---
 
-<section class="mx-auto my-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-  {
-    posts.map((post, i) => (
-      <div
-        class:list={[
-          // The second post is hidden by default and becomes visible at the `md` breakpoint
-          i === 1 && "hidden md:block",
-          // The third post is hidden by default and becomes visible at the `xl` breakpoint
-          i === 2 && "hidden xl:block",
-        ]}
-      >
-        <EinblickCard post={post} />
-      </div>
-    ))
-  }
-</section>
+<div class="w-full">
+  <div class="carousel">
+    {
+      posts.map((post, i) => {
+        const prevPost = posts.at(i - 1);
+        const nextPost = posts.at((i + 1) % posts.length);
+        return (
+          <div id={post.slug.replaceAll("/", "-")} class="carousel-item relative w-full">
+            <EinblickCard post={post} />
+            <div class="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
+              {prevPost !== undefined && <a href={`#${prevPost.slug.replaceAll("/", "-")}`} class="btn btn-circle btn-neutral">❮</a>}
+              {nextPost !== undefined && <a href={`#${nextPost.slug.replaceAll("/", "-")}`} class="btn btn-circle btn-neutral">❯</a>}
+            </div>
+          </div>
+        );
+      })
+    }
+  </div>
+</div>
