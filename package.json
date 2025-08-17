@@ -14,7 +14,8 @@
     "test:local": "playwright test",
     "test:prod": "cross-env BASE_URL=https://reisinger.pictures playwright test",
     "lint": "eslint src *.mjs",
-    "lint:fix": "eslint src *.mjs --fix"
+    "lint:fix": "eslint src *.mjs --fix",
+    "publish": "npm run build && sync.bat"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
