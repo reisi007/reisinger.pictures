@@ -1,10 +1,8 @@
 ---
 import { type CollectionEntry } from "astro:content";
 import { type Page } from "astro";
-import FormattedDate from "./FormattedDate.astro";
 import Pagination from "./Pagination.astro";
-import ResponsiveImage from "./ResponsiveImage.astro";
-import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
+import EinblickCard from "./EinblickCard.astro";
 
 interface Props {
   page: Page<CollectionEntry<"einblicke">>;
@@ -18,25 +16,7 @@ const { data: posts } = page;
 <Pagination page={page} />
 
 <section class="mx-auto my-4 grid gap-y-4 md:grid-cols-2 md:gap-x-4 xl:grid-cols-3">
-  {
-    posts.map((post) =>
-      (
-        <a href={`/einblicke/${post.slug}/`} class="card bg-base-200 shadow-sm hover:shadow-xl transition-shadow no-underline">
-          <figure>
-            <ResponsiveImage class="max-h-96" sizeModifiers={GALLERY_BREAKPOINTS[GalleryLayout.Overview]} name={post.data.heroImage} />
-          </figure>
-          <div class="card-body">
-            <h3 class="card-title">{post.data.title}</h3>
-            <p class="text-center">
-              <FormattedDate date={post.data.updated ?? post.data.pubDate} />
-            </p>
-            <div class="card-actions justify-center">
-              <span class="btn btn-primary">Jetzt lesen</span>
-            </div>
-          </div>
-        </a>
-      ))
-  }
+  {posts.map((post) => <EinblickCard {post} />)}
 </section>
 
 <Pagination page={page} />
