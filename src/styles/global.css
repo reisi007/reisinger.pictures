@@ -85,7 +85,7 @@
         @apply iconify;
     }
 
-    img {
+    img:not(.pswp__img) {
         @apply max-h-[80vh] object-contain;
     }
 
