@@ -6,7 +6,7 @@ function computeKey(key: string) {
   return k;
 }
 
-const IMAGES: Record<string, () => Promise<{
+export const IMAGES: Record<string, () => Promise<{
   default: ImageMetadata;
 }>> = Object.fromEntries(
   Object.entries(

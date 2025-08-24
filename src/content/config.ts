@@ -1,8 +1,8 @@
 import { defineCollection, reference, z } from "astro:content";
-import { glob } from "astro/loaders";
+import { file, glob } from "astro/loaders";
+
 
 const einblicke = defineCollection({
-  //loader: glob({pattern: "**/*.mdx", base: "./src/content/einblicke"}),
   type: "content",
   // Type-check frontmatter using a schema
   schema: z.object({
@@ -84,16 +84,33 @@ const imageMetadata = defineCollection({
   loader: glob({ pattern: "**/*.yaml", base: "./src" }),
   schema: z.object({
     title: z.string().nullish(),
-    darkInvert: z.boolean().default(false)
+    darkInvert: z.boolean().default(false),
+    metadata: z.object({
+      captureDate: z.coerce.date().optional(),
+      aperture: z.string().optional(),
+      shutter: z.string().optional(),
+      iso: z.number().optional(),
+      camera: z.string().optional(),
+      lens: z.string().optional()
+    }).optional().nullable(),
+    categories: z.array(z.string()).optional().nullable()
+  })
+});
+
+const categories = defineCollection({
+  loader: file("src/content/categories.json"),
+  schema: z.object({
+    name: z.string()
   })
 });
 
 export const collections = {
-   agbs,
+  agbs,
   areas,
   einblicke,
   einblickeOverviews,
   simple,
   testimonials,
-  imageMetadata
+  imageMetadata,
+  categories
 };

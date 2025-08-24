@@ -14,7 +14,6 @@ export async function getStaticPaths() {
 
 
   return sortedPosts.map((post, idx) => {
-    console.log(post.slug);
     return {
       params: { abgs: `agb/${post.slug}` },
       props: {
@@ -32,7 +31,6 @@ interface Props {
 const title = "Allgemeine Geschäftsbedingungen (AGB) für Fotoshootings";
 const { current, older } = Astro.props;
 const { Content } = await current.render();
-console.log({ older });
 ---
 <MinimalPage>
   <BaseHead title={title} slot="head" />

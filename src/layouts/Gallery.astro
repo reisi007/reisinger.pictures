@@ -4,12 +4,12 @@ import ImageGallery from "./ImageGallery.astro";
 import { GalleryLayout } from "./GalleryLayout";
 
 interface Props {
-  folder: string | string[],
+  folder?: string | string[],
   sorted: string[],
   layout?: GalleryLayout
 }
 
-const { folder, sorted, layout } = Astro.props;
+const { folder=[], sorted, layout } = Astro.props;
 const images = getImageNamesByNames(sorted, typeof folder === "string" ? [folder] : folder);
 ---
 {images.length > 0 &&
