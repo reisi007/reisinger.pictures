@@ -55,7 +55,7 @@ async function getHtmlFilePaths(dirPath) {
  * @param {string} filePath - The path to the HTML file to process.
  * @param {string} absoluteUrl - The absolute URL of the site.
  * @returns {Promise<{aLinks: string[], hIds: string[]}>} A promise that resolves to an object containing two arrays:
- *   `aLinks` for hrefs and `hIds` for heading IDs. Returns empty arrays on error.
+ * `aLinks` for hrefs and `hIds` for heading IDs. Returns empty arrays on error.
  */
 async function extractUniqueLinksFromFileWithJSDOM(filePath, absoluteUrl) {
   try {
@@ -89,7 +89,7 @@ export async function extractAllLinksRecursivelyWithJSDOM(folderPath, prefix) {
 
     if (htmlFiles.length === 0) {
       console.log(`No HTML files found in "${folderPath}" or its subdirectories.`);
-      return [];
+      return { links: [], anchors: [] };
     }
 
     console.log(`Found ${htmlFiles.length} HTML files to process...`);
@@ -136,6 +136,7 @@ export async function extractLocsFromSitemap(sitemapPath) {
     const { document } = dom.window;
     return Array.from(document.querySelectorAll("loc"))
       .map(element => element.textContent)
+      .map(e => decodeURI(e))
       .filter(e => e !== undefined);
   } catch (error) {
     console.error(`Failed to parse sitemap at ${sitemapPath}:`, error);
@@ -162,4 +163,3 @@ if (missingUrls.length > 0)
   throw new Error(`Found ${missingUrls.length} missing links:\n${missingUrls.join("\n")}`);
 else
   console.log("No missing links found!");
-

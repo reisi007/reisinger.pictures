@@ -1,0 +1,40 @@
+---
+export interface GalleryNode {
+  slug: string;
+  name: string;
+  children: GalleryNode[];
+}
+
+interface Props {
+  node: GalleryNode;
+  currentPath: string;
+}
+
+const { node, currentPath} = Astro.props;
+
+const hasChildren = node.children.length > 0;
+
+// Prepend the prefix to the slug to create the final URL
+const href = `/gallery/${node.slug}`;
+---
+{hasChildren ? (
+<li>
+  <details>
+    <summary>
+      <a href={href} class="menu-parent-link after:mr-6">{node.name}</a>
+    </summary>
+    <ul>
+      {node.children.map(childNode => (
+        <Astro.self
+          node={childNode}
+          currentPath={currentPath}
+        />
+      ))}
+    </ul>
+  </details>
+</li>
+  ) : (
+<li>
+  <a href={href}>{node.name}</a>
+</li>
+  )}

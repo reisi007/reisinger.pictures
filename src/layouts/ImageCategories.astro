@@ -1,0 +1,27 @@
+---
+import { getEntry } from "astro:content";
+import EinblickCard from "./EinblickCard.astro";
+import type { CollectionEntry } from "astro:content";
+import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
+
+type Props = { categories: string[], einblicke?: CollectionEntry<"einblicke"> };
+
+const { categories, einblicke } = Astro.props;
+---
+<h2>Kategorien</h2>
+<div class="mb-8">
+  <div class="grid grid-cols-2 lg:grid-cols-4 justify-center items-center gap-x-2 gap-y-4">
+    {categories.map(async category => {
+      const cat = await getEntry("categories", category);
+      return (
+        <a href={"/gallery/" + (category === "/" ? "" : category)} class="mx-auto badge badge-lg badge-primary hover:badge-secondary transition-colors duration-300">
+          {cat?.data.name}
+        </a>
+      );
+    })}
+  </div>
+  {einblicke !== undefined && (
+    <h2>Einblicke</h2>
+    <EinblickCard post={einblicke} imageSizeModifiers={GALLERY_BREAKPOINTS[GalleryLayout.Full]} />
+  )}
+</div>

@@ -4,23 +4,23 @@
 <script>
   import PhotoSwipeLightbox from "photoswipe/lightbox";
 
-    document.addEventListener("astro:page-load", () => {
-      const lightbox = new PhotoSwipeLightbox({
-        gallery: "section[data-gallery]",
-        children: "img:not([data-bg])",
-        thumbSelector: "img[data-bg]",
-        pswpModule: () => import("photoswipe")
-        });
+  document.addEventListener("astro:page-load", () => {
+    const lightbox = new PhotoSwipeLightbox({
+      gallery: "section[data-gallery]:not([data-clickable])",
+      children: "img:not([data-bg])",
+      thumbSelector: "img[data-bg]",
+      pswpModule: () => import("photoswipe")
+    });
 
-      lightbox.addFilter("domItemData", (itemData, element) => {
-        const imgElement = element as HTMLImageElement;
-        itemData.src = imgElement.src;
-        itemData.msrc = imgElement.src;
-        itemData.srcset = imgElement.srcset;
-        itemData.width = parseInt(imgElement.dataset?.pswpWidth ?? "0", 10);
-        itemData.height = parseInt(imgElement.dataset?.pswpHeight ?? "0", 10);
-        return itemData;
-        });
-      lightbox.init();
-      });
+    lightbox.addFilter("domItemData", (itemData, element) => {
+      const imgElement = element as HTMLImageElement;
+      itemData.src = imgElement.src;
+      itemData.msrc = imgElement.src;
+      itemData.srcset = imgElement.srcset;
+      itemData.width = parseInt(imgElement.dataset?.pswpWidth ?? "0", 10);
+      itemData.height = parseInt(imgElement.dataset?.pswpHeight ?? "0", 10);
+      return itemData;
+    });
+    lightbox.init();
+  });
 </script>

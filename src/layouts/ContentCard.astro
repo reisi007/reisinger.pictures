@@ -1,0 +1,53 @@
+---
+import FormattedDate from "./FormattedDate.astro";
+import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
+import ResponsiveImage from "./ResponsiveImage.astro";
+import type { NumericBreakpoints } from "../styles/Breakpoints";
+
+interface Props {
+  href: string;
+  imageName: string;
+  title: string;
+  date?: Date;
+  ctaLabel?: string;
+  imageSizeModifiers?: Partial<NumericBreakpoints>;
+  class?: string;
+}
+
+const {
+  href,
+  imageName,
+  title,
+  date,
+  ctaLabel = "Jetzt lesen", // Standardwert für den Button
+  imageSizeModifiers = GALLERY_BREAKPOINTS[GalleryLayout.Overview], // Standardwert für die Bildgrößen
+  class: className, // 'class' ist ein reserviertes Wort, wir benennen es um
+} = Astro.props;
+---
+
+<a href={href} class:list={[
+  "card bg-base-200 shadow-sm hover:shadow-xl transition-shadow no-underline group",
+  className
+]}>
+  <figure>
+    <ResponsiveImage
+      class="max-h-96"
+      sizeModifiers={imageSizeModifiers}
+      name={imageName}
+    />
+  </figure>
+  <div class="card-body">
+    <h3 class="card-title group-hover:text-primary transition-colors">{title}</h3>
+
+    {/* Das Datum wird nur gerendert, wenn es übergeben wird */}
+    {date && (
+      <p class="text-center text-sm text-base-content/70">
+        <FormattedDate date={date} />
+      </p>
+    )}
+
+    <div class="card-actions justify-center mt-4">
+      <span class="btn btn-primary">{ctaLabel}</span>
+    </div>
+  </div>
+</a>

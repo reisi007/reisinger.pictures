@@ -1,27 +1,20 @@
 ---
 import { type CollectionEntry } from "astro:content";
-import FormattedDate from "./FormattedDate.astro";
-import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
-import ResponsiveImage from "./ResponsiveImage.astro";
+import ContentCard from "./ContentCard.astro";
+import type { NumericBreakpoints } from "../styles/Breakpoints";
 
 interface Props {
   post: CollectionEntry<"einblicke">;
+  imageSizeModifiers?: Partial<NumericBreakpoints>;
 }
 
-const { post } = Astro.props;
+const { post,imageSizeModifiers } = Astro.props;
 ---
 
-<a href={`/einblicke/${post.slug}/`} class="card bg-base-200 shadow-sm hover:shadow-xl transition-shadow no-underline">
-  <figure>
-    <ResponsiveImage class="max-h-96" sizeModifiers={GALLERY_BREAKPOINTS[GalleryLayout.Overview]} name={post.data.heroImage} />
-  </figure>
-  <div class="card-body">
-    <h3 class="card-title">{post.data.title}</h3>
-    <p class="text-center">
-      <FormattedDate date={post.data.updated ?? post.data.pubDate} />
-    </p>
-    <div class="card-actions justify-center">
-      <span class="btn btn-primary">Jetzt lesen</span>
-    </div>
-  </div>
-</a>
+<ContentCard
+  href={`/einblicke/${post.slug}/`}
+  imageName={post.data.heroImage}
+  title={post.data.title}
+  date={post.data.updated ?? post.data.pubDate}
+  imageSizeModifiers={imageSizeModifiers}
+/>

@@ -88,6 +88,7 @@ const imageMetadata = defineCollection({
     metadata: z.object({
       captureDate: z.coerce.date().optional(),
       aperture: z.string().optional(),
+      focalLength: z.string().optional(),
       shutter: z.string().optional(),
       iso: z.number().optional(),
       camera: z.string().optional(),

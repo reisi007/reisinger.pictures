@@ -5,7 +5,7 @@ import ExifReader from "exifreader";
 
 // The root folder to start searching from
 const FOLDER_PATH = "./src";
-const CATEGORIES_PATH = path.join(FOLDER_PATH, 'content', 'categories.json');
+const CATEGORIES_PATH = path.join(FOLDER_PATH, "content", "categories.json");
 
 /**
  * Recursively gets all file paths from a directory.
@@ -51,7 +51,7 @@ function formatShutterSpeed(value) {
  * @returns {string | undefined} - The formatted aperture string.
  */
 function formatAperture(value) {
-  if (typeof value !== 'string') return undefined;
+  if (typeof value !== "string") return undefined;
   return value.replace(".0", "");
 }
 
@@ -61,8 +61,8 @@ function formatAperture(value) {
  * @returns {string | undefined} - The formatted ISO date string.
  */
 function formatCaptureDate(value) {
-  if (typeof value !== 'string' || value.length !== 19) return undefined;
-  const datePart = value.substring(0, 10).replace(/:/g, '-');
+  if (typeof value !== "string" || value.length !== 19) return undefined;
+  const datePart = value.substring(0, 10).replace(/:/g, "-");
   const timePart = value.substring(11);
   return `${datePart}T${timePart}`;
 }
@@ -71,14 +71,14 @@ function formatCaptureDate(value) {
  * The main function to process all YAML files.
  */
 async function processFiles() {
-  console.log(`🔍 Lese Dateien rekursiv von: ${FOLDER_PATH}`);
+  console.log(` Lese Dateien rekursiv von: ${FOLDER_PATH}`);
   let filesUpdatedCount = 0;
 
   // Initialize a new Map for categories for this run.
   // Add the static "All Pictures" category.
   let categoriesMap = new Map();
-  categoriesMap.set('/', { name: 'Alle Bilder' });
-  console.log('🗂️ Kategorien werden basierend auf den Bildern neu erstellt.');
+  categoriesMap.set("/", { name: "Alle Bilder" });
+  console.log("🗂️ Kategorien werden basierend auf den Bildern neu erstellt.");
 
   try {
     const allFiles = await getAllFiles(FOLDER_PATH);
@@ -95,9 +95,22 @@ async function processFiles() {
         const fileContent = await fs.readFile(yamlFilePath, "utf8");
         const data = yaml.load(fileContent) || {};
 
-        // --- 1. Generate Slug ---
+        // --- 1. Generate and Clean Slug ---
         const relativePath = path.relative(FOLDER_PATH, yamlFilePath);
-        const slug = relativePath.replace(/\.(yml|yaml)$/, '').replace(/[\\/]/g, '-');
+        let slug = relativePath.replace(/\.(yml|yaml)$/, "").replace(/[\\/]/g, "-");
+
+        // List of prefixes to remove from the start of the slug
+        const prefixesToRemove = [
+          "images-testimonials-",
+          "images-",
+          "content-einblicke-",
+          "content-simple-"
+        ];
+        for (const prefix of prefixesToRemove) {
+          if (slug.startsWith(prefix)) {
+            slug = slug.substring(prefix.length);
+          }
+        }
         data.slug = slug;
 
         // Process only if metadata is missing
@@ -107,16 +120,16 @@ async function processFiles() {
           if (data.metadata?.captureDate) {
             const date = new Date(data.metadata.captureDate);
             const year = date.getFullYear();
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, "0");
+            const day = date.getDate().toString().padStart(2, "0");
 
             const catYearKey = `${year}`;
             const catMonthKey = `${year}/${month}`;
             const catDayKey = `${year}/${month}/${day}`;
 
-            if (!categoriesMap.has(catYearKey)) categoriesMap.set(catYearKey, { name: new Intl.DateTimeFormat('de-AT', { year: 'numeric' }).format(date) });
-            if (!categoriesMap.has(catMonthKey)) categoriesMap.set(catMonthKey, { name: new Intl.DateTimeFormat('de-AT', { month: 'long', year: 'numeric' }).format(date) });
-            if (!categoriesMap.has(catDayKey)) categoriesMap.set(catDayKey, { name: new Intl.DateTimeFormat('de-AT', { day: 'numeric', month: 'long', year: 'numeric' }).format(date) });
+            if (!categoriesMap.has(catYearKey)) categoriesMap.set(catYearKey, { name: new Intl.DateTimeFormat("de-AT", { year: "numeric" }).format(date) });
+            if (!categoriesMap.has(catMonthKey)) categoriesMap.set(catMonthKey, { name: new Intl.DateTimeFormat("de-AT", { month: "long", year: "numeric" }).format(date) });
+            if (!categoriesMap.has(catDayKey)) categoriesMap.set(catDayKey, { name: new Intl.DateTimeFormat("de-AT", { day: "numeric", month: "long", year: "numeric" }).format(date) });
           }
           continue;
         }
@@ -135,37 +148,39 @@ async function processFiles() {
           const newMetadata = {
             captureDate: isoDate,
             aperture: formatAperture(exifData.FNumber?.description),
+            focalLength: exifData.FocalLength?.description,
             shutter: exifData.ExposureTime?.value ? formatShutterSpeed(exifData.ExposureTime.value) : undefined,
             iso: exifData.ISOSpeedRatings?.description,
             camera: exifData.Model?.description,
-            lens: exifData.LensModel?.description,
+            lens: exifData.LensModel?.description
           };
 
           Object.keys(newMetadata).forEach(key => newMetadata[key] === undefined && delete newMetadata[key]);
           data.metadata = newMetadata;
 
           // --- 3. Generate and Assign Categories ---
-          if (isoDate) {
+          // Do not add categories for files ending with "small"
+          if (isoDate && !fileBasename.endsWith("small")) {
             const date = new Date(isoDate);
             const year = date.getFullYear();
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, "0");
+            const day = date.getDate().toString().padStart(2, "0");
 
             const catYearKey = `${year}`;
             const catMonthKey = `${year}/${month}`;
             const catDayKey = `${year}/${month}/${day}`;
 
-            data.categories = ['/', catYearKey, catMonthKey, catDayKey];
+            data.categories = ["/", catYearKey, catMonthKey, catDayKey];
 
             // Add new categories to the central map if they don't exist
             if (!categoriesMap.has(catYearKey)) {
-              categoriesMap.set(catYearKey, { name: new Intl.DateTimeFormat('de-AT', { year: 'numeric' }).format(date) });
+              categoriesMap.set(catYearKey, { name: new Intl.DateTimeFormat("de-AT", { year: "numeric" }).format(date) });
             }
             if (!categoriesMap.has(catMonthKey)) {
-              categoriesMap.set(catMonthKey, { name: new Intl.DateTimeFormat('de-AT', { month: 'long', year: 'numeric' }).format(date) });
+              categoriesMap.set(catMonthKey, { name: new Intl.DateTimeFormat("de-AT", { month: "long", year: "numeric" }).format(date) });
             }
             if (!categoriesMap.has(catDayKey)) {
-              categoriesMap.set(catDayKey, { name: new Intl.DateTimeFormat('de-AT', { day: 'numeric', month: 'long', year: 'numeric' }).format(date) });
+              categoriesMap.set(catDayKey, { name: new Intl.DateTimeFormat("de-AT", { day: "numeric", month: "long", year: "numeric" }).format(date) });
             }
           }
 
@@ -203,7 +218,7 @@ async function processFiles() {
 
 
       const categoriesJson = JSON.stringify(categoriesList, null, 2);
-      await fs.writeFile(CATEGORIES_PATH, categoriesJson, 'utf8');
+      await fs.writeFile(CATEGORIES_PATH, categoriesJson, "utf8");
       console.log(`\n🗂️ ${categoriesMap.size} Kategorien wurden in '${CATEGORIES_PATH}' gespeichert.`);
     }
 

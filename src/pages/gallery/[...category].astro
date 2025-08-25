@@ -3,10 +3,12 @@ import { getCollection } from "astro:content";
 import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import type { InferGetStaticPropsType } from "astro";
 import BaseHead from "../../layouts/BaseHead.astro";
-import Gallery from "../../layouts/Gallery.astro";
 import { GalleryLayout } from "../../layouts/GalleryLayout";
 import SocialImage from "../../layouts/SocialImage.astro";
-
+import ResponsiveImage from "../../layouts/ResponsiveImage.astro";
+import { getImageMetadataSlugFromAbsoluteName } from "../../layouts/image.utils";
+import GalleryMenu from "../../layouts/GalleryMenu.astro";
+import categories from "../../content/categories.json";
 
 export async function getStaticPaths() {
   const categories = await getCollection("categories");
@@ -22,6 +24,7 @@ export async function getStaticPaths() {
 }
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 const { data, images } = Astro.props;
+const { category: currentPath } = Astro.params;
 const { name } = data;
 
 const title = name !== "Alle Bilder" ? `Alle Bilder - ${name}` : name;
@@ -30,8 +33,20 @@ const title = name !== "Alle Bilder" ? `Alle Bilder - ${name}` : name;
   <BaseHead title={title} slot="head">
     <SocialImage name={images[0]} />
   </BaseHead>
+
+  <GalleryMenu categories={categories} currentPath={currentPath} />
+
   <h1>{title}</h1>
 
-  <Gallery layout={GalleryLayout.Overview} sorted={images} />
+  <section data-clickable data-gallery={GalleryLayout.Presentation}>
+    {images.map((image) => {
+      return (
+        <a href={`/gallery/${getImageMetadataSlugFromAbsoluteName(image)}`}>
+          <ResponsiveImage name={image} />
+        </a>
+      );
+    })}
+  </section>
+
 
 </MinimalPage>

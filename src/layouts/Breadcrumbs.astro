@@ -16,9 +16,6 @@ function titleOrUndefined(o: Record<string, unknown>): string | undefined {
 }
 
 function getSlug(o: { id: string, slug?: string, data: Record<string, unknown> }) {
-  if (typeof o.data.slug === "string") {
-    return o.data.slug;
-  }
   if (o.slug)
     return o.slug;
   return o.id;
@@ -43,7 +40,7 @@ const contentPrefixConfig: Record<DataCollectionKey, string> = {
 };
 
 const collectionKeys = Object.entries(contentPrefixConfig)
-  .filter(([, v]) => url.startsWith(`/${v}`))
+  .filter(([, v]) => v === "" || url.startsWith(`/${v}`))
   .map(([k]) => k as DataCollectionKey);
 
 
@@ -55,12 +52,13 @@ const matchingContent = (await Promise.all(
             if (path.length > 0)
               path = `/${path}`;
             const slug = getSlug(e);
-            if (slug)
+            if (slug !== "/")
               path += `/${slug}`;
-            return ({
+
+            return {
               path,
               name: titleOrUndefined(e.data) ?? toName(slug)
-            });
+            };
           }
         )
       )
@@ -69,7 +67,8 @@ const matchingContent = (await Promise.all(
 
 
 const matchingUrls = matchingContent.flatMap(k => k)
-  .filter(({ path }) => url.startsWith(path) && path !== url)
+  // This filter is updated to match full path segments
+  .filter(({ path }) => path !== "" && path !== url && url.startsWith(`${path}/`))
   .sort(({ path: a }, { path: b }) => a.length - b.length);
 ---
 

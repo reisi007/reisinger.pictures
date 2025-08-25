@@ -1,0 +1,76 @@
+---
+import GalleryMenuItem from "./GalleryMenuItem.astro";
+import type { GalleryNode } from "./GalleryMenuItem.astro";
+
+interface Category {
+  slug: string;
+  name: string;
+}
+
+interface Props {
+  categories: Category[];
+  currentPath?: string;
+  linkPrefix?: string;
+}
+
+const { categories, currentPath = "" } = Astro.props;
+const rootItem = categories.find(cat => cat.slug === "/");
+const dateCategories = categories.filter(cat => cat.slug !== "/");
+// Handle the root link's href separately
+const rootHref = rootItem?.slug === "/" ? "/gallery" : `gallery/${rootItem?.slug}`;
+const tree: GalleryNode[] = [];
+const map: { [key: string]: GalleryNode } = {};
+dateCategories.forEach(item => {
+  const parts = item.slug.split("/");
+  const parentSlug = parts.slice(0, -1).join("/");
+  map[item.slug] = { ...item, children: [] };
+  const node = map[item.slug];
+  if (map[parentSlug]) {
+    map[parentSlug].children.push(node);
+  } else {
+    tree.push(node);
+  }
+});
+---
+<div class="menu-title text-lg font-bold text-center">Bilder-Archiv</div>
+{/* The ID is added here to uniquely identify the menu container */}
+<ul id="gallery-accordion-menu" class="w-full justify-center menu menu-vertical bg-base-200 rounded-box grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
+  {rootItem && (
+    <li><a href={rootHref}>{rootItem.name}</a></li>
+  )}
+
+  {tree.map(node => (
+    <GalleryMenuItem
+      node={node}
+      currentPath={currentPath}
+    />
+  ))}
+</ul>
+
+<script>
+  // This script ensures only one submenu is open at a time.
+  document.addEventListener("astro:page-load", () => {
+    const menu = document.getElementById("gallery-accordion-menu");
+    if (!menu) return;
+
+    // Get all top-level <details> elements within the menu.
+    // The ':scope > li > details' selector is important to only affect
+    // the main level and not nested submenus.
+    const detailsElements = Array.from(menu.querySelectorAll(":scope > li > details"));
+
+    detailsElements.forEach(details => {
+      details.addEventListener("toggle", (_) => {
+        // If the current <details> was just opened...
+        if (details.hasAttribute("open")) {
+          // ...then loop through all other top-level <details> elements.
+          detailsElements.forEach(otherDetails => {
+            // If it's not the one we just opened, close it.
+            if (otherDetails !== details) {
+              otherDetails.removeAttribute("open");
+            }
+          });
+        }
+      });
+    });
+  });
+</script>
