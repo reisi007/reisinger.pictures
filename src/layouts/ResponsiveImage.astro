@@ -5,7 +5,7 @@ import type { NumericBreakpoints } from "../styles/Breakpoints";
 import { computeSizes, DEFAULT_IMAGE_SIZES, mergeBreakpoints } from "../styles/Breakpoints";
 import { ResponsiveImageLoading } from "./ResponsiveImageLoading";
 import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
-import { getMetadataFromAbsoluteName } from "./image.utils";
+import { getMetadataForImageSlug } from "./image.utils";
 
 interface Props {
   name: string,
@@ -28,7 +28,7 @@ const {
 
 const absoluteName = getImageNameByName(name);
 const image = (await getImageByName(absoluteName)).default;
-const data = await getMetadataFromAbsoluteName(absoluteName);
+const data = await getMetadataForImageSlug(absoluteName);
 const alt = data?.title ?? "";
 const darkInvert = data?.darkInvert ?? false;
 const computedSizes = computeSizes(mergeBreakpoints(GALLERY_BREAKPOINTS[GalleryLayout.Full], sizeModifiers));

@@ -6,19 +6,16 @@ import BaseHead from "../../layouts/BaseHead.astro";
 import { GalleryLayout } from "../../layouts/GalleryLayout";
 import SocialImage from "../../layouts/SocialImage.astro";
 import ResponsiveImage from "../../layouts/ResponsiveImage.astro";
-import { getImageMetadataSlugFromAbsoluteName } from "../../layouts/image.utils";
 import GalleryMenu from "../../layouts/GalleryMenu.astro";
 import categories from "../../content/categories.json";
+import { computeKey } from "../../images/Images";
 
 export async function getStaticPaths() {
   const categories = await getCollection("categories");
   return await Promise.all(categories.map(async (category) => {
     const images = (await getCollection("imageMetadata", e => e.data.categories?.includes(category.id) ?? false))
       .sort((a, b) => (b.data.metadata?.captureDate?.getTime() ?? -1) - (a.data.metadata?.captureDate?.getTime() ?? -1))
-      .map(e => {
-        const { filePath = "xxxxxxxxx" } = e;
-        return filePath.substring(4, filePath.length - 5);
-      });
+      .map(e => computeKey(e.filePath ?? ""));
     return ({ params: { category: category.id }, props: { data: category.data, images } });
   }));
 }
@@ -41,7 +38,7 @@ const title = name !== "Alle Bilder" ? `Alle Bilder - ${name}` : name;
   <section data-clickable data-gallery={GalleryLayout.Presentation}>
     {images.map((image) => {
       return (
-        <a href={`/gallery/${getImageMetadataSlugFromAbsoluteName(image)}`}>
+        <a href={`/gallery/${image}`}>
           <ResponsiveImage name={image} />
         </a>
       );

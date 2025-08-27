@@ -97,7 +97,7 @@ async function processFiles() {
 
         // --- 1. Generate and Clean Slug ---
         const relativePath = path.relative(FOLDER_PATH, yamlFilePath);
-        let slug = relativePath.replace(/\.(yml|yaml)$/, "").replace(/[\\/]/g, "-");
+        let slug = relativePath.replace(/\.(yml|yaml)$/, "").replace(/[\\/ ]/g, "-");
 
         // List of prefixes to remove from the start of the slug
         const prefixesToRemove = [

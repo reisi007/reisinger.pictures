@@ -1,9 +1,39 @@
 import type { ImageMetadata } from "astro";
 
-function computeKey(key: string) {
-  let k = key.substring(5);
-  k = k.substring(0, k.indexOf("."));
-  return k;
+export function computeKey(key: string): string {
+  // Replace all forward slashes with hyphens to create a slug-like string.
+  let slug = key.replaceAll("/", "-");
+
+  // Define a list of prefixes that should be removed from the beginning of the slug.
+  const prefixesToRemove: string[] = [
+    "images-testimonials-",
+    "images-",
+    "content-einblicke-",
+    "content-simple-"
+  ].flatMap(e => [
+    `src-${e}`,
+    `-src-${e}`
+  ]);
+
+  // Iterate over the prefixes and remove the first one that matches.
+  for (const prefix of prefixesToRemove) {
+    if (slug.startsWith(prefix)) {
+      slug = slug.substring(prefix.length);
+      // Break the loop after the first match to avoid removing multiple prefixes.
+      break;
+    }
+  }
+
+  // Find the position of the last dot to identify the file extension.
+  const lastDotIndex = slug.lastIndexOf(".");
+
+  // If a dot is found and it's not the first character, remove the extension.
+  if (lastDotIndex > 0) {
+    slug = slug.substring(0, lastDotIndex);
+  }
+
+  // Return the final computed key.
+  return slug;
 }
 
 export const IMAGES: Record<string, () => Promise<{
@@ -32,18 +62,14 @@ export function getImageByName(name?: string, root: string[] = []) {
   return image;
 }
 
-const DEFAULT_FOLDER_NAMES = ["images/testimonials", "content/einblicke", "content/simple", "images"];
 
 export function tryGetImageNameByName(name: string | undefined, roots: string[] = []) {
   if (name === undefined)
     return undefined;
-  return [
-    ...DEFAULT_FOLDER_NAMES, // relative from default fdlder names
-    ...roots, // absolute root folders
-    ...DEFAULT_FOLDER_NAMES.flatMap(dn => roots.map(e => `${dn}/${e}`)) // relative root folders
-  ]
+  return roots
     .map(e => `${e}/${name}`) // relative file name
     .concat(name) // absolute file name
+    .map(e => e.replaceAll("/", "-"))
     .find(e => IMAGES[e] !== undefined);
 }
 

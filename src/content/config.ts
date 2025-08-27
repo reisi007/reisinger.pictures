@@ -90,7 +90,7 @@ const imageMetadata = defineCollection({
       aperture: z.string().optional(),
       focalLength: z.string().optional(),
       shutter: z.string().optional(),
-      iso: z.number().optional(),
+      iso: z.coerce.number().optional(),
       camera: z.string().optional(),
       lens: z.string().optional()
     }).optional().nullable(),

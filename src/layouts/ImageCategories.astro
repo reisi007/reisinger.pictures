@@ -3,10 +3,12 @@ import { getEntry } from "astro:content";
 import EinblickCard from "./EinblickCard.astro";
 import type { CollectionEntry } from "astro:content";
 import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
+import ContentCard from "./ContentCard.astro";
+import type { Props as ContentCardProps } from "./ContentCard.astro";
 
-type Props = { categories: string[], einblicke?: CollectionEntry<"einblicke"> };
+type Props = { categories: string[], einblicke?: CollectionEntry<"einblicke">, urls: ContentCardProps[] };
 
-const { categories, einblicke } = Astro.props;
+const { categories, einblicke, urls } = Astro.props;
 ---
 <h2>Kategorien</h2>
 <div class="mb-8">
@@ -23,5 +25,12 @@ const { categories, einblicke } = Astro.props;
   {einblicke !== undefined && (
     <h2>Einblicke</h2>
     <EinblickCard post={einblicke} imageSizeModifiers={GALLERY_BREAKPOINTS[GalleryLayout.Full]} />
+  )}
+  {urls.length > 0 && (
+    <h2>Entdecke mehr zu diesem Bild</h2>
+    <div class="grid gap-y-4">
+      {urls.map((ccp) => (
+        <ContentCard {...ccp} />))}
+    </div>
   )}
 </div>
