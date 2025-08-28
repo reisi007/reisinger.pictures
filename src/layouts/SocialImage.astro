@@ -1,23 +1,21 @@
 ---
 import { getImage } from "astro:assets";
-import { getImageByName, getImageNameByName } from "../images/Images";
+import { getImage as getImageByName } from "../images/Images";
 import { getMetadataForImageSlug } from "./image.utils";
 
 interface Props {
-  name?: string,
-  folder?: string
+  name?: string;
 }
 
-const { name, folder } = Astro.props;
+const { name } = Astro.props;
 
 if (name === undefined) return;
 
-const absoluteName = getImageNameByName(name, folder === undefined ? [] : [folder]);
-const socialImage = getImageByName(absoluteName);
-const alt = (await getMetadataForImageSlug(absoluteName))?.title;
+
+const alt = (await getMetadataForImageSlug(name))?.title;
 
 const imageInfo = await getImage({
-  src: socialImage,
+  src: getImageByName(name),
   format: "webp",
   width: 1200,
   height: 630,
@@ -25,7 +23,7 @@ const imageInfo = await getImage({
 });
 
 const { src, options } = imageInfo;
-const fullSrc = Astro.url.href.replace(/(\w\/).+/,"$1") + src.substring(1);
+const fullSrc = Astro.url.href.replace(/(\w\/).+/, "$1") + src.substring(1);
 const { width, height, format } = options;
 ---
 <meta property="og:image" content={fullSrc} />

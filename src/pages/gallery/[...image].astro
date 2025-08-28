@@ -1,5 +1,5 @@
 ---
-import { getCollection } from "astro:content";
+import {type AnyEntryMap, getCollection } from "astro:content";
 import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import type { InferGetStaticPropsType } from "astro";
 import BaseHead from "../../layouts/BaseHead.astro";
@@ -9,6 +9,7 @@ import ImageMetadata from "../../layouts/ImageMetadata.astro";
 import ImageCategories from "../../layouts/ImageCategories.astro";
 import { getEntry } from "astro:content";
 import type { Props as ContentCardProps } from "../../layouts/ContentCard.astro";
+import { fileContainsStringSync } from "../../utils";
 
 export async function getStaticPaths() {
   return (await getCollection("imageMetadata"))
@@ -20,47 +21,34 @@ export async function getStaticPaths() {
 }
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
-const { data, filePath = "" } = Astro.props;
+const { data } = Astro.props;
 const { title, metadata, categories = [] } = data;
 const { image } = Astro.params;
 
-async function findValidEinblickeEntry() {
-  if (!filePath.includes("einblicke")) {
-    return undefined;
-  }
-  const possibleUrls = [filePath.substring(22, filePath.lastIndexOf("/"))];
-  possibleUrls.push(possibleUrls[0].substring(0, possibleUrls[0].lastIndexOf("/")));
-
-  const entries = (await Promise.all(possibleUrls.filter(e => e.length > 0).map(async e => await getEntry("einblicke", e))))
-    .filter(e => e !== undefined);
-
-  if (entries.length > 0) {
-    return entries[0];
-  }
-  return undefined;
+async function getEntries<E extends keyof AnyEntryMap>(collection: E) {
+  return await getCollection<E>(collection, e => {
+    const path = e.filePath;
+    if (path === undefined) {
+      return false;
+    }
+    return fileContainsStringSync(path, image) || image.endsWith("-large") && fileContainsStringSync(path, image.substring(0, image.lastIndexOf("-")));
+  });
+} async function findValidEinblickeEntries(): Promise<ContentCardProps[]> {
+  return (await getEntries("einblicke")).map(e => ({
+    href: `/einblicke/${e.slug}`,
+    imageName: e.data.heroImage ?? image,
+    title: e.data.title,
+    date: e.data.updated ?? e.data.pubDate
+  }));
 }
 
 async function findValidSimpleEntry(): Promise<ContentCardProps[]> {
-  const possibleUrls = [filePath.substring(19, filePath.lastIndexOf("/"))];
-  possibleUrls.push(possibleUrls[0].substring(0, possibleUrls[0].lastIndexOf("/")));
-
-  const entries = (await Promise.all(possibleUrls.filter(e => e.length > 0).map(async e => await getEntry("simple", e))))
-    .filter(e => e !== undefined);
-
-  const heroImage = await getCollection("simple", e => e.data.heroImage === image);
-  if (heroImage !== undefined) {
-    entries.push(...heroImage);
-  }
-
-  if (entries.length > 0) {
-    return entries.map(e => ({
-      href: e.slug === "/" ? "/" : "/" + e.slug,
-      imageName: e.data.heroImage ?? image,
-      title: `Erfahre mehr über ${e.data.title}`,
-      date: e.data.updated ?? e.data.pubDate
-    }));
-  }
-  return [];
+  return (await getEntries("simple")).map(e => ({
+    href: e.slug === "/" ? "/" : "/" + e.slug,
+    imageName: e.data.heroImage ?? image,
+    title: `Erfahre mehr über ${e.data.title}`,
+    date: e.data.updated ?? e.data.pubDate
+  }));
 }
 
 async function findValidTestimonialEntry(): Promise<ContentCardProps | undefined> {
@@ -84,18 +72,16 @@ async function findValidTestimonialEntry(): Promise<ContentCardProps | undefined
 }
 
 async function findAreaUsage(): Promise<ContentCardProps[]> {
-  const entries = (await getCollection("areas", e => e.data.images.includes(image) || e.data.heroImage === image));
-
-  return entries.map(entry => ({
+  return (await getEntries("areas")).map(entry => ({
     href: "/" + entry.slug,
     imageName: entry.data.heroImage ?? image,
     title: `Erfahre mehr über ${entry.data.name}`
   }));
 }
 
-const einblickeEntry = await findValidEinblickeEntry();
 
 const urls: ContentCardProps[] = [
+  ...(await findValidEinblickeEntries()),
   await findValidTestimonialEntry(),
   ...(await findAreaUsage()),
   ...(await findValidSimpleEntry())
@@ -116,6 +102,6 @@ if (!title) {
   <ImageMetadata {...metadata} />
 
   {categories && categories.length > 0 &&
-    <ImageCategories categories={categories} einblicke={einblickeEntry} urls={urls} />}
+    <ImageCategories categories={categories} urls={urls} />}
 
 </MinimalPage>

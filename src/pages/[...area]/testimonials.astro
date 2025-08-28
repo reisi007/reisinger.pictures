@@ -6,7 +6,7 @@ import BaseHead from "../../layouts/BaseHead.astro";
 import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import { groupBy, slugToName } from "../../utils";
 import ResponsiveImage from "../../layouts/ResponsiveImage.astro";
-import { tryGetImageNameByName } from "../../images/Images";
+import { tryGetImage } from "../../images/Images";
 import SocialImage from "../../layouts/SocialImage.astro";
 
 export async function getStaticPaths() {
@@ -23,8 +23,8 @@ export async function getStaticPaths() {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 const { type, reviews } = Astro.props;
-const heroImage = reviews.map(e => `${e.slug}/large`)
-  .map(e => tryGetImageNameByName(e, []))
+const heroImage = reviews.map(e => `${e.slug}-large`)
+  .filter(e => tryGetImage(e) !== undefined)
   .find(e => e !== undefined);
 
 const name = slugToName(type);
@@ -37,7 +37,7 @@ const name = slugToName(type);
   <div class="mx-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
     {reviews.map(async e => {
       const smallName = `${e.slug}/small`;
-      const small = tryGetImageNameByName(smallName, []);
+      const small = tryGetImage(smallName);
       return (
         <>
           {

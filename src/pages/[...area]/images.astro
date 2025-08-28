@@ -5,7 +5,6 @@ import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import BaseHead from "../../layouts/BaseHead.astro";
 import ImageGallery from "../../layouts/ImageGallery.astro";
 import { slugToName } from "../../utils";
-import { getImageNamesByNames } from "../../images/Images";
 import { GalleryLayout } from "../../layouts/GalleryLayout";
 
 export async function getStaticPaths() {
@@ -13,8 +12,7 @@ export async function getStaticPaths() {
   if (!isDevMode) return [];
   return (await getCollection("areas"))
     .map(entry => {
-      const { slug: area, data: { images: rawImages } } = entry;
-      const images = getImageNamesByNames(rawImages, [`images/${area}`]);
+      const { slug: area, data: { images } } = entry;
       return ({
         params: { area },
         props: { images, area }

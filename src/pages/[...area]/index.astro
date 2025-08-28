@@ -25,7 +25,7 @@ const { Content } = await render();
 ---
 <MinimalPage>
   <BaseHead title={name} slot="head">
-    <SocialImage name={heroImage} folder={`images/${slug}`} />
+    <SocialImage name={heroImage} />
   </BaseHead>
 
   <h1>{name}</h1>
@@ -33,5 +33,5 @@ const { Content } = await render();
   <Content />
 
   <FeaturedTestimonials slug={slug} categoryTestimonials={categoryReviews} featuredTestimonials={reviewSlugs} />
-  <Gallery folder={`images/${slug}`} sorted={images} />
+  <Gallery sorted={images} />
 </MinimalPage>

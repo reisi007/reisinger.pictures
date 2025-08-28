@@ -1,11 +1,11 @@
 ---
 import { Image } from "astro:assets";
-import { getImageNameByName, getImageByName } from "../images/Images";
 import type { NumericBreakpoints } from "../styles/Breakpoints";
 import { computeSizes, DEFAULT_IMAGE_SIZES, mergeBreakpoints } from "../styles/Breakpoints";
 import { ResponsiveImageLoading } from "./ResponsiveImageLoading";
 import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
 import { getMetadataForImageSlug } from "./image.utils";
+import { getImage } from "../images/Images";
 
 interface Props {
   name: string,
@@ -26,9 +26,8 @@ const {
   class: classNames
 } = Astro.props;
 
-const absoluteName = getImageNameByName(name);
-const image = (await getImageByName(absoluteName)).default;
-const data = await getMetadataForImageSlug(absoluteName);
+const image = (await getImage(name)).default;
+const data = await getMetadataForImageSlug(name);
 const alt = data?.title ?? "";
 const darkInvert = data?.darkInvert ?? false;
 const computedSizes = computeSizes(mergeBreakpoints(GALLERY_BREAKPOINTS[GalleryLayout.Full], sizeModifiers));

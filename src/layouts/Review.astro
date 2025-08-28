@@ -1,7 +1,7 @@
 ---
 import { type CollectionEntry } from "astro:content";
 
-import { tryGetImageByName } from "../images/Images";
+import { filterInvalidImageName } from "../images/Images";
 import ResponsiveImage from "./ResponsiveImage.astro";
 import { type ReviewProps } from "./Types";
 
@@ -14,12 +14,11 @@ const {
   displayLargeImage = true
 } = Astro.props;
 
-const baseName = `testimonials/${slug}`;
-const smallName = `${baseName}/small`;
-const largeName = `${baseName}/large`;
+const smallName = `${slug}-small`;
+const largeName = `${slug}-large`;
 
-const small = await tryGetImageByName(smallName, []);
-const large = await tryGetImageByName(largeName, []);
+const small = filterInvalidImageName(smallName);
+const large = filterInvalidImageName(largeName);
 const { Content } = await render();
 ---
 
