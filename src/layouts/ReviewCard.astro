@@ -8,12 +8,12 @@ type Props = CollectionEntry<"testimonials"> & ReviewProps;
 
 const {
   slug,
-  data: { name, source },
+  data: { name, source, largeImage: optLargeImage },
   render,
   displayLargeImage = true
 } = Astro.props;
 const smallName = `${slug}-small`;
-const largeName = `${slug}-large`;
+const largeName = optLargeImage ?? `${slug}-large`;
 const small = tryGetImage(smallName);
 const large = tryGetImage(largeName);
 const { Content } = await render();

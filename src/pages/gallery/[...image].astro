@@ -1,5 +1,5 @@
 ---
-import {type AnyEntryMap, getCollection } from "astro:content";
+import { type AnyEntryMap, getCollection } from "astro:content";
 import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import type { InferGetStaticPropsType } from "astro";
 import BaseHead from "../../layouts/BaseHead.astro";
@@ -9,7 +9,7 @@ import ImageMetadata from "../../layouts/ImageMetadata.astro";
 import ImageCategories from "../../layouts/ImageCategories.astro";
 import { getEntry } from "astro:content";
 import type { Props as ContentCardProps } from "../../layouts/ContentCard.astro";
-import { fileContainsStringSync } from "../../utils";
+import { asyncFilter, fileContainsString } from "../../utils";
 
 export async function getStaticPaths() {
   return (await getCollection("imageMetadata"))
@@ -26,12 +26,15 @@ const { title, metadata, categories = [] } = data;
 const { image } = Astro.params;
 
 async function getEntries<E extends keyof AnyEntryMap>(collection: E) {
-  return await getCollection<E>(collection, e => {
+  return asyncFilter(await getCollection<E>(collection), async e => {
     const path = e.filePath;
     if (path === undefined) {
       return false;
     }
-    return fileContainsStringSync(path, image) || image.endsWith("-large") && fileContainsStringSync(path, image.substring(0, image.lastIndexOf("-")));
+    const containsImage = await fileContainsString(path, image);
+    if (containsImage) return true;
+    const testimonialId = await computeTestimonialId();
+    return testimonialId !== undefined && await fileContainsString(path, testimonialId);
   });
 } async function findValidEinblickeEntries(): Promise<ContentCardProps[]> {
   return (await getEntries("einblicke")).map(e => ({
@@ -51,14 +54,21 @@ async function findValidSimpleEntry(): Promise<ContentCardProps[]> {
   }));
 }
 
-async function findValidTestimonialEntry(): Promise<ContentCardProps | undefined> {
+async function computeTestimonialId() {
   const regx = /(.+)-large/;
   const result = regx.exec(image);
-  if (result === null) {
+  const testimonialId = result?.at(1);
+  if (testimonialId)
+    return testimonialId;
+  const testimonials = await getCollection("testimonials", e => e.data.largeImage === image);
+  return testimonials?.at(0)?.id;
+}
+
+async function findValidTestimonialEntry(): Promise<ContentCardProps | undefined> {
+  const testimonialId = await computeTestimonialId();
+  if (testimonialId === undefined) {
     return undefined;
   }
-
-  const testimonialId = result[1];
   const testimonial = await getEntry("testimonials", testimonialId);
   if (!testimonial) {
     return undefined;

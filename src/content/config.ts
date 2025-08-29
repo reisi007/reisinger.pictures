@@ -44,7 +44,8 @@ const testimonials = defineCollection({
     type: z.nativeEnum(ReviewType),
     date: z.coerce.date(),
     rating: z.number().optional(),
-    source: z.string().url("Must be a valid URL").optional()
+    source: z.string().url("Must be a valid URL").optional(),
+    largeImage: z.string().optional()
   })
 });
 

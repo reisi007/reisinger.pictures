@@ -1,5 +1,4 @@
 import { readFile } from "fs/promises";
-import { readFileSync } from "fs";
 
 export function groupBy<T>(
   items: T[],
@@ -44,25 +43,16 @@ export const fileContainsString = async (filePath: string, searchString: string)
   }
 };
 
-/**
- * Synchronously checks if a file contains a specific string.
- * This will block the Node.js event loop until the file is read.
- * Use it only in scripts or situations where blocking is acceptable.
- *
- * @param filePath The path to the file to check.
- * @param searchString The string to search for within the file.
- * @returns True if the string is found, otherwise false.
- */
-export const fileContainsStringSync = (filePath: string, searchString: string): boolean => {
-  try {
-    // Read the file content synchronously.
-    const content = readFileSync(filePath, "utf8");
+export async function asyncFilter<T>(
+  arr: T[],
+  predicate: (value: T) => Promise<boolean>
+): Promise<T[]> {
+  // Map each item to its corresponding promise from the async predicate
+  const promises = arr.map(predicate);
 
-    // Check if the content includes the search string.
-    return content.includes(searchString);
-  } catch (error) {
-    // Handle errors, such as the file not existing.
-    console.error(`Error reading file synchronously at ${filePath}:`, error);
-    return false;
-  }
-};
+  // Await the array of promises to get an array of boolean results
+  const results = await Promise.all(promises);
+
+  // Filter the original array based on the boolean results
+  return arr.filter((_value, index) => results[index]);
+}
