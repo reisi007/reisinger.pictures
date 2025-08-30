@@ -26,6 +26,7 @@ const {
   class: classNames
 } = Astro.props;
 
+const isDevMode = import.meta.env.MODE === "development";
 const image = (await getImage(name)).default;
 const data = await getMetadataForImageSlug(name);
 const alt = data?.title ?? "";
@@ -47,4 +48,5 @@ const maxOptimizedHeight = maxOptimizedWidth * image.height / image.width;
   data-pswp-height={maxOptimizedHeight}
   src={image}
   alt={alt}
+  data-name={isDevMode ? name : undefined}
 />
