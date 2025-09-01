@@ -93,7 +93,7 @@ async function processFiles() {
     for (const yamlFilePath of yamlFiles) {
       try {
         const fileContent = await fs.readFile(yamlFilePath, "utf8");
-        const data = yaml.load(fileContent) || {};
+        const data = yaml.load(fileContent) ?? {};
 
         // --- 1. Generate and Clean Slug ---
         const relativePath = path.relative(FOLDER_PATH, yamlFilePath);

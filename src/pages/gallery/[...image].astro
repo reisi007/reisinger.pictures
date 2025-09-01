@@ -10,6 +10,13 @@ import ImageCategories from "../../layouts/ImageCategories.astro";
 import { getEntry } from "astro:content";
 import type { Props as ContentCardProps } from "../../layouts/ContentCard.astro";
 import { asyncFilter, fileContainsString } from "../../utils";
+import { type SchemaCreationFunction } from "../../layouts/SchemaOrg";
+import { createImagePageSchema } from "../../layouts/SchemaOrg.factory";
+import { getImage } from "astro:assets";
+import { getImage as getImageByName } from "../../images/Images";
+import SchemaOrg from "../../layouts/SchemaOrg.astro";
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 export async function getStaticPaths() {
   return (await getCollection("imageMetadata"))
@@ -20,7 +27,6 @@ export async function getStaticPaths() {
     }).map(m => ({ params: { image: m.id }, props: m }));
 }
 
-type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 const { data } = Astro.props;
 const { title, metadata, categories = [] } = data;
 const { image } = Astro.params;
@@ -89,7 +95,6 @@ async function findAreaUsage(): Promise<ContentCardProps[]> {
   }));
 }
 
-
 const urls: ContentCardProps[] = [
   ...(await findValidEinblickeEntries()),
   await findValidTestimonialEntry(),
@@ -100,10 +105,31 @@ const urls: ContentCardProps[] = [
 if (!title) {
   return;
 }
+
+const schemaOrgImage = await getImage({
+  src: getImageByName(image),
+  format: "webp",
+  fit: "scale-down"
+});
+
+
+const createData: SchemaCreationFunction = (o, p, df, url) => createImagePageSchema({
+  pageName: title,
+  pageUrl: url,
+  imageName: image,
+  imageDescription: title,
+  contentUrl: schemaOrgImage.src,
+  width: schemaOrgImage.attributes.width as number,
+  height: schemaOrgImage.attributes.height as number,
+  author: p,
+  publisher: o,
+  datePublished: df(metadata?.captureDate)
+});
 ---
 <MinimalPage>
   <BaseHead title={title} slot="head">
     <SocialImage name={image} />
+    <SchemaOrg createData={createData} />
   </BaseHead>
   <h1>{title}</h1>
 

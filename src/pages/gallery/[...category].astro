@@ -9,6 +9,11 @@ import ResponsiveImage from "../../layouts/ResponsiveImage.astro";
 import GalleryMenu from "../../layouts/GalleryMenu.astro";
 import categories from "../../content/categories.json";
 import { computeKey } from "../../images/Images";
+import { type SchemaCreationFunction } from "../../layouts/SchemaOrg";
+import { createCollectionPageSchema } from "../../layouts/SchemaOrg.factory";
+import SchemaOrg from "../../layouts/SchemaOrg.astro";
+import { getEntry } from "astro:content";
+import { absoluteLink } from "../../layouts/ImageUtils";
 
 export async function getStaticPaths() {
   const categories = await getCollection("categories");
@@ -25,10 +30,29 @@ const { category: currentPath } = Astro.params;
 const { name } = data;
 
 const title = name !== "Alle Bilder" ? `Alle Bilder - ${name}` : name;
+
+const allImageMetadata = await Promise.all(images.map(async (image) => await getEntry("imageMetadata", image)));
+
+const lastImageMetadata = allImageMetadata[allImageMetadata.length - 1];
+if (lastImageMetadata === undefined) {
+  return;
+}
+
+const createData: SchemaCreationFunction = (_, __, df) => createCollectionPageSchema({
+  name: title,
+  dateModified: df(lastImageMetadata.data.metadata?.captureDate),
+  items: allImageMetadata.filter(e => e !== undefined)
+    .filter(e => typeof e.data.title === "string").map(e => ({
+      name: e.data.title ?? "",
+      type: "ImageObject",
+      url: absoluteLink(Astro.url, `/gallery/${e.id}`)
+    }))
+});
 ---
 <MinimalPage>
   <BaseHead title={title} slot="head">
     <SocialImage name={images[0]} />
+    <SchemaOrg createData={createData} />
   </BaseHead>
 
   <GalleryMenu categories={categories} currentPath={currentPath} />

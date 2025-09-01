@@ -2,6 +2,7 @@
 import { getImage } from "astro:assets";
 import { getImage as getImageByName } from "../images/Images";
 import { getMetadataForImageSlug } from "./image.utils";
+import { absoluteLink } from "./ImageUtils";
 
 interface Props {
   name?: string;
@@ -23,7 +24,7 @@ const imageInfo = await getImage({
 });
 
 const { src, options } = imageInfo;
-const fullSrc = Astro.url.href.replace(/(\w\/).+/, "$1") + src.substring(1);
+const fullSrc = absoluteLink(Astro.url, src);
 const { width, height, format } = options;
 ---
 <meta property="og:image" content={fullSrc} />
