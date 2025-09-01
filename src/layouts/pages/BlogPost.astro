@@ -6,15 +6,41 @@ import ResponsiveImage from "../ResponsiveImage.astro";
 import MinimalPage from "./MinimalPage.astro";
 import SocialImage from "../SocialImage.astro";
 import Published from "../Published.astro";
+import SchemaOrg from "../SchemaOrg.astro";
+import type { SchemaCreationFunction } from "../SchemaOrg";
+import { getImage } from "astro:assets";
+import { getImage as getImageByName } from "../../images/Images";
+import { absoluteLink } from "../ImageUtils";
+import { createBlogPostingSchema } from "../SchemaOrg.factory";
+import { LARGEST_IMAGE_SIZE } from "../../styles/Breakpoints";
 
 type Props = CollectionEntry<"einblicke">["data"];
 
-const { title, description, heroImage,...dates } = Astro.props;
+const { title, description, heroImage, ...dates } = Astro.props;
+
+const imageInfo = await getImage({
+  src: getImageByName(heroImage),
+  format: "webp",
+  width: LARGEST_IMAGE_SIZE,
+  fit: "scale-down"
+});
+
+const schemaOrg: SchemaCreationFunction = (o, me, df, url) => createBlogPostingSchema({
+  url,
+  headline: title,
+  description: description,
+  image: absoluteLink(Astro.url, imageInfo.src),
+  author: me,
+  publisher: o,
+  datePublished: df(dates.pubDate),
+  dateModified: df(dates.updated)
+});
 ---
 
 <MinimalPage>
   <BaseHead slot="head" title={title} description={description}>
     <SocialImage name={heroImage} />
+    <SchemaOrg createData={schemaOrg} />
   </BaseHead>
   <article>
     <section>

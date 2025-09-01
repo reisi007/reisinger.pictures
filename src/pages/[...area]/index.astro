@@ -7,6 +7,12 @@ import Gallery from "../../layouts/Gallery.astro";
 import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import { groupBy } from "../../utils";
 import SocialImage from "../../layouts/SocialImage.astro";
+import type { SchemaCreationFunction } from "../../layouts/SchemaOrg";
+import { createBlogPostingSchema } from "../../layouts/SchemaOrg.factory";
+import { getImage } from "astro:assets";
+import { getImage as getImageByName } from "../../images/Images";
+import SchemaOrg from "../../layouts/SchemaOrg.astro";
+import { LARGEST_IMAGE_SIZE } from "../../styles/Breakpoints";
 
 interface Props {
   entry: CollectionEntry<"areas">,
@@ -22,10 +28,26 @@ export async function getStaticPaths() {
 const { entry: { slug, render, data: { name, testimonials, images, heroImage } }, reviews: categoryReviews } = Astro.props;
 const reviewSlugs: string[] | undefined = testimonials?.map(e => e.id);
 const { Content } = await render();
+
+const schemaOrgImage = await getImage({
+  src: getImageByName("logo"),
+  format: "webp",
+  width: LARGEST_IMAGE_SIZE,
+  fit: "scale-down"
+});
+
+const createData: SchemaCreationFunction = (o, me, _, url) => createBlogPostingSchema({
+  url,
+  headline: name,
+  image: schemaOrgImage.src,
+  author: me,
+  publisher: o,
+});
 ---
 <MinimalPage>
   <BaseHead title={name} slot="head">
     <SocialImage name={heroImage} />
+    <SchemaOrg createData={createData} />
   </BaseHead>
 
   <h1>{name}</h1>

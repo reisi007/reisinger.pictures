@@ -3,10 +3,10 @@
 ---
 <h3 class="footer-title mx-auto mt-2">Erreiche mich über das Kontaktformular</h3>
 <form method="POST" action="https://form.reisinger.pictures" class="flex flex-col w-full max-w-lg mx-auto gap-y-2">
-  <label class="form-control w-full">
-    <label for="form__subject_prefix" class="label ml-2 mb-1">
+  <label for="form__subject_prefix"  class="form-control w-full">
+    <span class="label ml-2 mb-1">
       <span class="label-text">Art der Anfrage</span>
-    </label>
+    </span>
     <select name="subject_prefix" id="form__subject_prefix" required class="select select-primary w-full">
       <option value="" selected disabled>Bitte wähle eine Option</option>
       <option value="BEAUTY">Beauty Shooting</option>
@@ -26,32 +26,32 @@
     <input type="text" id="form__name" name="name" required class="input input-primary w-full" />
   </label>
 
-  <label class="form-control w-full">
+  <label for="form_email" class="form-control w-full">
     <span class="label ml-2 mb-1">
       <span class="label-text">Email</span>
       <span class="label-text-alt text-error">*</span>
     </span>
-    <input type="email" id="email" name="email" required class="input input-primary w-full" />
+    <input type="email" id="form_email" name="email" required class="input input-primary w-full" />
   </label>
 
-  <label class="form-control w-full">
+  <label for="form__phone" class="form-control w-full">
     <span class="label ml-2 mb-1">
       <span class="label-text">Telefonnummer</span>
     </span>
-    <input type="tel" name="phone" class="input input-primary w-full" />
+    <input type="tel" id="form__phone" name="phone" class="input input-primary w-full" />
   </label>
 
-  <label class="form-control w-full">
+  <label for="form_msg" class="form-control w-full">
     <span class="label ml-2 mb-1">
       <span class="label-text">Nachricht</span>
       <span class="label-text-alt text-error">*</span>
     </span>
-    <textarea name="message" rows="5" required class="textarea textarea-primary w-full"></textarea>
+    <textarea name="message" id="form_msg" rows="5" required class="textarea textarea-primary w-full"></textarea>
   </label>
 
-  <label class="hidden">
+  <span class="hidden">
     Bitte nicht ausfüllen: <input type="checkbox" name="dsgvo" />
-  </label>
+  </span>
   <input type="hidden" name="honeypot" value="6786c25a-b4fc-800d-b3c6-fa0d36f41154" />
   <div class="w-full flex justify-center">
     <button type="submit" class="btn btn-primary mt-4">Nachricht senden</button>

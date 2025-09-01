@@ -52,7 +52,8 @@ export default defineConfig([{
     "@typescript-eslint/no-unused-vars": ["error", {
       varsIgnorePattern: "^Props$"
     }],
-    "import/prefer-default-export": "off"
+    "import/prefer-default-export": "off",
+    "astro/jsx-a11y/label-has-associated-control": "off"
   }
 }, {
   files: ["**/*.astro"],

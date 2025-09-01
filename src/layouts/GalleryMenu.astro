@@ -19,7 +19,7 @@ const dateCategories = categories.filter(cat => cat.slug !== "/");
 // Handle the root link's href separately
 const rootHref = rootItem?.slug === "/" ? "/gallery" : `gallery/${rootItem?.slug}`;
 const tree: GalleryNode[] = [];
-const map: { [key: string]: GalleryNode } = {};
+const map: Record<string, GalleryNode> = {};
 dateCategories.forEach(item => {
   const parts = item.slug.split("/");
   const parentSlug = parts.slice(0, -1).join("/");

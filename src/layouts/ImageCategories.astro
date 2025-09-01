@@ -3,7 +3,7 @@ import { getEntry } from "astro:content";
 import ContentCard from "./ContentCard.astro";
 import type { Props as ContentCardProps } from "./ContentCard.astro";
 
-type Props = { categories: string[], urls: ContentCardProps[] };
+interface Props { categories: string[], urls: ContentCardProps[] }
 
 const { categories, urls } = Astro.props;
 ---

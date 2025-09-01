@@ -5,6 +5,10 @@ import Einblicke from "../../../layouts/Einblicke.astro";
 import BaseHead from "../../../layouts/BaseHead.astro";
 import MinimalPage from "../../../layouts/pages/MinimalPage.astro";
 import SocialImage from "../../../layouts/SocialImage.astro";
+import { type SchemaCreationFunction } from "../../../layouts/SchemaOrg";
+import { createCollectionPageSchema } from "../../../layouts/SchemaOrg.factory";
+import { absoluteLink } from "../../../layouts/ImageUtils";
+import SchemaOrg from "../../../layouts/SchemaOrg.astro";
 
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
   const overviewPages = (await getCollection("einblickeOverviews"));
@@ -33,11 +37,19 @@ type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 const { page, title, render, slug } = Astro.props;
 const { Content } = await render();
 const { data: posts } = page;
-const { heroImage } = posts[0].data;
+const { heroImage, pubDate, updated } = posts[0].data;
+
+const createData: SchemaCreationFunction = (_, __, df) => createCollectionPageSchema({
+  name: title,
+  description: "Blog Beiträge",
+  dateModified: df(updated ?? pubDate),
+  items: posts.map((e) => ({ url: absoluteLink(Astro.url, `/einblicke/${e.slug}`), name: e.data.title, type: "BlogPosting" }))
+});
 ---
 <MinimalPage>
   <BaseHead title={title} noIndex={!(slug === "/" && page.url.prev === undefined)} slot="head">
     <SocialImage name={heroImage} />
+    <SchemaOrg createData={createData} />
   </BaseHead>
   <h1>{title}</h1>
   <Content />

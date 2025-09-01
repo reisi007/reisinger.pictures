@@ -8,6 +8,10 @@ import { groupBy, slugToName } from "../../utils";
 import ResponsiveImage from "../../layouts/ResponsiveImage.astro";
 import { tryGetImage } from "../../images/Images";
 import SocialImage from "../../layouts/SocialImage.astro";
+import type { SchemaCreationFunction } from "../../layouts/SchemaOrg";
+import { createCollectionPageSchema } from "../../layouts/SchemaOrg.factory";
+import { absoluteLink } from "../../layouts/ImageUtils";
+import SchemaOrg from "../../layouts/SchemaOrg.astro";
 
 export async function getStaticPaths() {
   const testimonials = await getCollection("testimonials");
@@ -27,16 +31,24 @@ const heroImage = reviews.map(e => `${e.slug}-large`)
   .filter(e => tryGetImage(e) !== undefined)
   .find(e => e !== undefined);
 
-const name = slugToName(type);
+const name = slugToName(type);const title = `${name} Bewertungen`;
+
+const createData: SchemaCreationFunction = (_, __, df) => createCollectionPageSchema({
+  name: title,
+  description: `Bewertungen von Models über ${name} Fotoshootings`,
+  dateModified: df(reviews[0].data.date),
+  items: reviews.map(r => (({ url: absoluteLink(Astro.url, `/testimonials/${r.slug}`), name: r.data.name, type: "Review" })))
+});
 ---
 <MinimalPage>
-  <BaseHead title={`${name} Bewertungen`} slot="head">
+  <BaseHead title={title} slot="head">
     <SocialImage name={heroImage} />
+    <SchemaOrg createData={createData} />
   </BaseHead>
-  <h1 class="mb-8">{name} Bewertungen</h1>
+  <h1 class="mb-8">{title}</h1>
   <div class="mx-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
     {reviews.map(async e => {
-      const smallName = `${e.slug}/small`;
+      const smallName = `${e.slug}-small`;
       const small = tryGetImage(smallName);
       return (
         <>
@@ -52,7 +64,7 @@ const name = slugToName(type);
             !small &&
             <div class="avatar avatar-placeholder">
               <div class="size-32 bg-neutral rounded-full">
-                <a class="text-neutral-content no-underline" href={`/testimonials/${e.slug}`}
+                <a class="text-neutral-content wrap-break-word no-underline" href={`/testimonials/${e.slug}`}
                 >
                   {e.data.name}
                 </a>

@@ -5,6 +5,13 @@ import BaseHead from "../layouts/BaseHead.astro";
 import MinimalPage from "../layouts/pages/MinimalPage.astro";
 import SocialImage from "../layouts/SocialImage.astro";
 import Published from "../layouts/Published.astro";
+import type { SchemaCreationFunction } from "../layouts/SchemaOrg";
+import { createWebPageSchema } from "../layouts/SchemaOrg.factory";
+import SchemaOrg from "../layouts/SchemaOrg.astro";
+import { getImage } from "astro:assets";
+import { getImage as getImageByName } from "../images/Images";
+import type { GetImageResult } from "astro";
+import { LARGEST_IMAGE_SIZE } from "../styles/Breakpoints";
 
 export async function getStaticPaths() {
   const posts = await getCollection("simple");
@@ -18,11 +25,32 @@ type Props = CollectionEntry<"simple">;
 const { render, data } = Astro.props;
 const { title, description, heroImage, showContact, index = true, ...dates } = data;
 const { Content } = await render();
+
+let imageInfo: GetImageResult | undefined;
+if (heroImage !== undefined)
+  imageInfo = await getImage({
+    src: getImageByName(heroImage),
+    format: "webp",
+    width: LARGEST_IMAGE_SIZE,
+    fit: "scale-down"
+  });
+
+const createData: SchemaCreationFunction = (o, p, df, url) => createWebPageSchema({
+  name: title,
+  description,
+  url,
+  author: p,
+  publisher: o,
+  datePublished: df(dates.pubDate),
+  dateModified: df(dates.updated),
+  image: imageInfo?.src
+});
 ---
 
 <MinimalPage showContact={showContact}>
   <BaseHead title={title} description={description} noIndex={!index} slot="head">
     <SocialImage name={heroImage} />
+    <SchemaOrg createData={createData} />
   </BaseHead>
   <h1>{title}</h1>
   <Published {...dates} />
