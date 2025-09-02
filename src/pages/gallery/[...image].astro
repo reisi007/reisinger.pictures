@@ -9,7 +9,7 @@ import ImageMetadata from "../../layouts/ImageMetadata.astro";
 import ImageCategories from "../../layouts/ImageCategories.astro";
 import { getEntry } from "astro:content";
 import type { Props as ContentCardProps } from "../../layouts/ContentCard.astro";
-import { asyncFilter, fileContainsString } from "../../utils";
+import { asyncFilter, fileContainsString, absoluteLink } from "../../utils";
 import { type SchemaCreationFunction } from "../../layouts/SchemaOrg";
 import { createImagePageSchema } from "../../layouts/SchemaOrg.factory";
 import { getImage } from "astro:assets";
@@ -120,7 +120,7 @@ const createData: SchemaCreationFunction = (o, p, df, url) => createImagePageSch
   pageUrl: url,
   imageName: image,
   imageDescription: title,
-  contentUrl: schemaOrgImage.src,
+  contentUrl: absoluteLink(Astro.url, schemaOrgImage.src),
   width: schemaOrgImage.attributes.width as number,
   height: schemaOrgImage.attributes.height as number,
   author: p,

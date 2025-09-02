@@ -1,6 +1,11 @@
-import type { BlogPosting, CollectionPage, ImageObject, ListItem, Organization, Person, Rating, Review, ReviewableThing, WebPage } from "./SchemaOrg.ts";
+import type { BlogPosting, CollectionPage, ImageObject, ListItem, Organization, Person, Product, Rating, Review, ReviewableThing, Service, WebPage } from "./SchemaOrg.ts";
 
-// --- Typen für die Factory-Optionen ---
+// --- Factory Options Type Definitions ---
+
+type OrganizationFactoryOptions = Omit<Organization, "@context">;
+type ProductFactoryOptions = Omit<Product, "@context" | "@type">;
+type ServiceFactoryOptions = Omit<Service, "@context" | "@type">;
+type ImageObjectFactoryOptions = Omit<ImageObject, "@context" | "@type">;
 
 type ReviewFactoryOptions = Omit<Review, "@context" | "@type" | "author" | "reviewRating" | "name" | "itemReviewed" | "publisher"> & {
   reviewName: string;
@@ -16,11 +21,9 @@ type BlogPostingFactoryOptions = Omit<BlogPosting, "@context" | "@type" | "autho
   publisher: Organization;
 };
 
-// A union type for the possible types of items in a list.
 type ListItemType = "Review" | "BlogPosting" | "CollectionPage" | "ImageObject" | "WebPage" | "Product";
 
 type CollectionPageFactoryOptions = Omit<CollectionPage, "@context" | "@type" | "mainEntity"> & {
-  // The 'type' property now uses the strict ListItemType.
   items: { url: string; name: string; type: ListItemType }[];
 };
 
@@ -43,8 +46,52 @@ type ImagePageFactoryOptions = {
 };
 
 
-// --- Factory-Funktionen ---
+// --- Factory Functions ---
 
+/**
+ * Creates a valid Organization schema.
+ */
+export function createOrganizationSchema(options: OrganizationFactoryOptions): Organization {
+  return {
+    ...options
+  };
+}
+
+/**
+ * Creates a valid Product schema.
+ */
+export function createProductSchema(options: ProductFactoryOptions): Product {
+  return {
+    "@type": "Product",
+    ...options
+  };
+}
+
+/**
+ * Creates a valid Service schema, ideal for offerings like photoshoots.
+ */
+export function createServiceSchema(options: ServiceFactoryOptions): Service {
+  return {
+    "@type": "Service",
+    ...options
+  };
+}
+
+/**
+ * Creates a valid ImageObject schema.
+ */
+export function createImageObjectSchema(options: ImageObjectFactoryOptions): ImageObject {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ImageObject",
+    ...options
+  };
+}
+
+
+/**
+ * Creates a valid Review schema for any reviewable thing.
+ */
 export function createReviewSchema(
   {
     reviewBody,
@@ -77,6 +124,9 @@ export function createReviewSchema(
   };
 }
 
+/**
+ * Creates a valid BlogPosting schema.
+ */
 export function createBlogPostingSchema(
   {
     url,
@@ -103,6 +153,9 @@ export function createBlogPostingSchema(
   };
 }
 
+/**
+ * Creates a valid CollectionPage schema.
+ */
 export function createCollectionPageSchema({
                                              name,
                                              description,
@@ -125,8 +178,7 @@ export function createCollectionPageSchema({
 }
 
 /**
- * Erstellt ein valides WebPage-Schema für generische Inhaltsseiten.
- * ✅ NEU: Verarbeitet jetzt 'publisher'.
+ * Creates a valid WebPage schema for generic content pages.
  */
 export function createWebPageSchema({
                                       name,
@@ -134,7 +186,7 @@ export function createWebPageSchema({
                                       url,
                                       image,
                                       author,
-                                      publisher, // ✅ Destrukturieren
+                                      publisher,
                                       datePublished,
                                       dateModified
                                     }: WebPageFactoryOptions): WebPage {
@@ -145,7 +197,7 @@ export function createWebPageSchema({
     description,
     image,
     author,
-    publisher, // ✅ Hinzufügen zum Ergebnis
+    publisher,
     datePublished,
     dateModified,
     mainEntityOfPage: {
@@ -155,6 +207,9 @@ export function createWebPageSchema({
   };
 }
 
+/**
+ * Creates a WebPage that has an ImageObject as its main entity.
+ */
 export function createImagePageSchema({
                                         pageName,
                                         pageDescription,

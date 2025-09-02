@@ -56,3 +56,7 @@ export async function asyncFilter<T>(
   // Filter the original array based on the boolean results
   return arr.filter((_value, index) => results[index]);
 }
+
+export function absoluteLink(url: URL, src: string): string {
+  return url.href.replace(/(\w\/).+/, "$1") + src.substring(1);
+}

@@ -99,9 +99,22 @@ export type ListItem = {
 }
 
 /**
+ * Repräsentiert eine Dienstleistung, z.B. ein Fotoshooting-Angebot.
+ */
+export type Service = {
+  "@type": "Service";
+  name: string;
+  serviceType: string;
+  description?: string;
+  provider: Person | Organization;
+  areaServed?: string;
+  brand?: Organization;
+}
+
+/**
  * Ein Union-Typ, der alle Schema-Typen zusammenfasst, die bewertet werden können.
  */
-export type ReviewableThing = Organization | WebPage | ImageObject | Product;
+export type ReviewableThing = Organization | WebPage | ImageObject | Product | Service;
 
 /**
  * Schema für eine einzelne Kundenbewertung oder ein Testimonial.
@@ -158,7 +171,7 @@ export type WebPage = {
   description?: string;
   image?: string | ImageObject;
   author?: Person | Organization;
-  publisher?: Organization; // ✅ HINZUGEFÜGT
+  publisher?: Organization;
   datePublished?: string;
   dateModified?: string;
   mainEntityOfPage: {
@@ -178,4 +191,3 @@ export type SchemaObject = Review | BlogPosting | CollectionPage | ImageObject |
  * Definiert die Signatur für eine Funktion, die ein Schema-Objekt generiert.
  */
 export type SchemaCreationFunction = (o: Organization, me: Person, df: (date?: Date) => string | undefined, url: string) => SchemaObject;
-

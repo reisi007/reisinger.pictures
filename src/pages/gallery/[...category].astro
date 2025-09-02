@@ -13,7 +13,7 @@ import { type SchemaCreationFunction } from "../../layouts/SchemaOrg";
 import { createCollectionPageSchema } from "../../layouts/SchemaOrg.factory";
 import SchemaOrg from "../../layouts/SchemaOrg.astro";
 import { getEntry } from "astro:content";
-import { absoluteLink } from "../../layouts/ImageUtils";
+import { absoluteLink } from "../../utils";
 
 export async function getStaticPaths() {
   const categories = await getCollection("categories");

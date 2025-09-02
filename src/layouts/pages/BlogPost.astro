@@ -10,7 +10,7 @@ import SchemaOrg from "../SchemaOrg.astro";
 import type { SchemaCreationFunction } from "../SchemaOrg";
 import { getImage } from "astro:assets";
 import { getImage as getImageByName } from "../../images/Images";
-import { absoluteLink } from "../ImageUtils";
+import { absoluteLink } from "../../utils";
 import { createBlogPostingSchema } from "../SchemaOrg.factory";
 import { LARGEST_IMAGE_SIZE } from "../../styles/Breakpoints";
 
@@ -52,6 +52,7 @@ const schemaOrg: SchemaCreationFunction = (o, me, df, url) => createBlogPostingS
         </div>}
     </section>
     <hr />
+    <div data-toc />
     <slot />
   </article>
 </MinimalPage>

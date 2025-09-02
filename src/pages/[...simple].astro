@@ -12,6 +12,7 @@ import { getImage } from "astro:assets";
 import { getImage as getImageByName } from "../images/Images";
 import type { GetImageResult } from "astro";
 import { LARGEST_IMAGE_SIZE } from "../styles/Breakpoints";
+import { absoluteLink } from "../utils";
 
 export async function getStaticPaths() {
   const posts = await getCollection("simple");
@@ -35,6 +36,8 @@ if (heroImage !== undefined)
     fit: "scale-down"
   });
 
+const src = imageInfo?.src;
+
 const createData: SchemaCreationFunction = (o, p, df, url) => createWebPageSchema({
   name: title,
   description,
@@ -43,7 +46,7 @@ const createData: SchemaCreationFunction = (o, p, df, url) => createWebPageSchem
   publisher: o,
   datePublished: df(dates.pubDate),
   dateModified: df(dates.updated),
-  image: imageInfo?.src
+  image: src === undefined ? undefined : absoluteLink(Astro.url, src)
 });
 ---
 
@@ -54,5 +57,6 @@ const createData: SchemaCreationFunction = (o, p, df, url) => createWebPageSchem
   </BaseHead>
   <h1>{title}</h1>
   <Published {...dates} />
+  <div data-toc />
   <Content />
 </MinimalPage>

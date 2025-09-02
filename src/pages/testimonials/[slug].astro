@@ -9,7 +9,8 @@ import { filterInvalidImageName } from "../../images/Images";
 import type { SchemaCreationFunction } from "../../layouts/SchemaOrg";
 import SchemaOrg from "../../layouts/SchemaOrg.astro";
 import { readFile } from "fs/promises";
-import { createReviewSchema } from "../../layouts/SchemaOrg.factory";
+import { createReviewSchema, createServiceSchema } from "../../layouts/SchemaOrg.factory";
+import { slugToName } from "../../utils";
 
 export async function getStaticPaths() {
   return (await getCollection("testimonials")).map(r => ({
@@ -23,15 +24,21 @@ type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 const props = Astro.props;
 const { data, slug } = props;
-const { name, largeImage, date } = data;
+const { name, largeImage, date, type } = data;
 const title = `Eine ehrliche Bewertung von ${name}`;
 const socialImage = filterInvalidImageName(largeImage ?? `${slug}-large`);
+const areaName = slugToName(type);
 
 let reviewBody = await readFile(`./src/content/testimonials/${props.slug}.md`, "utf-8");
 reviewBody = reviewBody.substring(reviewBody.lastIndexOf("---") + 3).trim().replaceAll("\r\n", "\n");
 
-const createSchemaOrg: SchemaCreationFunction = (o, _, df) => createReviewSchema({
-  itemReviewed: o,
+const createSchemaOrg: SchemaCreationFunction = (o, me, df) => createReviewSchema({
+  itemReviewed: createServiceSchema({
+    name: `${areaName} Fotoshooting mit ${name}`,
+    provider: me,
+    brand: o,
+    serviceType: `${areaName} Fotoshooting`
+  }),
   reviewName: title,
   authorName: name,
   publisher: o,
