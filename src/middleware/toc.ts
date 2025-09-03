@@ -1,5 +1,6 @@
 import { defineMiddleware } from "astro:middleware";
 import { JSDOM } from "jsdom";
+import { extname } from 'node:path';
 
 /**
  * Definiert die rekursive Struktur für einen Überschriftenknoten.
@@ -88,6 +89,18 @@ function createTocItems(nodes?: HeadingNode[]): string {
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const response = await next();
+  const { pathname } = context.url;
+
+  // Combine all checks for a robust filter
+  const isInternalAstroRoute = pathname.startsWith('/_');
+  const isApiRoute = pathname.startsWith('/api/');
+  const hasFileExtension = extname(pathname) !== '';
+
+  // If it's ANY of these, it's not a standard page, so we skip our logic.
+  if (isInternalAstroRoute || isApiRoute || hasFileExtension) {
+    return response;
+  }
+
   const html = await response.text();
   const tocRegex = /<div data-toc(="")?[^>]*?>\s*<\/div>/s;
 
