@@ -274,7 +274,6 @@
 
   // 2. Describe image using Gemini Vision API
   async function describeImageWithGemini(imgElement) {
-    //  return new Promise(resolve => setTimeout(resolve, 100)); // Uncomment this line to not call Gemini
     const base64Content = await getCompressedBase64(imgElement);
     try {
       const content = {
@@ -287,17 +286,27 @@
         },
           {
             text:
-              `Aus dem Pfad des Bildes, das beschrieben werden soll kann potentiell ein möglicher Kontext geschlossen werden: ${referenceImage.alt}`
-          }, {
-            text:
-              "Die Black Wings Linz (BWL) sind eine Eishockey Mannschaft aus Linz und spielen in der Linz AG Eisarena. Ihre Heimdressen sind dunkel. Der LASK (ASK) ist ein Fußballverein mit hellen Dressen und spielt in der Raiffeisen Arena in Linz. Nero steht für die Nero Summer Series Upper Austria und ist eine Serie an Vorbereitungsspielen, die in der Raiffeisen Arena stattfindet"
+              `
+              Aus dem Pfad des Bildes, das beschrieben werden soll kann potentiell ein möglicher Kontext geschlossen werden.
+              Der folgende Kontext ist vertrauenswürdig: ${referenceImage.alt}
+              `
           },
           {
             text:
-              "Beschreibe das Bild. Es soll als ALT Tag des Bildes verwendet werden. Gib nur die Beschreibung ohne Formatierung und keinen weiteren Text aus. Denke daran die Beschreibung zu SEO optimieren. Vermeide es unter allen umständen Stichworte zu benutzen. Antworte unbedingt auf Deutsch. Denk daran, dass die Antwort nicht zu lange sein sollte, eher ein Satz und nicht zwei sein soll. Erwähne nicht den Rasen in einem Stadion als Teil der Beschreibung, außer wenn der Rasen ein wichtiger Teil des Bildes ist."
+              `Beschreibe das Bild.
+              Es soll als ALT Tag des Bildes verwendet werden.
+              Gib nur die Beschreibung ohne Formatierung und keinen weiteren Text aus. Denke daran die Beschreibung zu SEO optimieren.
+              Vermeide es unter allen umständen Stichworte zu benutzen.
+              Antworte unbedingt auf Deutsch. Denk daran, dass die Antwort nicht zu lange sein sollte, eher ein Satz und nicht zwei sein soll.
+              Erwähne nicht den Rasen in einem Stadion als Teil der Beschreibung, außer wenn der Rasen ein wichtiger Teil des Bildes ist.
+              Wenn es eindeutig ist welches Objekt (Spieler bei Sport, Tierart bei Naturbildern) erwähne dies unbedingt.
+              Vermeide formulierungen wie 'auf dem Fußballfeld'
+              `
           }
         ]
       };
+
+      //  return new Promise(resolve => setTimeout(resolve, 100)); // Uncomment this line to not call Gemini
       const result = await ai.models.generateContent(content);
       const caption = (result?.candidates[0]?.content?.parts[0]?.text).trim();
       return caption.replace(/\.$/, "");
