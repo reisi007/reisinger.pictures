@@ -200,6 +200,7 @@
       const data = needsCreation ? {} : readYaml(fileObj.handle);
       if (data && (data.title === null || data.title === "" || typeof data.title === "undefined")) {
         fileNameEl.textContent = fileObj.relativePath;
+        // Alt vor SRC setzen
         referenceImage.alt = "Pfad zum Bild: " + fileNameEl.textContent + (context !== null ? ". Inhalt des Artikels als weiterer Hinweis: "
           + context : "");
         titleInput.value = "";
@@ -272,12 +273,19 @@
     return dataUrl.split(",")[1];
   }
 
+  const MODELS_USED = ["gemini-2.5-pro", "gemini-2.5-flash"];
+  let curModelIndex = 0;
+
   // 2. Describe image using Gemini Vision API
   async function describeImageWithGemini(imgElement) {
+    if (curModelIndex >= MODELS_USED.length) {
+      return { type: "error", message: "Gemini API Rate Limit Exceeded" };
+    }
+    const model = MODELS_USED[curModelIndex];
     const base64Content = await getCompressedBase64(imgElement);
     try {
       const content = {
-        model: "gemini-2.5-flash",
+        model,
         contents: [{
           inlineData: {
             mimeType: "image/webp",
@@ -312,7 +320,8 @@
       return caption.replace(/\.$/, "");
     } catch (err) {
       if (err.status === 429) {
-        return { type: "error", message: "Gemini API Rate Limit Exceeded" };
+        curModelIndex++;
+        return describeImageWithGemini(imgElement);
       }
       console.warn("Gemini Image Captioning Error:", err);
       return { type: "error", message: "Beschreibung fehlgeschlagen" };
