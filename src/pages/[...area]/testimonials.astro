@@ -4,13 +4,10 @@ import { getCollection } from "astro:content";
 
 import BaseHead from "../../layouts/BaseHead.astro";
 import MinimalPage from "../../layouts/pages/MinimalPage.astro";
-import { groupBy, slugToName,absoluteLink } from "../../utils";
+import { groupBy, slugToName } from "../../utils";
 import ResponsiveImage from "../../layouts/ResponsiveImage.astro";
 import { tryGetImage } from "../../images/Images";
 import SocialImage from "../../layouts/SocialImage.astro";
-import type { SchemaCreationFunction } from "../../layouts/SchemaOrg";
-import { createCollectionPageSchema } from "../../layouts/SchemaOrg.factory";
-import SchemaOrg from "../../layouts/SchemaOrg.astro";
 
 export async function getStaticPaths() {
   const testimonials = await getCollection("testimonials");
@@ -30,19 +27,11 @@ const heroImage = reviews.map(e => `${e.slug}-large`)
   .filter(e => tryGetImage(e) !== undefined)
   .find(e => e !== undefined);
 
-const name = slugToName(type);const title = `${name} Bewertungen`;
-
-const createData: SchemaCreationFunction = (_, __, df) => createCollectionPageSchema({
-  name: title,
-  description: `Alle Bewertungen von ${name} Fotoshootings`,
-  dateModified: df(reviews[0].data.date),
-  items: reviews.map(r => (({ url: absoluteLink(Astro.url, `/testimonials/${r.slug}`), name: r.data.name, type: "Review" })))
-});
+const title = `${(slugToName(type))} Bewertungen`;
 ---
 <MinimalPage>
   <BaseHead title={title} slot="head">
     <SocialImage name={heroImage} />
-    <SchemaOrg createData={createData} />
   </BaseHead>
   <h1 class="mb-8">{title}</h1>
   <div class="mx-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">

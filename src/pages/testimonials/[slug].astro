@@ -6,11 +6,6 @@ import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import ReviewCard from "../../layouts/ReviewCard.astro";
 import SocialImage from "../../layouts/SocialImage.astro";
 import { filterInvalidImageName } from "../../images/Images";
-import type { SchemaCreationFunction } from "../../layouts/SchemaOrg";
-import SchemaOrg from "../../layouts/SchemaOrg.astro";
-import { readFile } from "fs/promises";
-import { createReviewSchema, createServiceSchema } from "../../layouts/SchemaOrg.factory";
-import { slugToName } from "../../utils";
 
 export async function getStaticPaths() {
   return (await getCollection("testimonials")).map(r => ({
@@ -24,32 +19,13 @@ type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 const props = Astro.props;
 const { data, slug } = props;
-const { name, largeImage, date, type } = data;
+const { name, largeImage } = data;
 const title = `Eine ehrliche Bewertung von ${name}`;
 const socialImage = filterInvalidImageName(largeImage ?? `${slug}-large`);
-const areaName = slugToName(type);
-
-let reviewBody = await readFile(`./src/content/testimonials/${props.slug}.md`, "utf-8");
-reviewBody = reviewBody.substring(reviewBody.lastIndexOf("---") + 3).trim().replaceAll("\r\n", "\n");
-
-const createSchemaOrg: SchemaCreationFunction = (o, me, df) => createReviewSchema({
-  itemReviewed: createServiceSchema({
-    name: `${areaName} Fotoshooting mit ${name}`,
-    provider: me,
-    brand: o,
-    serviceType: `${areaName} Fotoshooting`
-  }),
-  reviewName: title,
-  authorName: name,
-  publisher: o,
-  datePublished: df(date),
-  reviewBody
-});
 ---
 <MinimalPage>
   <BaseHead title={title} author={name} slot="head">
     <SocialImage name={socialImage} />
-    <SchemaOrg createData={createSchemaOrg} />
   </BaseHead>
   <div class="mb-6 mt-2">
     <ReviewCard {...props} />
