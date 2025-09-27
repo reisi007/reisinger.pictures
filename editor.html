@@ -41,9 +41,10 @@
                   class="textarea textarea-bordered w-full text-base mb-4 mt-2"
         ></textarea>
 
-        <div class="card-actions">
+        <div class="card-actions items-center">
           <button type="submit" class="btn btn-primary">Speichern und nächste Datei laden</button>
           <button type="button" id="redoDescriptionBtn" class="btn btn-secondary" disabled>KI-Bildbeschreibung wiederholen</button>
+          <span id="currentModel" class="badge badge-primary badge-outline ml-2"></span>
         </div>
       </form>
     </div>
@@ -67,7 +68,7 @@
   import { GoogleGenAI } from "https://cdn.jsdelivr.net/npm/@google/genai@1/+esm";
   import jsyaml from "https://cdn.jsdelivr.net/npm/js-yaml@4/+esm";
 
-  const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY, model: "gemini-2.5-flash" });
+  const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
   const selectFolderBtn = document.getElementById("selectFolderBtn");
   const editorDiv = document.getElementById("editor");
@@ -78,6 +79,7 @@
   const referenceImage = document.getElementById("referenceImage");
   const autoDescribeProgress = document.getElementById("autoDescribeProgress");
   const progressIndicator = document.getElementById("progressIndicator");
+  const currentModelEl = document.getElementById("currentModel");
 
   let directoryHandle = null;
   let filesToProcess = [];
@@ -282,6 +284,8 @@
       return { type: "error", message: "Gemini API Rate Limit Exceeded" };
     }
     const model = MODELS_USED[curModelIndex];
+    currentModelEl.textContent = model;
+
     const base64Content = await getCompressedBase64(imgElement);
     try {
       const content = {
@@ -314,7 +318,7 @@
         ]
       };
 
-      //  return new Promise(resolve => setTimeout(resolve, 100)); // Uncomment this line to not call Gemini
+    //  return new Promise(resolve => setTimeout(resolve, 100)); // Uncomment this line to not call Gemini
       const result = await ai.models.generateContent(content);
       const caption = (result?.candidates[0]?.content?.parts[0]?.text).trim();
       return caption.replace(/\.$/, "");

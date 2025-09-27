@@ -1,5 +1,5 @@
 import { defineMiddleware } from "astro:middleware";
-import { JSDOM } from "jsdom";
+import { JSDOM, VirtualConsole } from "jsdom";
 import { extname } from 'node:path';
 
 /**
@@ -19,7 +19,14 @@ type HeadingNode = {
  */
 export function parseHeadings(htmlString: string): HeadingNode[] {
   // Verwenden Sie JSDOM, um den HTML-String in einer Node.js-Umgebung zu parsen.
-  const dom = new JSDOM(htmlString);
+  const virtualConsole = new VirtualConsole();
+  virtualConsole.sendTo(console, { omitJSDOMErrors: true });
+  virtualConsole.on("jsdomError", (err) => {
+    if (err.message !== "Could not parse CSS stylesheet") {
+      console.error(err);
+    }
+  });
+  const dom = new JSDOM(htmlString,{virtualConsole});
   const doc = dom.window.document;
   const headings = doc.querySelectorAll(":is(h2, h3, h4, h5, h6)[id]:not(footer *)");
 

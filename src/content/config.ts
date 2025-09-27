@@ -4,7 +4,6 @@ import { file, glob } from "astro/loaders";
 
 const einblicke = defineCollection({
   type: "content",
-  // Type-check frontmatter using a schema
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
@@ -28,8 +27,6 @@ export enum ReviewType {
   Beauty = "beauty",
   Paare = "couples",
   Sport = "sport",
-  Business = "business",
-  Tanz = "tanz"
 }
 
 export enum OrientationEnum {

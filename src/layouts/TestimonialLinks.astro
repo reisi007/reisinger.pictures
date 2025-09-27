@@ -7,7 +7,7 @@ const testimoinials = await getCollection("testimonials");
 
 const grouped = groupBy(testimoinials, e => e.data.type);
 
-const categories: ReviewType[] = [ReviewType.Beauty, ReviewType.Akt, ReviewType.Paare, ReviewType.Tanz];
+const categories: ReviewType[] = [ReviewType.Beauty, ReviewType.Akt, ReviewType.Paare];
 ---
 <div>
   {categories.map(category => (<a href={`/${category}/testimonials`}>
