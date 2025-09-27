@@ -170,6 +170,7 @@
 
   const redoDescriptionBtn = document.getElementById("redoDescriptionBtn");
   redoDescriptionBtn.addEventListener("click", async () => {
+    curModelIndex = 0;
     referenceImage.onload();
   });
 
@@ -318,7 +319,7 @@
         ]
       };
 
-    //  return new Promise(resolve => setTimeout(resolve, 100)); // Uncomment this line to not call Gemini
+      //  return new Promise(resolve => setTimeout(resolve, 100)); // Uncomment this line to not call Gemini
       const result = await ai.models.generateContent(content);
       const caption = (result?.candidates[0]?.content?.parts[0]?.text).trim();
       return caption.replace(/\.$/, "");
