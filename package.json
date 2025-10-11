@@ -19,7 +19,7 @@
     "@astrojs/mdx": "^4.3.4",
     "@astrojs/sitemap": "^3.5.1",
     "@tailwindcss/cli": "^4.1.12",
-    "astro": "^5.13.5",
+    "astro": "^5.14.4",
     "dayjs": "^1.11.18",
     "photoswipe": "^5.4.4",
     "sharp": "^0.34.3"
