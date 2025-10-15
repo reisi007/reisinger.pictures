@@ -324,7 +324,7 @@
       const caption = (result?.candidates[0]?.content?.parts[0]?.text).trim();
       return caption.replace(/\.$/, "");
     } catch (err) {
-      if (err.status === 429) {
+      if (err.status === 429|| err.status === 503) {
         curModelIndex++;
         return describeImageWithGemini(imgElement);
       }
