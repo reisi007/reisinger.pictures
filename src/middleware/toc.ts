@@ -20,7 +20,7 @@ type HeadingNode = {
 export function parseHeadings(htmlString: string): HeadingNode[] {
   // Verwenden Sie JSDOM, um den HTML-String in einer Node.js-Umgebung zu parsen.
   const virtualConsole = new VirtualConsole();
-  virtualConsole.sendTo(console, { omitJSDOMErrors: true });
+  virtualConsole.forwardTo(console, { jsdomErrors: "none" });
   virtualConsole.on("jsdomError", (err) => {
     if (err.message !== "Could not parse CSS stylesheet") {
       console.error(err);
