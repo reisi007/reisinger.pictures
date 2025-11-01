@@ -14,6 +14,7 @@ const menue: Menue = [
     items: [
       { name: "Dein Fotoshooting", href: "" },
       images,
+      { name: "Einblicke", href: "/einblicke/beauty", absolute: true },
       reviewItem]
   }, {
     name: "Akt-Fotoshooting",
@@ -21,6 +22,7 @@ const menue: Menue = [
     items: [
       { name: "Alle Information", href: "" },
       images,
+      { name: "Einblicke", href: "/einblicke/akt", absolute: true },
       reviewItem,
       {
         name: "Akt-Shooting Ablauf",
@@ -41,7 +43,7 @@ const menue: Menue = [
     items: [
       { name: "Alle Sportarten", href: "" },
       { name: "Alle Sportarten Bilder", href: "/images", visibility: Visibility.DEV_ONLY },
-
+      { name: "Alle Sportarten - Einblicke", href: "/einblicke/sport", absolute: true },
       {
         name: "LASK - Linzer Allgemeiner Sportklub",
         href: "/lask"
@@ -126,9 +128,9 @@ function isMenuVisible(entry: MenueItem | SubMenu) {
                   <ul class="flex flex-col gap-y-1 py-1">
                     {item.items
                       .filter(e => isMenuVisible(e))
-                      .map(e => (
+                      .map((e) => (
                         <li>
-                          <a href={item.baseHref + e.href}>
+                          <a href={(e.absolute ?? false) ? e.href : item.baseHref + e.href}>
                             {e.name}
                           </a>
                         </li>

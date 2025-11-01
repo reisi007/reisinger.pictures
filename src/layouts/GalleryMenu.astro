@@ -31,10 +31,11 @@ dateCategories.forEach(item => {
     tree.push(node);
   }
 });
+
+tree.reverse()
 ---
 <div class="menu-title text-lg font-bold text-center">Bilder-Archiv</div>
-{/* The ID is added here to uniquely identify the menu container */}
-<ul id="gallery-accordion-menu" class="w-full justify-center menu menu-vertical bg-base-200 rounded-box grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
+<ul id="gallery-accordion-menu" class="w-full justify-center menu menu-vertical bg-base-200 rounded-box grid sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-6">
   {rootItem && (
     <li><a href={rootHref}>{rootItem.name}</a></li>
   )}

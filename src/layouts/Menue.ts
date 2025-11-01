@@ -10,7 +10,7 @@ export type MenueItem = {
   href: string,
   name: string,
   visibility?: Visibility,
-
+  absolute?: boolean,
 }
 
 export type SubMenu = {
