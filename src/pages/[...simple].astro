@@ -24,7 +24,7 @@ export async function getStaticPaths() {
 type Props = CollectionEntry<"simple">;
 
 const { render, data } = Astro.props;
-const { title, description, heroImage, showContact, index = true, ...dates } = data;
+const { title, description, heroImage, showContact,showToc, index = true, ...dates } = data;
 const { Content } = await render();
 
 let imageInfo: GetImageResult | undefined;
@@ -57,6 +57,6 @@ const createData: SchemaCreationFunction = (o, p, df, url) => createWebPageSchem
   </BaseHead>
   <h1>{title}</h1>
   <Published {...dates} />
-  <div data-toc />
+  {showToc && <div data-toc />}
   <Content />
 </MinimalPage>

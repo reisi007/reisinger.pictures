@@ -64,6 +64,7 @@ const simple = defineCollection({
     description: z.string().optional(),
     keywords: z.array(z.string()).optional(),
     showContact: z.boolean().optional(),
+    showToc: z.boolean().default(true),
     index: z.boolean().optional(),
     heroImage: z.string().optional(),
     pubDate: z.coerce.date().optional(),
@@ -71,10 +72,19 @@ const simple = defineCollection({
   })
 });
 
-const agbs = defineCollection({
-  type: "content",
+const agb = defineCollection({
+  loader: file("src/content/agb.json"),
   schema: z.object({
-    pubDate: z.coerce.date()
+    validFrom: z.coerce.date(),
+    filename: z.string(),
+  })
+});
+
+const dsb = defineCollection({
+  loader: file("src/content/dsb.json"),
+  schema: z.object({
+    validFrom: z.coerce.date(),
+    filename: z.string(),
   })
 });
 
@@ -104,8 +114,9 @@ const categories = defineCollection({
 });
 
 export const collections = {
-  agbs,
+  agb,
   areas,
+  dsb,
   einblicke,
   einblickeOverviews,
   simple,

@@ -150,4 +150,8 @@
     .prose {
         @apply max-w-none;
     }
+
+    .aspect-paper-vertical {
+        @apply aspect-[210/297];
+    }
 }
