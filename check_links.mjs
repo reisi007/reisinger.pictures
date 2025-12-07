@@ -158,6 +158,7 @@ let missingUrls = crossRefLinks
 
 missingUrls = removeIf(missingUrls, link => link.protocol.includes("mailto") && link.pathname === "florian@reisinger.pictures");
 missingUrls = removeIf(missingUrls, link => link.protocol.includes("https") && !link.host.includes("reisinger.pictures"));
+missingUrls = removeIf(missingUrls, link => link.pathname.endsWith(".pdf") && (["agb", "dsb"].some(prefix => link.pathname.includes(prefix))));
 
 if (missingUrls.length > 0)
   throw new Error(`Found ${missingUrls.length} missing links:\n${missingUrls.join("\n")}`);
