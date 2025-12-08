@@ -65,7 +65,7 @@ async function extractUniqueLinksFromFileWithJSDOM(filePath, absoluteUrl) {
     const hIds = Array.from(document.querySelectorAll("[id]"))
       .map(element => `${absoluteUrl}#${encodeURIComponent(element.getAttribute("id"))}`);
     const aLinks = Array.from(document.querySelectorAll("a[href]"))
-      .map(element => element.getAttribute("href")).map(e => e.includes("#") ? absoluteUrl + e : e);
+      .map(element => element.getAttribute("href")).map(e => e.startsWith("#") ? absoluteUrl + e : e);
     return { aLinks, hIds };
   } catch (error) {
     console.error(`Could not process file ${filePath}:`, error);
@@ -108,7 +108,7 @@ export async function extractAllLinksRecursivelyWithJSDOM(folderPath, prefix) {
     // 4. Flatten the array of arrays and perform the final global deduplication
     const links = aLinks.flat()
       .map(e => e.startsWith("/") || e.startsWith("#") ? prefix + e : e)
-      .map(e => !e.endsWith("/") && e.startsWith("https") && !e.includes("#") ? `${e}/` : e);
+      .map(e => !e.endsWith("/") && e.startsWith("https") && !e.includes("#") && !e.endsWith(".pdf") ? `${e}/` : e);
 
     return { links, anchors };
 
