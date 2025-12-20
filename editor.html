@@ -276,7 +276,12 @@
     return dataUrl.split(",")[1];
   }
 
-  const MODELS_USED = ["gemini-2.5-pro", "gemini-2.5-flash"];
+  const MODELS_USED = [
+    "gemini-3-pro-preview",
+    "gemini-2.5-pro",
+    "gemini-3-flash-preview",
+    "gemini-2.5-flash"
+  ];
   let curModelIndex = 0;
 
   // 2. Describe image using Gemini Vision API
