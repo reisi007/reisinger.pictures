@@ -1,5 +1,7 @@
 RewriteEngine On
 
+RewriteRule ^gallery/(.*)$ / [R=301,L]
+
 RewriteRule ^einblicke/sport/bundesliga/(.*) /einblicke/sport/fussball/bundesliga/$1 [R=301,L]
 RewriteRule ^einblicke/oefb/(.*) /einblicke/sport/fussball/oefb/$1 [R=301,L]
 RewriteRule ^einblicke/(sport/)?nero(\d+) /einblicke/sport/fussball/nero$2 [R=301,L]

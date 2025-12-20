@@ -9,6 +9,7 @@ import { getImage } from "../images/Images";
 
 interface Props {
   name: string,
+  alt?: string,
   class?: string,
   height?: string,
   sizes?: string,
@@ -22,6 +23,7 @@ const {
   sizes,
   sizeModifiers,
   widths: widthsOverride,
+  alt = "",
   loading = ResponsiveImageLoading.LAZY,
   class: classNames
 } = Astro.props;
@@ -29,7 +31,6 @@ const {
 const isDevMode = import.meta.env.MODE === "development";
 const image = (await getImage(name)).default;
 const data = await getMetadataForImageSlug(name);
-const alt = data?.title ?? "";
 const darkInvert = data?.darkInvert ?? false;
 const computedSizes = computeSizes(mergeBreakpoints(GALLERY_BREAKPOINTS[GalleryLayout.Full], sizeModifiers));
 const widths: number[] = (widthsOverride ?? DEFAULT_IMAGE_SIZES).filter(s => s <= image.width);

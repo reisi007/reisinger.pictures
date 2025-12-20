@@ -48,7 +48,7 @@ const schemaOrg: SchemaCreationFunction = (o, me, df, url) => createBlogPostingS
       <Published {...dates} />
       {heroImage &&
         <div>
-          <ResponsiveImage name={heroImage} height="32rem" />
+          <ResponsiveImage name={heroImage} alt={title} height="32rem" />
         </div>}
     </section>
     <hr />

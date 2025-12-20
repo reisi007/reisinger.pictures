@@ -7,7 +7,6 @@
     "start": "astro dev",
     "build": "astro check && astro build",
     "editor:css": "tailwindcss -i ./editor.tw.css -o ./editor.css --watch",
-    "prebuild": "node add-metadata.mjs",
     "postbuild": "node clean_output.mjs && node check_links.mjs",
     "preview": "astro preview",
     "lint": "eslint src",
