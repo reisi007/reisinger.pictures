@@ -138,8 +138,7 @@ fabric.properties
 # End of https://www.toptal.com/developers/gitignore/api/webstorm,react,astro
 .cache
 dist
-playwright-report
-test-results
+out
 editor-api-key.js
 public/agb
 public/dsb
