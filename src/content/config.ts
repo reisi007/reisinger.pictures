@@ -9,7 +9,7 @@ const einblicke = defineCollection({
     description: z.string().optional(),
     keywords: z.array(z.string()).optional(),
     // Transform string to Date object
-    pubDate: z.coerce.date(),
+    date: z.coerce.date(),
     updated: z.coerce.date().optional(),
     heroImage: z.string()
   })
@@ -67,7 +67,7 @@ const simple = defineCollection({
     showToc: z.boolean().default(true),
     index: z.boolean().optional(),
     heroImage: z.string().optional(),
-    pubDate: z.coerce.date().optional(),
+    date: z.coerce.date().optional(),
     updated: z.coerce.date().optional()
   })
 });

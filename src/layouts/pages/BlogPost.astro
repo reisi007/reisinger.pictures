@@ -32,7 +32,7 @@ const schemaOrg: SchemaCreationFunction = (o, me, df, url) => createBlogPostingS
   image: absoluteLink(Astro.url, imageInfo.src),
   author: me,
   publisher: o,
-  datePublished: df(dates.pubDate),
+  datePublished: df(dates.date),
   dateModified: df(dates.updated)
 });
 ---

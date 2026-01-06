@@ -44,7 +44,7 @@ const createData: SchemaCreationFunction = (o, p, df, url) => createWebPageSchem
   url,
   author: p,
   publisher: o,
-  datePublished: df(dates.pubDate),
+  datePublished: df(dates.date),
   dateModified: df(dates.updated),
   image: src === undefined ? undefined : absoluteLink(Astro.url, src)
 });

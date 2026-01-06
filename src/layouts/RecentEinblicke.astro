@@ -7,7 +7,7 @@ const posts = (await getCollection("einblicke"))
     const aData = a.data;
     const bData = b.data;
 
-    return Math.max(bData.pubDate.valueOf(), bData.updated?.valueOf() ?? Number.MIN_VALUE) - Math.max(aData.pubDate.valueOf(), aData.updated?.valueOf() ?? Number.MIN_VALUE);
+    return Math.max(bData.date.valueOf(), bData.updated?.valueOf() ?? Number.MIN_VALUE) - Math.max(aData.date.valueOf(), aData.updated?.valueOf() ?? Number.MIN_VALUE);
   })
   .slice(0, 5);
 ---
