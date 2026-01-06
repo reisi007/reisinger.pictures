@@ -61,6 +61,9 @@ async function mergeMarkdownFiles() {
 
       // Separator erstellen
       const separator = `
+------------
+${relativePath}
+------------
 `;
 
       const footer = `
