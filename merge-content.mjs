@@ -1,11 +1,6 @@
-import { readdir, readFile, writeFile } from 'node:fs/promises';
-import { join, relative, extname, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-// --- KONFIGURATION ---
-const INPUT_DIR = './src/content'; // Der Ordner, der durchsucht werden soll
-const OUTPUT_FILE = './out/allContent.txt'; // Der Name der Zieldatei
-// ---------------------
+import { readdir, readFile, writeFile } from "node:fs/promises";
+import { dirname, extname, join, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 
 // Helper für __dirname in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -26,11 +21,11 @@ async function getFilesRecursively(dir) {
 /**
  * Hauptfunktion
  */
-async function mergeMarkdownFiles() {
+async function mergeMarkdownFiles(inputdir , outputfile ) {
   try {
     // Pfade auflösen
-    const startPath = join(__dirname, INPUT_DIR);
-    const outputPath = join(__dirname, OUTPUT_FILE);
+    const startPath = join(__dirname, inputdir);
+    const outputPath = join(__dirname, outputfile);
 
     console.log(`🔍 Suche nach .md und .mdx Dateien in: ${startPath}`);
 
@@ -75,7 +70,7 @@ ${relativePath}
     // Ergebnis schreiben
     await writeFile(outputPath, combinedContent, 'utf-8');
 
-    console.log(`✅ Erfolgreich! Alle Dateien wurden kombiniert in: ${OUTPUT_FILE}`);
+    console.log(`✅ Erfolgreich! Alle Dateien wurden kombiniert in: ${outputfile}`);
 
   } catch (error) {
     console.error('❌ Ein Fehler ist aufgetreten:', error);
@@ -83,4 +78,5 @@ ${relativePath}
 }
 
 // Skript starten
-mergeMarkdownFiles();
+mergeMarkdownFiles('./src/content','./out/allContent.txt');
+mergeMarkdownFiles('./src/content/testimonials','./out/reviews.txt');
