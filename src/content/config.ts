@@ -42,7 +42,7 @@ const testimonials = defineCollection({
     date: z.coerce.date(),
     rating: z.number().optional(),
     source: z.string().url("Must be a valid URL").optional(),
-    largeImage: z.string().optional()
+    large: z.string().optional()
   })
 });
 

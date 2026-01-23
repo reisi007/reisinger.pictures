@@ -8,7 +8,7 @@ type Props = CollectionEntry<"testimonials"> & ReviewProps;
 
 const {
   slug,
-  data: { name, source, largeImage: optLargeImage },
+  data: { name, source, large: optLargeImage },
   render,
   displayLargeImage = true
 } = Astro.props;

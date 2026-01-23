@@ -19,9 +19,9 @@ type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 const props = Astro.props;
 const { data, slug } = props;
-const { name, largeImage } = data;
+const { name, large } = data;
 const title = `Eine ehrliche Bewertung von ${name}`;
-const socialImage = filterInvalidImageName(largeImage ?? `${slug}-large`);
+const socialImage = filterInvalidImageName(large ?? `${slug}-large`);
 ---
 <MinimalPage>
   <BaseHead title={title} author={name} slot="head">
