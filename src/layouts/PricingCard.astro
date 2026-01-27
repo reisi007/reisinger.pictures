@@ -1,0 +1,92 @@
+---
+interface Props {
+  title: string;
+  subtitle?: string;
+  price: string;
+  originalPrice?: string;
+  description?: string;
+  features: string[];
+  ribbon?: string; // z.B. "Limited Availability"
+  highlight?: boolean; // Für das "Creative Special" (ändert Farben)
+  footerText?: string[];
+}
+
+const {
+  title,
+  subtitle,
+  price,
+  originalPrice,
+  description,
+  features,
+  ribbon,
+  highlight = false,
+  footerText=[]
+} = Astro.props;
+
+// Dynamische Klassen basierend auf "highlight" Status
+const cardBg = highlight ? "bg-primary text-primary-content" : "bg-base-100 text-base-content border border-base-300";
+const titleColor = highlight ? "text-secondary" : "text-primary";
+const footerBgColor = highlight ? "border-secondary" : "border-onPrimary";
+const descriptionColor = highlight ? "text-secondary" : "text-onPrimary";
+const checkIconColor = highlight ? "bg-secondary text-secondary-content" : "bg-primary/10 text-primary";
+---
+
+<div class={`card shadow-xl relative overflow-hidden ${cardBg} h-full transition-transform hover:-translate-y-1`}>
+
+  <div class="card-body p-8">
+    <div class="text-center mb-6">
+      <h2 class={`text-3xl font-black uppercase tracking-wide mb-2 ${titleColor}`}>
+        {title}
+      </h2>
+      {subtitle && <p class="opacity-80 text-sm font-medium">{subtitle}</p>}
+      {ribbon && (
+        <div class="badge badge-secondary badge-outline mt-2 uppercase text-xs font-bold tracking-widest">
+          {ribbon}
+        </div>
+      )}
+    </div>
+
+    <div class="divider opacity-20 my-0"></div>
+
+    <div class="flex flex-col items-center justify-center my-6">
+      {originalPrice && (
+        <span class="text-lg line-through opacity-60 decoration-secondary/60 decoration-2">
+          {originalPrice}
+        </span>
+      )}
+      <span class="text-5xl font-black text-center tracking-tight">{price}</span>
+    </div>
+
+    {description && (
+      <div class={`prose prose-sm prose-p:my-1 mb-6 leading-snug opacity-90 mx-auto text-center ${descriptionColor}`}>
+        <p>{description}</p>
+      </div>
+    )}
+
+    <ul class="space-y-3 my-auto">
+      {features.map((item) => (
+        <li class="flex items-start gap-3">
+          <span class={`size-6 shrink-0 rounded-full flex items-center justify-center text-xs mt-0.5 ${checkIconColor}`}>
+            <span class="mdi--check"></span>
+          </span>
+          <span class="font-medium text-sm leading-6">{item}</span>
+        </li>
+      ))}
+    </ul>
+
+    <div class="mt-6 gap-y-2 flex flex-col">
+      {footerText.map((f) => (
+        <div class={`${footerBgColor} border grid grid-cols-8 gap-x-2 items-center text-xs font-bold opacity-70  py-2 rounded-lg justify-center px-3`}>
+          <span class="mdi--information-outline">️</span>
+          <span class="col-span-7">{f}</span>
+        </div>)
+      )}
+    </div>
+
+    <div class="card-actions mt-6">
+      <a href="#kontakt" class={`btn btn-block shadow-lg border-0 ${highlight ? "btn-secondary text-secondary-content" : "btn-primary"}`}>
+        Jetzt kontaktieren
+      </a>
+    </div>
+  </div>
+</div>
