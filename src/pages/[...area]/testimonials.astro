@@ -1,13 +1,13 @@
 ---
 import type { InferGetStaticPropsType } from "astro";
-import { getCollection } from "astro:content";
-
+import { getCollection, getEntry } from "astro:content";
 import BaseHead from "../../layouts/BaseHead.astro";
 import MinimalPage from "../../layouts/pages/MinimalPage.astro";
 import { groupBy, slugToName } from "../../utils";
 import ResponsiveImage from "../../layouts/ResponsiveImage.astro";
 import { tryGetImage } from "../../images/Images";
 import SocialImage from "../../layouts/SocialImage.astro";
+import AiSummaryCard from "../../layouts/AiSummaryCard.astro";
 
 export async function getStaticPaths() {
   const testimonials = await getCollection("testimonials");
@@ -28,12 +28,18 @@ const heroImage = reviews.map(e => `${e.slug}-large`)
   .find(e => e !== undefined);
 
 const title = `${(slugToName(type))} Bewertungen`;
+
+const aiSummary = (await getEntry("testimonialSummary", type))?.data;
+console.log(aiSummary, type);
 ---
 <MinimalPage>
   <BaseHead title={title} slot="head">
     <SocialImage name={heroImage} />
   </BaseHead>
   <h1 class="mb-8">{title}</h1>
+
+  {aiSummary !== undefined &&
+    <AiSummaryCard summary={aiSummary.summary} reviewCount={aiSummary.reviewCount} />}
   <div class="mx-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
     {reviews.map(async e => {
       const smallName = `${e.slug}-small`;

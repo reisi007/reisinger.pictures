@@ -1,0 +1,46 @@
+---
+interface Props {
+  summary: string;
+  reviewCount: number;
+}
+
+const { summary, reviewCount } = Astro.props;
+---
+
+<div class="card card-compact w-full lg:w-2/3 bg-base-100 shadow-sm border border-base-200 rounded-lg overflow-hidden mx-auto">
+
+  <div class="card-body flex-row gap-3 items-start p-3">
+
+    <div class="min-w-fit pt-0.5">
+      <div class="p-2 aspect-square inline-flex items-center bg-primary/10 text-primary rounded-md">
+      <span class="text-xl material-symbols--smart-toy"></span>
+      </div>
+    </div>
+
+    <label class="flex-1 min-w-0 flex flex-col gap-1 cursor-pointer group relative">
+
+      <input type="checkbox" class="peer hidden" />
+
+      <span class="text-[10px] font-bold uppercase tracking-wider text-base-content/50 select-none">
+        Basierend auf {reviewCount} Reviews
+      </span>
+
+      <div
+        class="prose prose-sm prose-p:my-0 prose-p:leading-snug text-base-content/80 line-clamp-3 peer-checked:line-clamp-none transition-all duration-200"
+      >
+        <p class="whitespace-pre-line">{ summary }</p>
+      </div>
+
+      <div class="flex items-center gap-1 mt-1 text-xs font-medium text-primary peer-checked:hidden opacity-80 hover:opacity-100">
+        <span>Mehr anzeigen</span>
+        <span class="mdi--chevron-down"></span>
+      </div>
+
+      <div class="hidden peer-checked:flex items-center gap-1 mt-2 text-xs font-medium text-base-content/40 hover:text-primary transition-colors">
+        <span>Weniger anzeigen</span>
+        <span class="mdi--chevron-up"></span>
+      </div>
+
+    </label>
+  </div>
+</div>

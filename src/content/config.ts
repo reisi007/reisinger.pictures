@@ -76,7 +76,15 @@ const agb = defineCollection({
   loader: file("src/content/agb.json"),
   schema: z.object({
     validFrom: z.coerce.date(),
-    filename: z.string(),
+    filename: z.string()
+  })
+});
+
+const testimonialSummary = defineCollection({
+  loader: file("src/content/testimonialSummary.json"),
+  schema: z.object({
+    summary: z.string(),
+    reviewCount: z.number()
   })
 });
 
@@ -84,7 +92,7 @@ const dsb = defineCollection({
   loader: file("src/content/dsb.json"),
   schema: z.object({
     validFrom: z.coerce.date(),
-    filename: z.string(),
+    filename: z.string()
   })
 });
 
@@ -121,6 +129,7 @@ export const collections = {
   einblickeOverviews,
   simple,
   testimonials,
+  testimonialSummary,
   imageMetadata,
   categories
 };
