@@ -154,4 +154,8 @@
     .aspect-paper-vertical {
         @apply aspect-[210/297];
     }
+
+    .card-body {
+        @apply text-base;
+    }
 }
