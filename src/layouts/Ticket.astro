@@ -1,0 +1,51 @@
+---
+interface Props {
+  headline?: string;
+  title: string;
+  description: string;
+  value: string;
+}
+
+const {
+  headline = "Friends of Friends",
+  title,
+  description,
+  value
+} = Astro.props;
+---
+<div
+  class="flex bg-primary text-primary-content rounded-xl overflow-hidden relative filter drop-shadow-xl"
+  style="mask-image: radial-gradient(circle at 0 50%, transparent 20px, black 21px), radial-gradient(circle at 100% 50%, transparent 20px, black 21px); -webkit-mask-image: radial-gradient(circle at 0 50%, transparent 20px, black 21px), radial-gradient(circle at 100% 50%, transparent 20px, black 21px);"
+>
+
+  <div class="flex-1 p-8 py-10 flex flex-col justify-center border-r-2 border-dashed border-primary-content/30 relative">
+
+    <h3 class="uppercase tracking-widest text-sm font-semibold mb-1 text-primary-content">
+      {headline}
+    </h3>
+
+    <h2 class="text-3xl md:text-5xl font-black uppercase leading-tight mb-4 text-primary-content">
+      {title}
+    </h2>
+
+    <div class="flex flex-wrap items-baseline gap-y-4 gap-x-8 mt-2">
+      {description && (
+        <p class="basis-3 grow text-lg font-light">
+          {description}
+        </p>
+      )}
+      {value && (
+        <div class="badge badge-secondary badge-lg font-bold py-4 px-6 shadow-sm">
+          Wert: {value}
+        </div>
+      )}
+    </div>
+  </div>
+
+  <div class="w-24 flex items-center justify-center relative bg-black/5">
+      <span class="text-xs font-bold uppercase tracking-[0.2em] opacity-70 whitespace-nowrap" style="writing-mode: vertical-rl; transform: rotate(180deg);">
+        Jetzt teilen
+      </span>
+  </div>
+
+</div>
