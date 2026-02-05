@@ -1,5 +1,5 @@
-import { defineCollection, reference, z } from "astro:content";
 import { file, glob } from "astro/loaders";
+import { defineCollection, reference, z } from "astro:content";
 
 
 const einblicke = defineCollection({

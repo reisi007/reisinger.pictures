@@ -1,8 +1,9 @@
 ---
-import { type CollectionEntry } from "astro:content";
 import { type Page } from "astro";
-import Pagination from "./Pagination.astro";
+import { type CollectionEntry } from "astro:content";
+
 import EinblickCard from "./EinblickCard.astro";
+import Pagination from "./Pagination.astro";
 
 interface Props {
   page: Page<CollectionEntry<"einblicke">>;

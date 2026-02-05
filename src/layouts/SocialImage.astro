@@ -1,8 +1,9 @@
 ---
 import { getImage } from "astro:assets";
+
 import { getImage as getImageByName } from "../images/Images";
-import { getMetadataForImageSlug } from "./image.utils";
 import { absoluteLink } from "../utils";
+import { getMetadataForImageSlug } from "./image.utils";
 
 interface Props {
   name?: string;

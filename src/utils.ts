@@ -67,12 +67,16 @@ export function formatPsychologicalPrice(value: number, options: Partial<Intl.Nu
  * OPTION B: Exakter Preis (Centgenau)
  * Beispiel: 123.45 -> 123,45 €
  */
-export function formatExactPrice(value: number, options: Partial<Intl.NumberFormatOptions> = {}) {
+export function formatExactPrice(value: number) {
   return new Intl.NumberFormat("de-AT", {
     ...BASE_OPTIONS,
-    // Standard für EUR ist automatisch 2 Stellen, kann aber explizit gesetzt werden:
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-    ...options
+    maximumFractionDigits: 2
   }).format(value);
+}
+
+export function psychologicalPriceAsNumber(value: number) {
+  const string = formatPsychologicalPrice(value).replace(/[^\d.]/g, "");
+  console.log(value, string);
+  return parseFloat(string);
 }

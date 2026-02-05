@@ -1,18 +1,18 @@
 ---
+import { getImage } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 
-import BaseHead from "../BaseHead.astro";
-import ResponsiveImage from "../ResponsiveImage.astro";
-import MinimalPage from "./MinimalPage.astro";
-import SocialImage from "../SocialImage.astro";
-import Published from "../Published.astro";
-import SchemaOrg from "../SchemaOrg.astro";
-import type { SchemaCreationFunction } from "../SchemaOrg";
-import { getImage } from "astro:assets";
 import { getImage as getImageByName } from "../../images/Images";
-import { absoluteLink } from "../../utils";
-import { createBlogPostingSchema } from "../SchemaOrg.factory";
 import { LARGEST_IMAGE_SIZE } from "../../styles/Breakpoints";
+import { absoluteLink } from "../../utils";
+import BaseHead from "../BaseHead.astro";
+import Published from "../Published.astro";
+import ResponsiveImage from "../ResponsiveImage.astro";
+import type { SchemaCreationFunction } from "../SchemaOrg";
+import SchemaOrg from "../SchemaOrg.astro";
+import { createBlogPostingSchema } from "../SchemaOrg.factory";
+import SocialImage from "../SocialImage.astro";
+import MinimalPage from "./MinimalPage.astro";
 
 type Props = CollectionEntry<"einblicke">["data"];
 

@@ -1,13 +1,14 @@
 ---
 import type { InferGetStaticPropsType } from "astro";
 import { getCollection, getEntry } from "astro:content";
+
+import { tryGetImage } from "../../images/Images";
+import AiSummaryCard from "../../layouts/AiSummaryCard.astro";
 import BaseHead from "../../layouts/BaseHead.astro";
 import MinimalPage from "../../layouts/pages/MinimalPage.astro";
-import { groupBy, slugToName } from "../../utils";
 import ResponsiveImage from "../../layouts/ResponsiveImage.astro";
-import { tryGetImage } from "../../images/Images";
 import SocialImage from "../../layouts/SocialImage.astro";
-import AiSummaryCard from "../../layouts/AiSummaryCard.astro";
+import { groupBy, slugToName } from "../../utils";
 
 export async function getStaticPaths() {
   const testimonials = await getCollection("testimonials");

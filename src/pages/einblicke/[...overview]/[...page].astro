@@ -1,14 +1,15 @@
 ---
 import type { InferGetStaticPropsType, PaginateFunction } from "astro";
 import { getCollection } from "astro:content";
-import Einblicke from "../../../layouts/Einblicke.astro";
+
 import BaseHead from "../../../layouts/BaseHead.astro";
+import Einblicke from "../../../layouts/Einblicke.astro";
 import MinimalPage from "../../../layouts/pages/MinimalPage.astro";
-import SocialImage from "../../../layouts/SocialImage.astro";
 import { type SchemaCreationFunction } from "../../../layouts/SchemaOrg";
-import { createCollectionPageSchema } from "../../../layouts/SchemaOrg.factory";
-import { absoluteLink } from "../../../utils";
 import SchemaOrg from "../../../layouts/SchemaOrg.astro";
+import { createCollectionPageSchema } from "../../../layouts/SchemaOrg.factory";
+import SocialImage from "../../../layouts/SocialImage.astro";
+import { absoluteLink } from "../../../utils";
 
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
   const overviewPages = (await getCollection("einblickeOverviews"));

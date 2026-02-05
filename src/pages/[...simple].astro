@@ -1,16 +1,16 @@
 ---
+import type { GetImageResult } from "astro";
+import { getImage } from "astro:assets";
 import { type CollectionEntry, getCollection } from "astro:content";
 
+import { getImage as getImageByName } from "../images/Images";
 import BaseHead from "../layouts/BaseHead.astro";
 import MinimalPage from "../layouts/pages/MinimalPage.astro";
-import SocialImage from "../layouts/SocialImage.astro";
 import Published from "../layouts/Published.astro";
 import type { SchemaCreationFunction } from "../layouts/SchemaOrg";
-import { createWebPageSchema } from "../layouts/SchemaOrg.factory";
 import SchemaOrg from "../layouts/SchemaOrg.astro";
-import { getImage } from "astro:assets";
-import { getImage as getImageByName } from "../images/Images";
-import type { GetImageResult } from "astro";
+import { createWebPageSchema } from "../layouts/SchemaOrg.factory";
+import SocialImage from "../layouts/SocialImage.astro";
 import { LARGEST_IMAGE_SIZE } from "../styles/Breakpoints";
 import { absoluteLink } from "../utils";
 

@@ -1,11 +1,12 @@
 ---
 import type { InferGetStaticPropsType } from "astro";
 import { getCollection } from "astro:content";
-import MinimalPage from "../../layouts/pages/MinimalPage.astro";
+
 import BaseHead from "../../layouts/BaseHead.astro";
-import ImageGallery from "../../layouts/ImageGallery.astro";
-import { slugToName } from "../../utils";
 import { GalleryLayout } from "../../layouts/GalleryLayout";
+import ImageGallery from "../../layouts/ImageGallery.astro";
+import MinimalPage from "../../layouts/pages/MinimalPage.astro";
+import { slugToName } from "../../utils";
 
 export async function getStaticPaths() {
   const isDevMode = import.meta.env.MODE === "development";

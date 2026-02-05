@@ -1,11 +1,12 @@
 ---
 import { Image } from "astro:assets";
+
+import { getImage } from "../images/Images";
 import type { NumericBreakpoints } from "../styles/Breakpoints";
 import { computeSizes, DEFAULT_IMAGE_SIZES, mergeBreakpoints } from "../styles/Breakpoints";
-import { ResponsiveImageLoading } from "./ResponsiveImageLoading";
 import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
 import { getMetadataForImageSlug } from "./image.utils";
-import { getImage } from "../images/Images";
+import { ResponsiveImageLoading } from "./ResponsiveImageLoading";
 
 interface Props {
   name: string,

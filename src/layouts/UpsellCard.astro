@@ -2,19 +2,21 @@
 interface Props {
   title: string;
   price: string;
+  originalPrice?: string;
   description: string;
-  icon?: string; // z.B. "mdi--brush"
+  icon?: string;
 }
 
 const {
   title,
   price,
+  originalPrice,
   description,
   icon
 } = Astro.props;
 ---
 
-<div class="card card-side bg-base-100 border-2 border-dashed border-base-300 shadow-sm hover:border-primary hover:shadow-md transition-all duration-300 group">
+<div class="not-prose card card-side bg-base-100 border-2 border-dashed border-base-300/60 shadow-sm hover:border-primary hover:shadow-md transition-all duration-300 group">
   {icon !== undefined &&
     <figure class="w-12 pl-4 md:pl-6 text-3xl text-primary opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-transform">
       <span class={icon}></span>
@@ -25,9 +27,18 @@ const {
       <h3 class="card-title text-base font-bold leading-tight group-hover:text-primary transition-colors">
         {title}
       </h3>
-      <div class="badge badge-primary badge-outline font-bold whitespace-nowrap">
-        {price}
+
+      <div class="flex items-center gap-2">
+        {originalPrice && (
+          <span class="text-xs line-through text-onPrimary opacity-40  decoration-1">
+            {originalPrice}
+          </span>
+        )}
+        <div class="badge badge-primary badge-outline font-bold whitespace-nowrap">
+          {price}
+        </div>
       </div>
+
     </div>
     <p class="text-xs opacity-70 leading-snug mt-1">
       {description}

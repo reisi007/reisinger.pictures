@@ -158,4 +158,8 @@
     .card-body {
         @apply text-base;
     }
+
+    .badge {
+        @apply h-auto;
+    }
 }
