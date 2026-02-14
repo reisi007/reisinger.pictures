@@ -1,0 +1,37 @@
+---
+import { type CollectionEntry, getCollection } from "astro:content";
+import BlogPost from "../../layouts/pages/BlogPost.astro"; // Oder ein eigenes CourseLayout
+
+export async function getStaticPaths() {
+  const courses = await getCollection("courses");
+  return courses.map((course) => ({
+    params: { slug: course.slug },
+    props: course
+  }));
+}
+
+type Props = CollectionEntry<"courses">;
+
+const course = Astro.props;
+const { Content } = await course.render();
+const { data } = course;
+const { price, duration } = data;
+---
+<BlogPost {...data}>
+  <div slot="start" class="alert flex justify-center items-center gap-4 p-4 shadow-sm">
+    <span class="text-xl mdi--information-variant-circle-outline"></span>
+    <span class="text-sm font-bold uppercase tracking-wider opacity-70">Kurs-Infos</span>
+
+    <span class="flex items-center gap-1.5 font-medium">
+          <span class="opacity-70">Preis:</span>
+          <span class="text-info-content">{price}</span>
+        </span>
+    <span class="hidden opacity-30 sm:block">•</span>
+    <span class="flex items-center gap-1.5 font-medium">
+          <span class="opacity-70">Dauer:</span>
+          <span class="text-info-content">{duration}</span>
+        </span>
+  </div>
+
+  <Content />
+</BlogPost>

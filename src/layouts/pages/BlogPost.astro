@@ -14,7 +14,7 @@ import { createBlogPostingSchema } from "../SchemaOrg.factory";
 import SocialImage from "../SocialImage.astro";
 import MinimalPage from "./MinimalPage.astro";
 
-type Props = CollectionEntry<"einblicke">["data"];
+type Props = CollectionEntry<"einblicke">["data"] | CollectionEntry<"courses">["data"];
 
 const { title, description, heroImage, ...dates } = Astro.props;
 
@@ -25,6 +25,9 @@ const imageInfo = await getImage({
   fit: "scale-down"
 });
 
+const date = "date" in dates ? dates.date : undefined;
+const updated = "updated" in dates ? dates.updated : undefined;
+
 const schemaOrg: SchemaCreationFunction = (o, me, df, url) => createBlogPostingSchema({
   url,
   headline: title,
@@ -32,8 +35,8 @@ const schemaOrg: SchemaCreationFunction = (o, me, df, url) => createBlogPostingS
   image: absoluteLink(Astro.url, imageInfo.src),
   author: me,
   publisher: o,
-  datePublished: df(dates.date),
-  dateModified: df(dates.updated)
+  datePublished: df(date),
+  dateModified: df(updated)
 });
 ---
 
@@ -45,13 +48,14 @@ const schemaOrg: SchemaCreationFunction = (o, me, df, url) => createBlogPostingS
   <article>
     <section>
       <h1>{title}</h1>
-      <Published {...dates} />
+      <Published date={date} updated={updated} />
       {heroImage &&
         <div>
           <ResponsiveImage name={heroImage} alt={title} height="32rem" />
         </div>}
     </section>
     <hr />
+    <slot name="start"></slot>
     <div data-toc />
     <slot />
   </article>
