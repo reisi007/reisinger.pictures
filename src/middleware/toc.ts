@@ -86,7 +86,7 @@ function createTocItems(nodes?: HeadingNode[]): string {
   // Use reduce to build the HTML string for the current level.
   return nodes.reduce((html, node) => {
     // Recursively generate the HTML for any children.
-    const childrenHtml = node.children ? `<ul>${createTocItems(node.children)}</ul>` : "";
+    const childrenHtml = node.children?.length ?? 0 > 0 ? `${createTocItems(node.children)}` : "";
 
     // Append the current item and its nested children list (if any).
     return html + `<li><a href="${node.link}">${node.name}</a>${childrenHtml}</li>`;
@@ -115,7 +115,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     if (nodes.length === 0) {
       return "";
     }
-    return `<h2 class="text-left">Inhaltsverzeichnis</h2>${createTocItems(nodes)}`;
+    return `<h2 class="text-left">Inhaltsverzeichnis</h2><ul>${createTocItems(nodes)}</ul>`;
   }
 
   const processedString = html.replace(tocRegex, generateTableOfContents);

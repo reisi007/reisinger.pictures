@@ -57,6 +57,8 @@ const createData: SchemaCreationFunction = (o, p, df, url) => createWebPageSchem
   </BaseHead>
   <h1>{title}</h1>
   <Published {...dates} />
+
   {showToc && <div data-toc />}
+
   <Content />
 </MinimalPage>

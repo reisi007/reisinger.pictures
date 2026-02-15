@@ -77,6 +77,5 @@ export function formatExactPrice(value: number) {
 
 export function psychologicalPriceAsNumber(value: number) {
   const string = formatPsychologicalPrice(value).replace(/[^\d.]/g, "");
-  console.log(value, string);
   return parseFloat(string);
 }

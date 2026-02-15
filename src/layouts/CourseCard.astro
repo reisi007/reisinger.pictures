@@ -1,10 +1,11 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import ResponsiveImage from "./ResponsiveImage.astro";
-import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout.ts";
-import type { NumericBreakpoints } from "../styles/Breakpoints.ts"; // Pfad ggf. anpassen
 
-type Props = {
+import type { NumericBreakpoints } from "../styles/Breakpoints.ts"; // Pfad ggf. anpassen
+import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout.ts";
+import ResponsiveImage from "./ResponsiveImage.astro";
+
+interface Props {
   course: CollectionEntry<"courses">,
   imageSizeModifiers?: Partial<NumericBreakpoints>
 }
