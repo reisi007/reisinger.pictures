@@ -125,11 +125,12 @@ const courses = defineCollection({
   type: "content",
   schema: z.object({
     title: z.string(),
+    short: z.string(),
     description: z.string().optional(),
     order: z.number().default(99),
     price: z.string(),
     duration: z.string(),
-    heroImage: z.string(),
+    heroImage: z.string()
   })
 });
 
