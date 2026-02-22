@@ -2,7 +2,7 @@
 import { isSubMenu, type Menue, type MenueItem, type SubMenu, Visibility } from "./Menue";
 import ResponsiveImage from "./ResponsiveImage.astro";
 import { ResponsiveImageLoading } from "./ResponsiveImageLoading";
-import { getCollection, getEntries } from "astro:content";
+import { getCollection } from "astro:content";
 
 const reviewItem: MenueItem = { name: "Bewertungen", href: "/testimonials" };
 const images: MenueItem = { name: "Bilder", href: "/images", visibility: Visibility.DEV_ONLY };
