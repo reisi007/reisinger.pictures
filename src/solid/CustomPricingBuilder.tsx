@@ -11,30 +11,42 @@ const standardFeatures = [
   "Redaktionelle kommerzielle Nutzungsrechte inklusive"
 ];
 
-const discountFeatures = [
-  "Private Nutzungsrechte inklusive"
+const discountFeatures: string[] = [
 ];
 
 const standardFooters = [
-  "Wir shooten, bis du dich wohlfühlst",
   "Höchste Diskretion & Vertrauen inklusive"
 ];
 
 const discountFooters = [
   "Voraussetzung: Veröffentlichung der Bilder",
-  "Gilt nur für Beauty, Pärchen & Akt"
+  "Gilt nur für Beauty, Pärchen & Akt Shootings"
 ];
 
 export default function CustomPricingBuilder() {
   const [duration, setDuration] = createSignal(90);
   const [images, setImages] = createSignal(10);
   const [isDiscounted, setIsDiscounted] = createSignal(false);
+  const [isCopied, setIsCopied] = createSignal(false);
 
   const basePrice = createMemo(() => calculatePackagePrice(duration(), images()));
   const finalPrice = createMemo(() => calculatePackagePrice(duration(), images(), isDiscounted() ? 0.5 : 1));
 
   const formattedBasePrice = createMemo(() => formatPsychologicalPrice(basePrice()));
   const formattedFinalPrice = createMemo(() => formatPsychologicalPrice(finalPrice()));
+
+  // Function to copy the current configuration to clipboard
+  const handleCopyOffer = async () => {
+    const offerText = `Dein Individuelles Angebot für:\n- ${duration()} Minuten\n- ${images()} bearbeitete Bilder\n- N*xt Generation Rabatt (18-25 Jahre): ${isDiscounted() ? 'Ja' : 'Nein'}\n\nPreis: ${formattedFinalPrice()}`;
+
+    try {
+      await navigator.clipboard.writeText(offerText);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+    }
+  };
 
   return (
     <div class="card shadow-xl relative overflow-hidden bg-base-100 text-base-content border border-base-300 h-full transition-transform hover:-translate-y-1 md:col-span-2 block">
@@ -162,9 +174,17 @@ export default function CustomPricingBuilder() {
           </Show>
         </div>
 
-        <div class="card-actions mt-auto pt-4 border-t border-base-300 border-opacity-50">
+        <div class="card-actions mt-auto pt-4 border-t border-base-300 border-opacity-50 flex-col gap-3">
+          <button
+            onClick={handleCopyOffer}
+            class="btn btn-block btn-outline border-base-300 hover:bg-base-200 hover:text-base-content hover:border-base-300"
+          >
+            <span class={isCopied() ? "mdi--check text-success" : "mdi--content-copy"}></span>
+            {isCopied() ? "Angebot kopiert!" : "Angebot als Text kopieren"}
+          </button>
+
           <a href="#kontakt" class="btn btn-block shadow-lg border-0 btn-primary">
-            Individuelles Paket anfragen
+            Jetzt kontaktieren
           </a>
         </div>
       </div>
