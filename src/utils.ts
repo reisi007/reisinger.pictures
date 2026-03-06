@@ -24,15 +24,18 @@ export function absoluteLink(url: URL, src: string): string {
 /**
  * Berechnet den "psychologischen" Preis.
  * Rundet auf den nächsten 5er. Wenn das Ergebnis auf 0 endet (z.B. 100, 20),
- * wird 1 abgezogen (z.B. 99, 19).
+ * wird 1 abgezogen (z.B. 99, 19). Bei Werten unter 12 Euro wird normal auf ganze Euros gerundet.
  */
 function roundToPsychologicalValue(value: number): number {
+  if (value < 12) {
+    // Bei sehr kleinen Beträgen (z.B. +1 Bild OG Rabatt) einfach auf volle Euro runden
+    return Math.max(1, Math.round(value));
+  }
+
   // 1. Auf den nächsten 5er runden
   let rounded = Math.round(value / 5) * 5;
 
   // 2. Prüfen, ob die Zahl durch 10 teilbar ist (Endziffer 0)
-  // Wir schließen 0 aus, damit "0 Euro" nicht zu "-1 Euro" wird,
-  // es sei denn, das ist gewünscht.
   if (rounded !== 0 && rounded % 10 === 0) {
     rounded -= 1;
   }
