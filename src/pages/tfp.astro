@@ -1,0 +1,59 @@
+---
+import { getCollection, render } from "astro:content";
+
+import BaseHead from "../layouts/BaseHead.astro";
+import MinimalPage from "../layouts/pages/MinimalPage.astro";
+import { formatExactPrice } from "../utils";
+
+// 1. Fetch and Sort TFP Projects by Priority (highest first)
+const tfpEntries = (await getCollection("tfp")).sort(
+  (a, b) => b.data.priority - a.data.priority
+);
+
+// 2. Pre-render Content components for the grid
+const tfpIdeas = await Promise.all(
+  tfpEntries.map(async (entry) => {
+    const { Content } = await render(entry);
+    return { entry, Content };
+  })
+);
+
+const title = "TFP Ideen & Projekte";
+const description = "Spannende Foto-Projekte auf TFP-Basis. Bewirb dich jetzt!";
+---
+
+<MinimalPage>
+  <BaseHead {title} {description} slot="head" />
+
+  <h1 class="text-4xl font-bold mb-8">{title}</h1>
+
+  <p>
+    Ich suche aktuell Modelle für folgende kreative Konzepte. Bei Interesse an einer Zusammenarbeit auf TFP-Basis (Time for Print), melde dich gerne!
+  </p>
+
+  <div class="grid gap-6 md:grid-cols-2">
+    {tfpIdeas.map(({ entry, Content }) => (
+      <div class="card bg-base-100 shadow-xl border border-base-300 rounded-2xl">
+        <div class="card-body flex flex-col">
+          <h3 class="card-title font-bold text-primary mb-2">
+            {entry.data.title}
+          </h3>
+          <div class="prose-sm prose-p:my-4 mb-4">
+            <Content />
+          </div>
+          <div class="mt-auto pt-4">
+            <a href="#contact" class="btn btn-primary btn-sm btn-outline w-full">
+              Jetzt bewerben
+            </a>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+
+
+  <p class="text-sm italic">
+    Je nach Projekt fällt ein Unkostenbeitrag von bis zu {formatExactPrice(50)} an.
+  </p>
+
+</MinimalPage>

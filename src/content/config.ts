@@ -8,7 +8,6 @@ const einblicke = defineCollection({
     title: z.string(),
     description: z.string().optional(),
     keywords: z.array(z.string()).optional(),
-    // Transform string to Date object
     date: z.coerce.date(),
     updated: z.coerce.date().optional(),
     heroImage: z.string()
@@ -134,16 +133,25 @@ const courses = defineCollection({
   })
 });
 
+const tfp = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/tfp" }),
+  schema: z.object({
+    title: z.string(),
+    priority: z.number()
+  })
+});
+
 export const collections = {
   agb,
   areas,
+  categories,
   courses,
   dsb,
   einblicke,
   einblickeOverviews,
-  simple,
-  testimonials,
-  testimonialSummary,
   imageMetadata,
-  categories
+  simple,
+  testimonialSummary,
+  testimonials,
+  tfp
 };
