@@ -3,6 +3,8 @@ import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 
+import solidJs from "@astrojs/solid-js";
+
 const excludedPages = [
   "preise/ogs/"
 ];
@@ -12,7 +14,7 @@ export default defineConfig({
   site: "https://reisinger.pictures",
   cacheDir: "./.cache",
   vite: { plugins: [tailwindcss()] },
-  integrations: [mdx(), sitemap({
+  integrations: [mdx(), solidJs(), sitemap({
     filter(page) {
       return !excludedPages.some(pagePath => page.endsWith(pagePath));
     }

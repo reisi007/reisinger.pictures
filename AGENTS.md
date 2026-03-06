@@ -2,45 +2,37 @@
 
 This document summarizes key architectural decisions and workflow rules for this project. All contributions and AI-generated code must adhere to these standards.
 
-**Language Policy:** All documentation, code, and comments must be in **English**. User interface strings (menus, dialogs, labels) must be implemented in the **project's target language** (e.g.,
-German).
+**Language Policy:** All documentation, code, and comments must be in **English**. User interface strings (menus, dialogs, labels) must be implemented in the **project's target language** (e.g., German).
 
 ---
 
 ## 1. AI Interaction & Workflow Guidelines
+* **Full Code Output:** Always provide the complete, copy-pasteable code for any modified file. Avoid providing partial snippets or diffs.
+* **Rule Update Exception:** When updating this guidelines file (`AGENTS.md`), only provide the specific new rules or sections to be added.
+* **Proactive Rule Suggestion:** Suggest new rules whenever identifying recurring patterns or to try to avoid critical mistakes in the future.
 
-* **Full Code Output:** Always provide the complete, copy-pasteable code for any modified file. Avoid providing partial snippets or diffs, as this forces manual merging.
-* **Rule Update Exception:** When updating this guidelines file (`AGENTS.md`), only provide the specific new rules or sections to be added, not the entire document.
-* **Proactive Rule Suggestion:** The AI is expected to proactively suggest new rules, architectural guidelines, or workflow improvements for this document whenever it identifies recurring patterns or
-  potential pitfalls. Keep the document as concise as possible.
+## 2. Code Quality & Maintenance
+* **Dead Code Removal:** Remove unused functions and styles entirely to keep the codebase clean.
+* **Centralized Logic:** Math and calculation logic (e.g., pricing formulas) must reside in `src/content/pricing.ts` to ensure consistency between SSR and Client-side islands. Avoid duplicating logic inside UI components.
 
-## 2. Code Quality
+## 3. UI/UX Standards
+* **Feedback:** Provide clear visual feedback for user interactions (e.g., toggles changing pricing tiers or feature lists).
+* **Button Placement:** In Pricing Cards and custom builders, the CTA button must always be pushed to the bottom using Tailwind's `mt-auto` within a flex container for a consistent grid appearance.
+* **Skeleton Policy:** Do not use loading skeletons for components that are server-side rendered (SSR) and have no external data dependencies. Rely on Astro's seamless hydration instead.
 
-* **Code Cleanliness:** Do not leave empty functions, obsolete code blocks, or placeholder comments.
-* **Dead Code Removal:** Remove unused functions and all their corresponding calls entirely to keep the codebase clean and maintainable.
+## 4. Frontend & Client-Side Interactivity
+* **Styling:** Strictly use Tailwind CSS (v4) and DaisyUI. Do not write custom CSS in `<style>` blocks or separate files.
+* **Folder Structure:**
+  * **Layouts:** Static Astro components and page wrappers reside in `src/layouts/`.
+  * **Reactive Islands:** Framework-specific components (SolidJS) must be placed in `src/solid/` to clearly separate them from static Astro logic.
+* **Technology Choice:**
+  * **Vanilla JS:** Use for simple DOM enhancements, third-party library wrappers (e.g., PhotoSwipe), and basic UI toggles.
+  * **SolidJS:** Use exclusively for complex, state-driven UI (e.g., configurators, calculators) where declarative rendering is superior to imperative DOM manipulation.
+* **Hydration Strategy:**
+  * Use **`client:visible`** for all components below the fold to optimize PageSpeed and TBT.
+  * Use **`client:load`** only for critical interactive elements in the header or top section.
+  * Use **`client:only`** only if browser-only APIs are strictly required and SSR is impossible.
 
-## 3. UI/UX & Form Handling Standards
-
-* **Explicit User Feedback:** Provide explicit feedback (e.g., optional success or mandatory failure messages) for user interactions like form submissions.
-* **Input Validation:** Clearly handle optional vs. mandatory fields. Validate mandatory fields before attempting form submissions.
-
-## 4. Frontend & Styling (Astro & Tailwind)
-
-* **Styling Framework:** Strictly use Tailwind CSS (v4) utility classes and DaisyUI components for styling. Do not write custom CSS in `<style>` blocks or separate `.css` files unless solving a highly
-  specific edge case (e.g., third-party library overrides).
-* **Component Preference:** Prefer standard Astro components (`.astro`) for UI structure. Keep the frontend as Zero-JS as possible. If client-side interactivity is required, prefer vanilla JavaScript
-  within native `<script>` tags over heavy UI frameworks.
-* **Image Handling:** NEVER use standard HTML `<img>` tags or Astro's native `<Image>` component for content images. Always use the custom `ResponsiveImage.astro` component to ensure proper
-  optimization, EXIF data handling, and responsive breakpoints via `sizeModifiers`.
-
-## 5. Content & SEO Management
-
-* **Content Collections:** All structured data (Markdown, YAML, JSON) must be managed via Astro Content Collections. Whenever adding a new frontmatter property or metadata field, you MUST update the
-  corresponding Zod schema in `src/content/config.ts`.
-* **SEO & Structured Data:** Every new page or layout must integrate `BaseHead.astro` for meta tags and open graph images. Furthermore, strictly implement `SchemaOrg.astro` utilizing the factories in
-  `SchemaOrg.factory.ts` to generate valid JSON-LD structured data.
-
-## 6. TypeScript & Linting
-
-* **Type Safety:** Maintain strict TypeScript compliance. Do not use `any`. Always declare explicit interfaces or types for component `Props` and function payloads.
-* **Imports:** The project uses `simple-import-sort`. Ensure all imported modules are correctly named and available, knowing that the linter will handle the final alphabetical and grouping sort.
+## 5. Content & Images
+* **ResponsiveImage:** NEVER use standard `<img>` or Astro's `<Image>`. Always use the custom `ResponsiveImage.astro` for optimization, EXIF handling, and responsive breakpoints.
+* **Content Collections:** Manage all data via collections and update Zod schemas in `src/content/config.ts` accordingly.
