@@ -1,0 +1,25 @@
+{
+  "output": {
+    "style": "markdown",
+    "filePath": "out/repomix-output.md",
+    "removeComments": false,
+    "removeEmptyLines": true,
+    "showLineNumbers": false,
+    "fileSummary": true,
+    "directoryStructure": true
+  },
+  "include": [
+    "*",
+    "src/**/*"
+  ],
+  "ignore": {
+    "useGitignore": false,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      "editor*",
+      "package-lock.json",
+      ".gitignore",
+      "*.svg"
+    ]
+  }
+}
