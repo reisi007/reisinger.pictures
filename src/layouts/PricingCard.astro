@@ -1,5 +1,7 @@
 ---
-interface Props {
+import { generateContactLink, type ContactFormPrefill } from "../utils";
+
+type Props = {
   title: string;
   subtitle?: string;
   price: string;
@@ -9,7 +11,8 @@ interface Props {
   ribbon?: string; // z.B. "Limited Availability"
   highlight?: boolean; // Für das "Creative Special" (ändert Farben)
   footerText?: string[];
-}
+  subjectPrefix?: ContactFormPrefill["subject_prefix"];
+};
 
 const {
   title,
@@ -20,7 +23,8 @@ const {
   features,
   ribbon,
   highlight = false,
-  footerText=[]
+  footerText=[],
+  subjectPrefix
 } = Astro.props;
 
 // Dynamische Klassen basierend auf "highlight" Status
@@ -29,6 +33,11 @@ const titleColor = highlight ? "text-secondary" : "text-primary";
 const footerBgColor = highlight ? "border-secondary" : "border-onPrimary";
 const descriptionColor = highlight ? "text-secondary" : "text-onPrimary";
 const checkIconColor = highlight ? "bg-secondary text-secondary-content" : "bg-primary/10 text-primary";
+
+const contactUrl = generateContactLink({
+  subject_prefix: subjectPrefix,
+  message: `Hallo Florian,\n\nich interessiere mich sehr für das Shooting-Paket "${title}" zum Preis von ${price}.\nIch würde mich freuen, wenn wir die Details dazu unverbindlich besprechen könnten.\n\nLiebe Grüße,\n`
+});
 ---
 
 <div class={`card shadow-xl relative overflow-hidden ${cardBg} h-full transition-transform hover:-translate-y-1`}>
@@ -84,7 +93,7 @@ const checkIconColor = highlight ? "bg-secondary text-secondary-content" : "bg-p
     </div>
 
     <div class="card-actions mt-6">
-      <a href="#kontakt" class={`btn btn-block shadow-lg border-0 ${highlight ? "btn-secondary text-secondary-content" : "btn-primary"}`}>
+      <a href={contactUrl} class={`btn btn-block shadow-lg border-0 ${highlight ? "btn-secondary text-secondary-content" : "btn-primary"}`}>
         Jetzt kontaktieren
       </a>
     </div>

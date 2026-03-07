@@ -12,7 +12,8 @@
     "preview": "astro preview",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
-    "publish": "npm run build && sync.bat",
+    "publish": "npm run build ",
+    "postpublish": "sync.bat",
     "merge:llm": "repomix"
   },
   "dependencies": {

@@ -1,5 +1,4 @@
-import { createMemo, createSignal, For,Show } from "solid-js";
-
+import { createMemo, createSignal, For, Show } from "solid-js";
 import { calculatePackagePrice } from "../content/pricing";
 import { formatPsychologicalPrice } from "../utils";
 
@@ -7,18 +6,14 @@ import { formatPsychologicalPrice } from "../utils";
 const baseFeatures = [
   "Volle Flexibilität und Kostenkontrolle"
 ];
-
 const standardFeatures = [
   "Redaktionelle kommerzielle Nutzungsrechte inklusive"
 ];
-
 const discountFeatures: string[] = [
 ];
-
 const standardFooters = [
   "Höchste Diskretion & Vertrauen inklusive"
 ];
-
 const discountFooters = [
   "Voraussetzung: Veröffentlichung der Bilder",
   "Gilt nur für Beauty, Pärchen & Akt Shootings"
@@ -32,14 +27,18 @@ export default function CustomPricingBuilder() {
 
   const basePrice = createMemo(() => calculatePackagePrice(duration(), images()));
   const finalPrice = createMemo(() => calculatePackagePrice(duration(), images(), isDiscounted() ? 0.5 : 1));
-
   const formattedBasePrice = createMemo(() => formatPsychologicalPrice(basePrice()));
   const formattedFinalPrice = createMemo(() => formatPsychologicalPrice(finalPrice()));
 
-  // Function to copy the current configuration to clipboard
+  // Dynamischer Link zur Vorbelegung des Formulars (Nachrichten-Feld mit persönlicher Anrede)
+  const contactLink = createMemo(() => {
+    const offerText = `Hallo Florian,\n\nich habe mir mit deinem Konfigurator ein individuelles Shooting-Paket zusammengestellt und würde das gerne anfragen:\n\n- Shooting-Zeit: ${duration()} Minuten\n- Bearbeitete Bilder: ${images()} Stück\n- N*xt Generation Rabatt (18-25 Jahre): ${isDiscounted() ? 'Ja' : 'Nein'}\n\nKalkulierter Preis: ${formattedFinalPrice()}\n\nLass uns gerne unverbindlich darüber sprechen!\n\nLiebe Grüße,\n`;
+    return `?message=${encodeURIComponent(offerText)}#kontakt`;
+  });
+
+  // Function to copy the current configuration to clipboard (hier bleibt es als Übersicht erhalten)
   const handleCopyOffer = async () => {
     const offerText = `Dein Individuelles Angebot für:\n- ${duration()} Minuten\n- ${images()} bearbeitete Bilder\n- N*xt Generation Rabatt (18-25 Jahre): ${isDiscounted() ? 'Ja' : 'Nein'}\n\nPreis: ${formattedFinalPrice()}`;
-
     try {
       await navigator.clipboard.writeText(offerText);
       setIsCopied(true);
@@ -60,9 +59,7 @@ export default function CustomPricingBuilder() {
             Stelle dir dein eigenes Shooting exakt nach deinen Bedürfnissen zusammen.
           </p>
         </div>
-
         <div class="divider opacity-20 my-0"></div>
-
         <div class="flex flex-col items-center justify-center my-6 min-h-24">
           <Show when={isDiscounted()}>
             <span class="text-lg line-through text-primary opacity-40 decoration-1 mb-1">
@@ -73,7 +70,6 @@ export default function CustomPricingBuilder() {
             {formattedFinalPrice()}
           </span>
         </div>
-
         <div class="space-y-6 mb-2 w-full max-w-sm mx-auto">
           <div>
             <label class="label pb-1">
@@ -90,7 +86,6 @@ export default function CustomPricingBuilder() {
               <span>8 Std</span>
             </div>
           </div>
-
           <div>
             <label class="label pb-1">
               <span class="label-text font-bold">Bearbeitete Bilder: {images()} Stück</span>
@@ -106,7 +101,6 @@ export default function CustomPricingBuilder() {
               <span>120</span>
             </div>
           </div>
-
           <div class="form-control w-full mt-4">
             <label class="cursor-pointer label border border-base-300 rounded-xl px-4 py-3 bg-base-100/50 hover:bg-base-200 transition-colors flex justify-between gap-4">
               <span class="label-text font-medium opacity-80">Ich bin zwischen 18 und 25 Jahre alt</span>
@@ -119,7 +113,6 @@ export default function CustomPricingBuilder() {
             </label>
           </div>
         </div>
-
         <ul class="space-y-3 mt-6">
           <For each={baseFeatures}>{(feature) => (
             <li class="flex items-start gap-3">
@@ -129,7 +122,6 @@ export default function CustomPricingBuilder() {
               <span class="font-medium text-sm leading-6">{feature}</span>
             </li>
           )}</For>
-
           <Show
             when={isDiscounted()}
             fallback={
@@ -153,7 +145,6 @@ export default function CustomPricingBuilder() {
             )}</For>
           </Show>
         </ul>
-
         <div class="mt-6 mb-2 gap-y-2 flex flex-col">
           <Show
             when={isDiscounted()}
@@ -174,7 +165,6 @@ export default function CustomPricingBuilder() {
             )}</For>
           </Show>
         </div>
-
         <div class="card-actions mt-auto pt-4 border-t border-base-300 border-opacity-50 flex-col gap-3">
           <button
             onClick={handleCopyOffer}
@@ -183,8 +173,7 @@ export default function CustomPricingBuilder() {
             <span class={isCopied() ? "mdi--check text-success" : "mdi--content-copy"}></span>
             {isCopied() ? "Angebot kopiert!" : "Angebot als Text kopieren"}
           </button>
-
-          <a href="#kontakt" class="btn btn-block shadow-lg border-0 btn-primary">
+          <a href={contactLink()} class="btn btn-block shadow-lg border-0 btn-primary">
             Jetzt kontaktieren
           </a>
         </div>

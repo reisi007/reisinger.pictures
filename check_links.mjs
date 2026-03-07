@@ -65,7 +65,9 @@ async function extractUniqueLinksFromFileWithJSDOM(filePath, absoluteUrl) {
     const hIds = Array.from(document.querySelectorAll("[id]"))
       .map(element => `${absoluteUrl}#${encodeURIComponent(element.getAttribute("id"))}`);
     const aLinks = Array.from(document.querySelectorAll("a[href]"))
-      .map(element => element.getAttribute("href")).map(e => e.startsWith("#") ? absoluteUrl + e : e);
+      .map(element => element.getAttribute("href"))
+      // NEU: Hänge absoluteUrl auch bei Query-Parametern (?) an
+      .map(e => e.startsWith("#") || e.startsWith("?") ? absoluteUrl + e : e);
     return { aLinks, hIds };
   } catch (error) {
     console.error(`Could not process file ${filePath}:`, error);
@@ -107,8 +109,9 @@ export async function extractAllLinksRecursivelyWithJSDOM(folderPath, prefix) {
 
     // 4. Flatten the array of arrays and perform the final global deduplication
     const links = aLinks.flat()
-      .map(e => e.startsWith("/") || e.startsWith("#") ? prefix + e : e)
-      .map(e => !e.endsWith("/") && e.startsWith("https") && !e.includes("#") && !e.endsWith(".pdf") ? `${e}/` : e);
+      // NEU: Berücksichtige auch "?"
+      .map(e => e.startsWith("/") || e.startsWith("#") || e.startsWith("?") ? prefix + e : e)
+      .map(e => !e.endsWith("/") && e.startsWith("https") && !e.includes("#") && !e.includes("?") && !e.endsWith(".pdf") ? `${e}/` : e);
 
     return { links, anchors };
 
@@ -153,8 +156,19 @@ const { links: crossRefLinks, anchors } = await crossRefLinksPromise;
 const knownUrls = [...new Set([...sitemapUrls, ...anchors])];
 
 let missingUrls = crossRefLinks
+  .map(link => {
+    try {
+      // Nutze config.site als Fallback-BaseURL, damit relative Links und "?..." Links nicht crashen
+      const urlObj = new URL(link, config.site);
+      // Strip Query-Parameter für den Abgleich
+      urlObj.search = '';
+      return urlObj.href;
+    } catch {
+      return link;
+    }
+  })
   .filter(link => !knownUrls.includes(link))
-  .map(link => new URL(link));
+  .map(link => new URL(link, config.site));
 
 missingUrls = removeIf(missingUrls, link => link.protocol.includes("mailto") && link.pathname === "florian@reisinger.pictures");
 missingUrls = removeIf(missingUrls, link => link.protocol.includes("https") && !link.host.includes("//reisinger.pictures"));

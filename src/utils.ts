@@ -11,16 +11,12 @@ export function groupBy<T>(
     return grouped;
   }, {} as Record<string, T[]>);
 }
-
-
 export function slugToName(slug: string) {
   return slug[0].toUpperCase() + slug.substring(1);
 }
-
 export function absoluteLink(url: URL, src: string): string {
   return url.href.replace(/(\w\/).+/, "$1") + src.substring(1);
 }
-
 /**
  * Berechnet den "psychologischen" Preis.
  * Rundet auf den nächsten 5er. Wenn das Ergebnis auf 0 endet (z.B. 100, 20),
@@ -31,18 +27,14 @@ function roundToPsychologicalValue(value: number): number {
     // Bei sehr kleinen Beträgen (z.B. +1 Bild OG Rabatt) einfach auf volle Euro runden
     return Math.max(1, Math.round(value));
   }
-
   // 1. Auf den nächsten 5er runden
   let rounded = Math.round(value / 5) * 5;
-
   // 2. Prüfen, ob die Zahl durch 10 teilbar ist (Endziffer 0)
   if (rounded !== 0 && rounded % 10 === 0) {
     rounded -= 1;
   }
-
   return rounded;
 }
-
 /**
  * Basis-Optionen für ein konsistentes Aussehen (Währung, Sprache)
  */
@@ -51,21 +43,18 @@ const BASE_OPTIONS: Intl.NumberFormatOptions = {
   currency: "EUR",
   trailingZeroDisplay: "stripIfInteger" // Optional, je nach Browser-Support
 };
-
 /**
  * OPTION A: Psychologischer Preis (Rundung + Formatierung)
  * Beispiel: 103 -> 105 € | 98 -> 99 €
  */
 export function formatPsychologicalPrice(value: number, options: Partial<Intl.NumberFormatOptions> = {}) {
   const psychologicalValue = roundToPsychologicalValue(value);
-
   return new Intl.NumberFormat("de-AT", {
     ...BASE_OPTIONS,
     maximumFractionDigits: 0, // Keine Cents bei psychologischen Preisen (sind immer Ganzzahlen)
     ...options
   }).format(psychologicalValue);
 }
-
 /**
  * OPTION B: Exakter Preis (Centgenau)
  * Beispiel: 123.45 -> 123,45 €
@@ -77,8 +66,31 @@ export function formatExactPrice(value: number) {
     maximumFractionDigits: 2
   }).format(value);
 }
-
 export function psychologicalPriceAsNumber(value: number) {
   const string = formatPsychologicalPrice(value).replace(/[^\d.]/g, "");
   return parseFloat(string);
+}
+
+export type ContactFormPrefill = {
+  subject_prefix?: "BUSINESS" | "BEAUTY" | "AKT" | "COUPLES" | "TANZ" | "TFP" | "REVIEW" | "HOCHZEIT" | "REPORTAGE";
+  name?: string;
+  email?: string;
+  phone?: string;
+  message?: string;
+};
+
+/**
+ * Generiert einen Link zum Kontaktformular mit optionalen vorausgefüllten Daten.
+ */
+export function generateContactLink(data: ContactFormPrefill): string {
+  const params = new URLSearchParams();
+
+  if (data.subject_prefix) params.append("subject_prefix", data.subject_prefix);
+  if (data.name) params.append("name", data.name);
+  if (data.email) params.append("email", data.email);
+  if (data.phone) params.append("phone", data.phone);
+  if (data.message) params.append("message", data.message);
+
+  const queryString = params.toString();
+  return queryString ? `?${queryString}#kontakt` : "#kontakt";
 }
