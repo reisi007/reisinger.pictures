@@ -2,6 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import yaml from "js-yaml";
 import ExifReader from "exifreader";
+import sharp from "sharp";
 
 // The root folder to start searching from
 const FOLDER_PATH = "./src";
@@ -113,8 +114,11 @@ async function processFiles() {
         }
         data.slug = slug;
 
-        // Process only if metadata is missing
-        if (data.metadata !== undefined) {
+        // Process only if metadata AND orientation are missing
+        const hasMetadata = data.metadata !== undefined && data.metadata !== null;
+        const hasOrientation = hasMetadata && data.metadata.orientation !== undefined;
+
+        if (hasMetadata && hasOrientation) {
           console.log(`✅ '${yamlFilePath}' wurde bereits verarbeitet. Überspringe.`);
           // Even if we skip, we need to read the date for categories
           if (data.metadata?.captureDate) {
@@ -134,25 +138,36 @@ async function processFiles() {
           continue;
         }
 
-        console.log(`- '${yamlFilePath}' benötigt Metadaten. Suche nach passendem JPG...`);
+        console.log(`- '${yamlFilePath}' benötigt Metadaten (Update). Suche nach passendem JPG...`);
         const fileBasename = path.basename(yamlFilePath, path.extname(yamlFilePath));
         const imagePath = path.join(path.dirname(yamlFilePath), `${fileBasename}.jpg`);
 
         try {
           const imageBuffer = await fs.readFile(imagePath);
           const exifData = ExifReader.load(imageBuffer);
-
           const isoDate = formatCaptureDate(exifData.DateTimeOriginal?.description);
 
+          // Get dimensions using sharp
+          const imgInfo = await sharp(imageBuffer).metadata();
+          const width = imgInfo.width;
+          const height = imgInfo.height;
+
+          let orientation = "square";
+          if (width > height) orientation = "landscape";
+          else if (height > width) orientation = "portrait";
+
           // --- 2. Construct Metadata ---
+          // Combine existing metadata with new extraction so we don't lose anything
           const newMetadata = {
-            captureDate: isoDate,
-            aperture: formatAperture(exifData.FNumber?.description),
-            focalLength: exifData.FocalLength?.description,
-            shutter: exifData.ExposureTime?.value ? formatShutterSpeed(exifData.ExposureTime.value) : undefined,
-            iso: exifData.ISOSpeedRatings?.description,
-            camera: exifData.Model?.description,
-            lens: exifData.LensModel?.description
+            ...(data.metadata || {}),
+            captureDate: isoDate || data.metadata?.captureDate,
+            aperture: formatAperture(exifData.FNumber?.description) || data.metadata?.aperture,
+            focalLength: exifData.FocalLength?.description || data.metadata?.focalLength,
+            shutter: exifData.ExposureTime?.value ? formatShutterSpeed(exifData.ExposureTime.value) : data.metadata?.shutter,
+            iso: exifData.ISOSpeedRatings?.description ? parseInt(exifData.ISOSpeedRatings.description, 10) : data.metadata?.iso,
+            camera: exifData.Model?.description || data.metadata?.camera,
+            lens: exifData.LensModel?.description || data.metadata?.lens,
+            orientation: orientation
           };
 
           Object.keys(newMetadata).forEach(key => newMetadata[key] === undefined && delete newMetadata[key]);
@@ -160,8 +175,8 @@ async function processFiles() {
 
           // --- 3. Generate and Assign Categories ---
           // Do not add categories for files ending with "small"
-          if (isoDate && !fileBasename.endsWith("small")) {
-            const date = new Date(isoDate);
+          if (newMetadata.captureDate && !fileBasename.endsWith("small")) {
+            const date = new Date(newMetadata.captureDate);
             const year = date.getFullYear();
             const month = (date.getMonth() + 1).toString().padStart(2, "0");
             const day = date.getDate().toString().padStart(2, "0");
@@ -188,13 +203,13 @@ async function processFiles() {
           const newYamlContent = yaml.dump(data);
           await fs.writeFile(yamlFilePath, newYamlContent, "utf8");
 
-          console.log(`  -> 💾 '${yamlFilePath}' aktualisiert mit Metadaten & Kategorien.`);
+          console.log(`  -> 💾 '${yamlFilePath}' aktualisiert mit Metadaten & Ausrichtung (${orientation}).`);
           filesUpdatedCount++;
 
         } catch (imageError) {
           if (imageError.code === "ENOENT") {
             console.log(`  -> ❌ Konnte '${imagePath}' nicht finden. Markiere Datei zum Überspringen.`);
-            data.metadata = null;
+            if (!data.metadata) data.metadata = null;
             await fs.writeFile(yamlFilePath, yaml.dump(data), "utf8");
           } else {
             console.error(`  -> ❌ Fehler beim Lesen von '${imagePath}':`, imageError.message);

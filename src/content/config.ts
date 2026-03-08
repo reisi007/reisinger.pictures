@@ -107,7 +107,8 @@ const imageMetadata = defineCollection({
       shutter: z.string().optional(),
       iso: z.coerce.number().optional(),
       camera: z.string().optional(),
-      lens: z.string().optional()
+      lens: z.string().optional(),
+      orientation: z.enum(["portrait", "landscape", "square"]).optional()
     }).optional().nullable(),
     categories: z.array(z.string()).optional().nullable()
   })

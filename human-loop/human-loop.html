@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Human-in-the-Loop Reviewer</title>
+  <link rel="stylesheet" href="human-loop.css">
+  <style>
+      .drag-over-top { border-top: 3px solid var(--color-primary, #2A9D8F) !important; border-top-left-radius: 0; border-top-right-radius: 0; }
+      .drag-over-bottom { border-bottom: 3px solid var(--color-primary, #2A9D8F) !important; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+      .dragging { opacity: 0.4; transform: scale(0.98); }
+  </style>
+</head>
+<body class="bg-base-200 min-h-screen p-8">
+<div class="max-w-6xl mx-auto space-y-8">
+  <h1 class="text-3xl font-bold">Human-in-the-Loop Curation</h1>
+
+  <div class="card bg-base-100 shadow-xl border border-base-300">
+    <div class="card-body">
+      <h2 class="card-title mb-4">1. Daten laden</h2>
+
+      <div class="flex flex-col gap-6">
+        <label for="jsonInput" class="form-control w-full">
+          <div class="label mb-1">
+            <span class="label-text font-bold">1. Basis JSON (Aufgaben von der KI)</span>
+          </div>
+          <textarea id="jsonInput" class="textarea textarea-bordered textarea-primary w-full h-40 font-mono text-sm" placeholder='{"tasks": [...]}'></textarea>
+        </label>
+
+        <label for="jsonState" class="form-control w-full">
+          <div class="label mb-1">
+            <span class="label-text font-bold">2. Bisheriges Ergebnis laden (Optional)</span>
+          </div>
+          <textarea id="jsonState" class="textarea textarea-bordered textarea-primary w-full h-32 font-mono text-sm" placeholder='{"responses": [...]}'></textarea>
+        </label>
+      </div>
+
+      <div class="card-actions justify-end mt-4">
+        <button id="loadBtn" class="btn btn-primary">Laden & Starten</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tasksContainer" class="space-y-8 hidden"></div>
+
+  <div id="outputSection" class="card bg-base-100 shadow-xl border border-base-300 hidden">
+    <div class="card-body">
+      <h2 class="card-title mb-2">3. Ergebnis exportieren</h2>
+
+      <label for="jsonOutput" class="form-control w-full">
+        <div class="label ml-2 mb-1">
+          <span class="label-text font-bold">Generiertes Output-JSON (inkl. Sortierung & Kommentare)</span>
+        </div>
+        <textarea id="jsonOutput" class="textarea textarea-bordered textarea-primary w-full h-40 font-mono text-sm" readonly></textarea>
+      </label>
+
+      <div class="card-actions justify-end mt-4">
+        <button id="copyBtn" class="btn btn-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          JSON Kopieren
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentData = null;
+
+  // SVG Icons
+  const svgGrip = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>`;
+  const svgCheck = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+  const svgUncheck = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>`;
+  const svgUp = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`;
+  const svgDown = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`;
+  const svgClose = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+
+  document.getElementById('loadBtn').addEventListener('click', () => {
+    try {
+      const baseVal = document.getElementById('jsonInput').value;
+      if (!baseVal.trim()) {
+        alert('Bitte füge das Basis-JSON ein.');
+        return;
+      }
+      currentData = JSON.parse(baseVal);
+
+      const stateVal = document.getElementById('jsonState').value;
+      if (stateVal.trim()) {
+        const stateData = JSON.parse(stateVal);
+        if (stateData && stateData.responses) {
+          currentData.tasks.forEach(task => {
+            const savedState = stateData.responses.find(r => r.id === task.id);
+            if (savedState) {
+              task.selections = savedState.selected_ids || [];
+              task.comment = savedState.comment || "";
+            }
+          });
+        }
+      }
+
+      renderTasks();
+      document.getElementById('tasksContainer').classList.remove('hidden');
+      document.getElementById('outputSection').classList.remove('hidden');
+    } catch (e) {
+      alert('Ungültiges JSON! Bitte überprüfe das Format. ' + e.message);
+    }
+  });
+
+  function getRelativePath(url) {
+    if (url && url.startsWith('/src/')) return '..' + url;
+    return url;
+  }
+
+  function renderTasks() {
+    const container = document.getElementById('tasksContainer');
+    container.innerHTML = '';
+
+    currentData.tasks.forEach((task, taskIndex) => {
+      task.selections = task.selections || [];
+      task.comment = task.comment || "";
+
+      const taskCard = document.createElement('div');
+      taskCard.className = 'card bg-base-100 shadow-xl border border-base-300';
+
+      const cardBody = document.createElement('div');
+      cardBody.className = 'card-body p-6 md:p-8';
+
+      // FIX: Use label as title, and render text if it exists
+      const title = task.label || task.question || 'Ohne Titel';
+      const descriptionHtml = task.text ? `<p class="mb-4 text-base-content/80">${task.text}</p>` : '';
+
+      cardBody.innerHTML = `
+          <h2 class="card-title text-primary text-2xl mb-1">${title}</h2>
+          ${descriptionHtml}
+          <p class="text-sm font-bold opacity-60 mb-6 uppercase tracking-widest">Ausgewählt: ${task.selections.length} / Maximal: ${task.max_selections}</p>
+        `;
+
+      const grid = document.createElement('div');
+      grid.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-10';
+
+      task.options.forEach(opt => {
+        const optDiv = document.createElement('div');
+        const isSelected = task.selections.includes(opt.id);
+
+        optDiv.className = `card border-2 cursor-pointer transition-all ${isSelected ? 'border-primary bg-primary/5 scale-[0.98] shadow-inner' : 'border-base-300 hover:border-primary/50 shadow-sm'}`;
+        optDiv.onclick = () => toggleSelection(taskIndex, opt.id);
+
+        let imgHtml = '';
+        const relativeUrl = getRelativePath(opt.image_url || opt.avatar_url);
+
+        if (opt.image_url) {
+          imgHtml = `<figure class="px-4 pt-4"><img src="${relativeUrl}" class="rounded-xl h-56 w-full object-contain bg-base-200/50" draggable="false" /></figure>`;
+        } else if (opt.avatar_url) {
+          imgHtml = `<figure class="px-4 pt-4"><img src="${relativeUrl}" class="rounded-full h-32 w-32 object-cover mx-auto mt-2" draggable="false" /></figure>`;
+        }
+
+        optDiv.innerHTML = `
+            ${imgHtml}
+            <div class="card-body p-4 text-center items-center justify-between">
+              <p class="text-sm font-semibold leading-snug">${opt.label}</p>
+              <div class="mt-2 ${isSelected ? 'text-primary' : 'text-base-300'}">${isSelected ? svgCheck : svgUncheck}</div>
+            </div>
+          `;
+        grid.appendChild(optDiv);
+      });
+      cardBody.appendChild(grid);
+
+      if (task.selections.length > 0) {
+        const sortSection = document.createElement('div');
+        sortSection.className = "bg-base-200/50 p-6 rounded-xl border border-base-300";
+        sortSection.innerHTML = `<h3 class="text-sm font-bold mb-4 uppercase tracking-widest opacity-60">Gewählte Reihenfolge anpassen (Drag & Drop)</h3>`;
+
+        const list = document.createElement('ul');
+        list.className = 'space-y-3';
+
+        task.selections.forEach((selId, selIndex) => {
+          const opt = task.options.find(o => o.id === selId);
+          const li = document.createElement('li');
+          li.className = 'flex items-center gap-4 p-3 bg-base-100 border border-base-300 rounded-lg shadow-sm cursor-grab hover:border-primary/50 transition-colors';
+          li.draggable = true;
+          li.dataset.taskIndex = taskIndex;
+          li.dataset.id = selId;
+
+          let thumbHtml = '';
+          const relativeUrl = getRelativePath(opt.image_url || opt.avatar_url);
+          if (relativeUrl) {
+            thumbHtml = `<img src="${relativeUrl}" class="w-16 h-16 rounded object-contain bg-base-200" draggable="false" />`;
+          }
+
+          li.innerHTML = `
+              <span class="text-base-content/30 cursor-grab hover:text-primary">${svgGrip}</span>
+              <span class="font-bold text-base-content/50 w-6 text-right">${selIndex + 1}.</span>
+              ${thumbHtml}
+              <span class="flex-1 font-medium">${opt.label}</span>
+              <div class="join">
+                <button class="btn btn-sm btn-ghost join-item" onclick="moveItem(${taskIndex}, '${selId}', -1)" ${selIndex === 0 ? 'disabled' : ''} title="Nach oben">
+                  ${svgUp}
+                </button>
+                <button class="btn btn-sm btn-ghost join-item" onclick="moveItem(${taskIndex}, '${selId}', 1)" ${selIndex === task.selections.length - 1 ? 'disabled' : ''} title="Nach unten">
+                  ${svgDown}
+                </button>
+                <button class="btn btn-sm btn-ghost join-item text-error hover:bg-error/20" onclick="toggleSelection(${taskIndex}, '${selId}')" title="Auswahl entfernen">
+                  ${svgClose}
+                </button>
+              </div>
+            `;
+
+          li.addEventListener('dragstart', handleDragStart);
+          li.addEventListener('dragover', handleDragOver);
+          li.addEventListener('dragleave', handleDragLeave);
+          li.addEventListener('drop', handleDrop);
+          li.addEventListener('dragend', handleDragEnd);
+
+          list.appendChild(li);
+        });
+        sortSection.appendChild(list);
+        cardBody.appendChild(sortSection);
+      }
+
+      const commentSection = document.createElement('div');
+      commentSection.className = "mt-8";
+      commentSection.innerHTML = `
+          <label class="form-control w-full">
+            <div class="label mb-1">
+              <span class="label-text font-bold opacity-70 uppercase tracking-widest text-xs">Kommentar / Feedback (Optional)</span>
+            </div>
+            <textarea class="textarea textarea-bordered border-base-300 bg-base-200/50 w-full h-24" placeholder="Hier kannst du mir Notizen, Änderungswünsche oder Feedback zu dieser Auswahl hinterlassen..."></textarea>
+          </label>
+        `;
+
+      const textarea = commentSection.querySelector('textarea');
+      textarea.value = task.comment;
+      textarea.addEventListener('input', (e) => {
+        currentData.tasks[taskIndex].comment = e.target.value;
+        updateOutput();
+      });
+
+      cardBody.appendChild(commentSection);
+      taskCard.appendChild(cardBody);
+      container.appendChild(taskCard);
+    });
+
+    updateOutput();
+  }
+
+  let draggedElement = null;
+
+  function handleDragStart(e) {
+    draggedElement = this;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', this.dataset.id);
+    setTimeout(() => this.classList.add('dragging'), 0);
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (this === draggedElement) return;
+
+    const rect = this.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+
+    if (e.clientY < midY) {
+      this.classList.add('drag-over-top');
+      this.classList.remove('drag-over-bottom');
+    } else {
+      this.classList.add('drag-over-bottom');
+      this.classList.remove('drag-over-top');
+    }
+  }
+
+  function handleDragLeave(e) {
+    this.classList.remove('drag-over-top', 'drag-over-bottom');
+  }
+
+  function handleDrop(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    this.classList.remove('drag-over-top', 'drag-over-bottom');
+
+    if (draggedElement !== this) {
+      const taskIndex = parseInt(this.dataset.taskIndex);
+      const draggedId = draggedElement.dataset.id;
+      const targetId = this.dataset.id;
+
+      const rect = this.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      const insertAfter = e.clientY > midY;
+
+      reorderSelection(taskIndex, draggedId, targetId, insertAfter);
+    }
+  }
+
+  function handleDragEnd(e) {
+    this.classList.remove('dragging');
+    document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el => {
+      el.classList.remove('drag-over-top', 'drag-over-bottom');
+    });
+  }
+
+  function reorderSelection(taskIndex, draggedId, targetId, insertAfter) {
+    const selections = currentData.tasks[taskIndex].selections;
+    const draggedIndex = selections.indexOf(draggedId);
+    selections.splice(draggedIndex, 1);
+
+    let targetIndex = selections.indexOf(targetId);
+    if (insertAfter) targetIndex++;
+
+    selections.splice(targetIndex, 0, draggedId);
+    renderTasks();
+  }
+
+  function toggleSelection(taskIndex, optId) {
+    const task = currentData.tasks[taskIndex];
+    const idx = task.selections.indexOf(optId);
+
+    if (idx > -1) {
+      task.selections.splice(idx, 1);
+    } else {
+      if (task.selections.length >= task.max_selections) {
+        alert(`Maximal ${task.max_selections} Auswahl(en) erlaubt.`);
+        return;
+      }
+      task.selections.push(optId);
+    }
+    renderTasks();
+  }
+
+  function moveItem(taskIndex, optId, direction) {
+    const selections = currentData.tasks[taskIndex].selections;
+    const idx = selections.indexOf(optId);
+    if (idx < 0) return;
+
+    const newIdx = idx + direction;
+    if (newIdx >= 0 && newIdx < selections.length) {
+      [selections[idx], selections[newIdx]] = [selections[newIdx], selections[idx]];
+      renderTasks();
+    }
+  }
+
+  function updateOutput() {
+    const out = {
+      responses: currentData.tasks.map(t => ({
+        id: t.id,
+        selected_ids: t.selections,
+        comment: t.comment || ""
+      }))
+    };
+    document.getElementById('jsonOutput').value = JSON.stringify(out, null, 2);
+  }
+
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    const el = document.getElementById('jsonOutput');
+    el.select();
+    document.execCommand('copy');
+
+    const btn = document.getElementById('copyBtn');
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Kopiert!';
+    setTimeout(() => { btn.innerHTML = originalHtml; }, 2000);
+  });
+</script>
+</body>
+</html>

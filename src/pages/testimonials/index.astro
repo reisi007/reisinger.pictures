@@ -1,0 +1,38 @@
+---
+import { getCollection, getEntry } from "astro:content";
+
+import AiSummaryCard from "../../layouts/AiSummaryCard.astro";
+import BaseHead from "../../layouts/BaseHead.astro";
+import MinimalPage from "../../layouts/pages/MinimalPage.astro";
+import ReviewCards from "../../layouts/ReviewCards.astro";
+
+// Alle Bewertungen holen und nach Datum absteigend sortieren (neueste zuerst)
+const allReviews = (await getCollection("testimonials"))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Slugs extrahieren für die ReviewCards-Komponente
+const slugs = allReviews.map(r => r.slug);
+
+const title = "Alle Kundenbewertungen";
+const description = "Lies dir durch, was meine Kunden über ihre Fotoshootings sagen. Echte Erfahrungen, ungestellte Meinungen und ehrliches Feedback.";
+
+// Allgemeine KI-Zusammenfassung laden
+const aiSummary = (await getEntry("testimonialSummary", "general"))?.data;
+---
+<MinimalPage>
+  <BaseHead title={title} description={description} slot="head" />
+
+  <h1 class="mb-4 text-center">{title}</h1>
+
+  <p class="text-center text-lg opacity-80 mb-8 max-w-2xl mx-auto not-prose">
+    {description}
+  </p>
+
+  {aiSummary !== undefined && (
+    <div class="mb-12">
+      <AiSummaryCard summary={aiSummary.summary} reviewCount={aiSummary.reviewCount} />
+    </div>
+  )}
+
+  <ReviewCards slugs={slugs} displayLargeImage={true} />
+</MinimalPage>
