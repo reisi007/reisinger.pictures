@@ -1,13 +1,13 @@
-import fs from 'fs/promises';
-import path from 'path';
-import yaml from 'js-yaml';
+import fs from "fs/promises";
+import path from "path";
+import yaml from "js-yaml";
 
 const command = process.argv[2];
 // Optionales Filter-Jahr als drittes Argument (z.B. "2026")
 const filterYearArg = process.argv[3];
 const minYear = filterYearArg ? parseInt(filterYearArg, 10) : null;
 
-const FOLDER_PATH = './src';
+const FOLDER_PATH = "./src";
 
 async function getAllFiles(dirPath) {
   let filesArray = [];
@@ -24,9 +24,9 @@ async function getAllFiles(dirPath) {
 }
 
 async function exportFavorites() {
-  console.log(`Sammle alle Bilddaten (Favoriten immer, Kandidaten${minYear ? ` ab Jahr ${minYear}` : ' komplett'})...`);
+  console.log(`Sammle alle Bilddaten (Favoriten immer, Kandidaten${minYear ? ` ab Jahr ${minYear}` : " komplett"})...`);
   const allFiles = await getAllFiles(FOLDER_PATH);
-  const yamlFiles = allFiles.filter(file => file.endsWith('.yml') || file.endsWith('.yaml'));
+  const yamlFiles = allFiles.filter(file => file.endsWith(".yml") || file.endsWith(".yaml"));
 
   const currentOptions = [];
   const currentSelections = [];
@@ -36,7 +36,7 @@ async function exportFavorites() {
     try {
       const dir = path.dirname(yamlPath);
       const baseName = path.basename(yamlPath, path.extname(yamlPath));
-      const imagePath = path.join(dir, baseName + '.jpg');
+      const imagePath = path.join(dir, baseName + ".jpg");
 
       // Prüfen, ob auch wirklich ein JPG Bild existiert
       try {
@@ -45,11 +45,11 @@ async function exportFavorites() {
         continue; // Überspringen, wenn es kein zugehöriges Bild gibt
       }
 
-      const content = await fs.readFile(yamlPath, 'utf8');
+      const content = await fs.readFile(yamlPath, "utf8");
       const data = yaml.load(content) || {};
 
       // Pfad Web-kompatibel für das HITL-Tool machen
-      const imageUrl = '/' + imagePath.split(path.sep).join('/');
+      const imageUrl = "/" + imagePath.split(path.sep).join("/");
       const id = yamlPath;
 
       const option = {
@@ -93,31 +93,33 @@ async function exportFavorites() {
         text: "Hier sind deine aktuellen Favoriten (ungefiltert). Alle sind vorausgewählt. Wähle die Bilder AB, die KEINE Favoriten mehr sein sollen.",
         max_selections: 9999,
         selections: currentSelections,
-        options: currentOptions
+        options: currentOptions,
+        sortable: false
       },
       {
         id: "review-new-candidates",
-        label: `Neue Favoriten aus dem Rest wählen ${minYear ? `(Ab Jahr ${minYear})` : '(Alle Bilder)'}`,
+        label: `Neue Favoriten aus dem Rest wählen ${minYear ? `(Ab Jahr ${minYear})` : "(Alle Bilder)"}`,
         text: "Klicke auf die Bilder, die du NEU als Favoriten markieren möchtest.",
         max_selections: 9999,
         selections: [],
-        options: candidateOptions
+        options: candidateOptions,
+        sortable: false
       }
     ]
   };
 
-  await fs.writeFile('favorites_hitl.json', JSON.stringify(hitlJson, null, 2), 'utf8');
+  await fs.writeFile("favorites_hitl.json", JSON.stringify(hitlJson, null, 2), "utf8");
   console.log(`\nErfolgreich ${currentOptions.length} aktuelle Favoriten und ${candidateOptions.length} weitere Kandidaten gefunden!`);
   console.log("Die Datei 'favorites_hitl.json' wurde erstellt.");
 }
 
 async function importFavorites() {
   try {
-    const hitlOutput = await fs.readFile('favorites_response.json', 'utf8');
+    const hitlOutput = await fs.readFile("favorites_response.json", "utf8");
     const responseData = JSON.parse(hitlOutput);
 
-    const currentResponse = responseData.responses.find(r => r.id === 'review-current-favorites');
-    const newResponse = responseData.responses.find(r => r.id === 'review-new-candidates');
+    const currentResponse = responseData.responses.find(r => r.id === "review-current-favorites");
+    const newResponse = responseData.responses.find(r => r.id === "review-new-candidates");
 
     if (!currentResponse && !newResponse) {
       console.error("Konnte die Aufgaben-Daten in der JSON nicht finden.");
@@ -128,9 +130,9 @@ async function importFavorites() {
     const selectedNewIds = newResponse ? newResponse.selected_ids : [];
 
     // Input laden, um zu wissen, was in "Aufgabe 1" (Favoriten) zur Debatte stand (was also ggf. abgewählt wurde)
-    const hitlInput = await fs.readFile('favorites_hitl.json', 'utf8');
+    const hitlInput = await fs.readFile("favorites_hitl.json", "utf8");
     const inputData = JSON.parse(hitlInput);
-    const taskCurrentInput = inputData.tasks.find(t => t.id === 'review-current-favorites');
+    const taskCurrentInput = inputData.tasks.find(t => t.id === "review-current-favorites");
     const allCurrentIds = taskCurrentInput ? taskCurrentInput.options.map(o => o.id) : [];
 
     let verifiedCount = 0;
@@ -144,7 +146,7 @@ async function importFavorites() {
     for (const yamlPath of allCurrentIds) {
       const isSelected = selectedCurrentIds.includes(yamlPath);
       try {
-        const content = await fs.readFile(yamlPath, 'utf8');
+        const content = await fs.readFile(yamlPath, "utf8");
         const data = yaml.load(content) || {};
         let changed = false;
 
@@ -167,9 +169,9 @@ async function importFavorites() {
 
         if (changed) {
           const newContent = yaml.dump(data);
-          await fs.writeFile(yamlPath, newContent, 'utf8');
+          await fs.writeFile(yamlPath, newContent, "utf8");
         }
-      } catch(e) {
+      } catch (e) {
         console.error(`Fehler beim Aktualisieren von ${yamlPath}:`, e.message);
       }
     }
@@ -177,17 +179,17 @@ async function importFavorites() {
     // 2. Neue Favoriten aus den Kandidaten hinzufügen
     for (const yamlPath of selectedNewIds) {
       try {
-        const content = await fs.readFile(yamlPath, 'utf8');
+        const content = await fs.readFile(yamlPath, "utf8");
         const data = yaml.load(content) || {};
 
         if (data.favorite !== true) {
           data.favorite = true;
           const newContent = yaml.dump(data);
-          await fs.writeFile(yamlPath, newContent, 'utf8');
+          await fs.writeFile(yamlPath, newContent, "utf8");
           addedCount++;
           console.log(`⭐ Neuer Favorit hinzugefügt: ${yamlPath}`);
         }
-      } catch(e) {
+      } catch (e) {
         console.error(`Fehler beim Hinzufügen von ${yamlPath}:`, e.message);
       }
     }
@@ -195,15 +197,15 @@ async function importFavorites() {
     console.log("\nAktualisierung erfolgreich abgeschlossen!");
     console.log(`Zusammenfassung: ${addedCount} NEUE hinzugefügt | ${verifiedCount} alte bestätigt | ${fixedCount} fehlende korrigiert | ${removedCount} alte abgewählt & gelöscht.`);
 
-  } catch(e) {
+  } catch (e) {
     console.error("Fehler beim Importieren:", e.message);
     console.log("Stelle sicher, dass sowohl 'favorites_hitl.json' als auch 'favorites_response.json' existieren.");
   }
 }
 
-if (command === 'export') {
+if (command === "export") {
   exportFavorites();
-} else if (command === 'import') {
+} else if (command === "import") {
   importFavorites();
 } else {
   console.log("Bitte nutze das Skript mit einem Befehl:");

@@ -5,20 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Human-in-the-Loop Reviewer</title>
   <link rel="stylesheet" href="human-loop.css">
-  <style>
-      .drag-over-top { border-top: 3px solid var(--color-primary, #2A9D8F) !important; border-top-left-radius: 0; border-top-right-radius: 0; }
-      .drag-over-bottom { border-bottom: 3px solid var(--color-primary, #2A9D8F) !important; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
-      .dragging { opacity: 0.4; transform: scale(0.98); }
-  </style>
 </head>
 <body class="bg-base-200 min-h-screen p-8">
 <div class="max-w-6xl mx-auto space-y-8">
   <h1 class="text-3xl font-bold">Human-in-the-Loop Curation</h1>
-
   <div class="card bg-base-100 shadow-xl border border-base-300">
     <div class="card-body">
       <h2 class="card-title mb-4">1. Daten laden</h2>
-
       <div class="flex flex-col gap-6">
         <label for="jsonInput" class="form-control w-full">
           <div class="label mb-1">
@@ -26,7 +19,6 @@
           </div>
           <textarea id="jsonInput" class="textarea textarea-bordered textarea-primary w-full h-40 font-mono text-sm" placeholder='{"tasks": [...]}'></textarea>
         </label>
-
         <label for="jsonState" class="form-control w-full">
           <div class="label mb-1">
             <span class="label-text font-bold">2. Bisheriges Ergebnis laden (Optional)</span>
@@ -34,26 +26,21 @@
           <textarea id="jsonState" class="textarea textarea-bordered textarea-primary w-full h-32 font-mono text-sm" placeholder='{"responses": [...]}'></textarea>
         </label>
       </div>
-
       <div class="card-actions justify-end mt-4">
         <button id="loadBtn" class="btn btn-primary">Laden & Starten</button>
       </div>
     </div>
   </div>
-
   <div id="tasksContainer" class="space-y-8 hidden"></div>
-
   <div id="outputSection" class="card bg-base-100 shadow-xl border border-base-300 hidden">
     <div class="card-body">
       <h2 class="card-title mb-2">3. Ergebnis exportieren</h2>
-
       <label for="jsonOutput" class="form-control w-full">
         <div class="label ml-2 mb-1">
           <span class="label-text font-bold">Generiertes Output-JSON (inkl. Sortierung & Kommentare)</span>
         </div>
         <textarea id="jsonOutput" class="textarea textarea-bordered textarea-primary w-full h-40 font-mono text-sm" readonly></textarea>
       </label>
-
       <div class="card-actions justify-end mt-4">
         <button id="copyBtn" class="btn btn-primary">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -63,9 +50,9 @@
     </div>
   </div>
 </div>
-
 <script>
   let currentData = null;
+  window.layoutCols = {}; // Speichert das Layout (1 oder 2 Spalten) pro Task
 
   // SVG Icons
   const svgGrip = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>`;
@@ -74,6 +61,13 @@
   const svgUp = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`;
   const svgDown = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`;
   const svgClose = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+  const svgCol1 = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="4" rx="1"/><rect x="4" y="14" width="16" height="4" rx="1"/></svg>`;
+  const svgCol2 = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="16" rx="1"/><rect x="14" y="4" width="6" height="16" rx="1"/></svg>`;
+
+  window.setLayout = function(taskIndex, cols) {
+    window.layoutCols[taskIndex] = cols;
+    renderTasks();
+  };
 
   document.getElementById('loadBtn').addEventListener('click', () => {
     try {
@@ -83,7 +77,6 @@
         return;
       }
       currentData = JSON.parse(baseVal);
-
       const stateVal = document.getElementById('jsonState').value;
       if (stateVal.trim()) {
         const stateData = JSON.parse(stateVal);
@@ -97,7 +90,6 @@
           });
         }
       }
-
       renderTasks();
       document.getElementById('tasksContainer').classList.remove('hidden');
       document.getElementById('outputSection').classList.remove('hidden');
@@ -114,21 +106,16 @@
   function renderTasks() {
     const container = document.getElementById('tasksContainer');
     container.innerHTML = '';
-
     currentData.tasks.forEach((task, taskIndex) => {
       task.selections = task.selections || [];
       task.comment = task.comment || "";
-
       const taskCard = document.createElement('div');
       taskCard.className = 'card bg-base-100 shadow-xl border border-base-300';
-
       const cardBody = document.createElement('div');
       cardBody.className = 'card-body p-6 md:p-8';
 
-      // FIX: Use label as title, and render text if it exists
       const title = task.label || task.question || 'Ohne Titel';
       const descriptionHtml = task.text ? `<p class="mb-4 text-base-content/80">${task.text}</p>` : '';
-
       cardBody.innerHTML = `
           <h2 class="card-title text-primary text-2xl mb-1">${title}</h2>
           ${descriptionHtml}
@@ -137,23 +124,18 @@
 
       const grid = document.createElement('div');
       grid.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-10';
-
       task.options.forEach(opt => {
         const optDiv = document.createElement('div');
         const isSelected = task.selections.includes(opt.id);
-
         optDiv.className = `card border-2 cursor-pointer transition-all ${isSelected ? 'border-primary bg-primary/5 scale-[0.98] shadow-inner' : 'border-base-300 hover:border-primary/50 shadow-sm'}`;
         optDiv.onclick = () => toggleSelection(taskIndex, opt.id);
-
         let imgHtml = '';
         const relativeUrl = getRelativePath(opt.image_url || opt.avatar_url);
-
         if (opt.image_url) {
           imgHtml = `<figure class="px-4 pt-4"><img src="${relativeUrl}" class="rounded-xl h-56 w-full object-contain bg-base-200/50" draggable="false" /></figure>`;
         } else if (opt.avatar_url) {
           imgHtml = `<figure class="px-4 pt-4"><img src="${relativeUrl}" class="rounded-full h-32 w-32 object-cover mx-auto mt-2" draggable="false" /></figure>`;
         }
-
         optDiv.innerHTML = `
             ${imgHtml}
             <div class="card-body p-4 text-center items-center justify-between">
@@ -165,18 +147,35 @@
       });
       cardBody.appendChild(grid);
 
-      if (task.selections.length > 0) {
-        const sortSection = document.createElement('div');
-        sortSection.className = "bg-base-200/50 p-6 rounded-xl border border-base-300";
-        sortSection.innerHTML = `<h3 class="text-sm font-bold mb-4 uppercase tracking-widest opacity-60">Gewählte Reihenfolge anpassen (Drag & Drop)</h3>`;
+      // Hier wird die Sortierung nur angezeigt, wenn sortable nicht explizit false ist
+      if (task.selections.length > 0 && task.sortable !== false) {
+        const cols = window.layoutCols[taskIndex] || 1;
+        const gridClass = cols === 2 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1';
 
-        const list = document.createElement('ul');
-        list.className = 'space-y-3';
+        const sortSection = document.createElement('div');
+        sortSection.className = "bg-base-200/50 p-6 rounded-xl border border-base-300 mt-8";
+
+        sortSection.innerHTML = `
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+            <h3 class="text-sm font-bold uppercase tracking-widest opacity-60 m-0">Gewählte Reihenfolge anpassen (Drag & Drop)</h3>
+            <div class="join">
+              <button class="join-item btn btn-sm ${cols === 1 ? 'btn-neutral' : 'btn-outline border-base-300 bg-base-100'}" onclick="setLayout(${taskIndex}, 1)">
+                ${svgCol1} 1 Spalte
+              </button>
+              <button class="join-item btn btn-sm ${cols === 2 ? 'btn-neutral' : 'btn-outline border-base-300 bg-base-100'}" onclick="setLayout(${taskIndex}, 2)">
+                ${svgCol2} 2 Spalten
+              </button>
+            </div>
+          </div>
+        `;
+
+        const list = document.createElement('div');
+        list.className = `grid gap-4 ${gridClass}`;
 
         task.selections.forEach((selId, selIndex) => {
           const opt = task.options.find(o => o.id === selId);
-          const li = document.createElement('li');
-          li.className = 'flex items-center gap-4 p-3 bg-base-100 border border-base-300 rounded-lg shadow-sm cursor-grab hover:border-primary/50 transition-colors';
+          const li = document.createElement('div');
+          li.className = 'flex flex-col gap-4 p-4 bg-base-100 border-2 border-base-300 rounded-lg shadow-sm cursor-grab hover:border-primary/50 transition-all duration-200';
           li.draggable = true;
           li.dataset.taskIndex = taskIndex;
           li.dataset.id = selId;
@@ -184,14 +183,15 @@
           let thumbHtml = '';
           const relativeUrl = getRelativePath(opt.image_url || opt.avatar_url);
           if (relativeUrl) {
-            thumbHtml = `<img src="${relativeUrl}" class="w-16 h-16 rounded object-contain bg-base-200" draggable="false" />`;
+            thumbHtml = `<img src="${relativeUrl}" class="w-full h-64 object-contain bg-base-200/50 rounded-md" draggable="false" />`;
           }
 
           li.innerHTML = `
-              <span class="text-base-content/30 cursor-grab hover:text-primary">${svgGrip}</span>
-              <span class="font-bold text-base-content/50 w-6 text-right">${selIndex + 1}.</span>
-              ${thumbHtml}
-              <span class="flex-1 font-medium">${opt.label}</span>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="text-base-content/30 cursor-grab hover:text-primary transition-colors">${svgGrip}</span>
+                <span class="font-bold text-lg text-primary w-8">${selIndex + 1}.</span>
+              </div>
               <div class="join">
                 <button class="btn btn-sm btn-ghost join-item" onclick="moveItem(${taskIndex}, '${selId}', -1)" ${selIndex === 0 ? 'disabled' : ''} title="Nach oben">
                   ${svgUp}
@@ -203,7 +203,10 @@
                   ${svgClose}
                 </button>
               </div>
-            `;
+            </div>
+            ${thumbHtml}
+            <span class="font-medium text-sm text-center px-2 pb-1">${opt.label}</span>
+          `;
 
           li.addEventListener('dragstart', handleDragStart);
           li.addEventListener('dragover', handleDragOver);
@@ -213,6 +216,7 @@
 
           list.appendChild(li);
         });
+
         sortSection.appendChild(list);
         cardBody.appendChild(sortSection);
       }
@@ -227,7 +231,6 @@
             <textarea class="textarea textarea-bordered border-base-300 bg-base-200/50 w-full h-24" placeholder="Hier kannst du mir Notizen, Änderungswünsche oder Feedback zu dieser Auswahl hinterlassen..."></textarea>
           </label>
         `;
-
       const textarea = commentSection.querySelector('textarea');
       textarea.value = task.comment;
       textarea.addEventListener('input', (e) => {
@@ -239,7 +242,6 @@
       taskCard.appendChild(cardBody);
       container.appendChild(taskCard);
     });
-
     updateOutput();
   }
 
@@ -249,52 +251,45 @@
     draggedElement = this;
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', this.dataset.id);
-    setTimeout(() => this.classList.add('dragging'), 0);
+    setTimeout(() => this.classList.add('opacity-40', 'scale-[0.98]'), 0);
   }
 
   function handleDragOver(e) {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     if (this === draggedElement) return;
-
-    const rect = this.getBoundingClientRect();
-    const midY = rect.top + rect.height / 2;
-
-    if (e.clientY < midY) {
-      this.classList.add('drag-over-top');
-      this.classList.remove('drag-over-bottom');
-    } else {
-      this.classList.add('drag-over-bottom');
-      this.classList.remove('drag-over-top');
-    }
+    this.classList.add('border-primary', 'bg-primary/10', 'scale-[1.02]', 'shadow-lg');
   }
 
   function handleDragLeave(e) {
-    this.classList.remove('drag-over-top', 'drag-over-bottom');
+    this.classList.remove('border-primary', 'bg-primary/10', 'scale-[1.02]', 'shadow-lg');
   }
 
   function handleDrop(e) {
     e.stopPropagation();
     e.preventDefault();
-    this.classList.remove('drag-over-top', 'drag-over-bottom');
+    this.classList.remove('border-primary', 'bg-primary/10', 'scale-[1.02]', 'shadow-lg');
 
-    if (draggedElement !== this) {
+    if (draggedElement && draggedElement !== this) {
       const taskIndex = parseInt(this.dataset.taskIndex);
       const draggedId = draggedElement.dataset.id;
       const targetId = this.dataset.id;
 
-      const rect = this.getBoundingClientRect();
-      const midY = rect.top + rect.height / 2;
-      const insertAfter = e.clientY > midY;
+      const selections = currentData.tasks[taskIndex].selections;
+      const draggedIndex = selections.indexOf(draggedId);
+      const targetIndex = selections.indexOf(targetId);
+
+      // Bestimme, ob wir das Element vor oder nach dem Ziel-Element einfügen
+      const insertAfter = draggedIndex < targetIndex;
 
       reorderSelection(taskIndex, draggedId, targetId, insertAfter);
     }
   }
 
   function handleDragEnd(e) {
-    this.classList.remove('dragging');
-    document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el => {
-      el.classList.remove('drag-over-top', 'drag-over-bottom');
+    this.classList.remove('opacity-40', 'scale-[0.98]');
+    document.querySelectorAll('[data-id]').forEach(el => {
+      el.classList.remove('border-primary', 'bg-primary/10', 'scale-[1.02]', 'shadow-lg');
     });
   }
 
@@ -313,7 +308,6 @@
   function toggleSelection(taskIndex, optId) {
     const task = currentData.tasks[taskIndex];
     const idx = task.selections.indexOf(optId);
-
     if (idx > -1) {
       task.selections.splice(idx, 1);
     } else {
@@ -330,7 +324,6 @@
     const selections = currentData.tasks[taskIndex].selections;
     const idx = selections.indexOf(optId);
     if (idx < 0) return;
-
     const newIdx = idx + direction;
     if (newIdx >= 0 && newIdx < selections.length) {
       [selections[idx], selections[newIdx]] = [selections[newIdx], selections[idx]];
@@ -353,7 +346,6 @@
     const el = document.getElementById('jsonOutput');
     el.select();
     document.execCommand('copy');
-
     const btn = document.getElementById('copyBtn');
     const originalHtml = btn.innerHTML;
     btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Kopiert!';
