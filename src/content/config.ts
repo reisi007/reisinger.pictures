@@ -100,6 +100,7 @@ const imageMetadata = defineCollection({
   schema: z.object({
     title: z.string().nullish(),
     darkInvert: z.boolean().default(false),
+    favorite: z.boolean().default(false),
     metadata: z.object({
       captureDate: z.coerce.date().optional(),
       aperture: z.string().optional(),

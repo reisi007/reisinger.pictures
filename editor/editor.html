@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Metadaten Editor</title>
-  <link rel="stylesheet" href="/editor/editor.csstor.css" />
-  <script src="editor-api-key.js"></script>
+  <link rel="stylesheet" href="/editor/editor.css" />
+  <script src="/editor/editor-api-key.js"></script>
 </head>
 <body class="p-10">
 <div class="card bg-base-100 shadow-xl max-w-4xl mx-auto">
@@ -16,7 +16,6 @@
     <div class="card-actions">
       <button id="selectFolderBtn" class="btn btn-primary">Ordner auswählen</button>
     </div>
-
     <div id="editor" class="hidden mt-5">
       <p class="file-info italic text-sm mb-2">
         Bearbeite Datei: <b id="fileName"></b>
@@ -28,10 +27,18 @@
           class="max-w-full h-auto rounded my-4 mx-auto object-contain"
           style="display: none; max-height: 400px"
         >
-
         <div id="autoDescribeProgress" class="flex items-center gap-2 my-2">
           <span class="loading loading-spinner text-primary"></span>
           <span>Bild wird automatisch beschrieben…</span>
+        </div>
+
+        <div class="form-control w-max mb-4 mt-2">
+          <label class="cursor-pointer label gap-4 p-4 bg-base-200/50 rounded-xl border border-base-300 hover:bg-base-200 transition-colors">
+            <input type="checkbox" id="favoriteInput" class="checkbox checkbox-primary" />
+            <div class="flex flex-col">
+              <span class="label-text font-bold text-base">Als Favorit markieren ⭐</span>
+            </div>
+          </label>
         </div>
 
         <label for="titleInput" class="block font-medium">Titel:</label>
@@ -48,7 +55,6 @@
         </div>
       </form>
     </div>
-
     <div id="successMessage" class="hidden">
       <div role="alert" class="alert alert-success">
         <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
@@ -62,20 +68,18 @@
     </div>
   </div>
 </div>
-
 <script type="module">
-  // The existing JavaScript code remains unchanged
   import { GoogleGenAI } from "https://cdn.jsdelivr.net/npm/@google/genai@1/+esm";
   import jsyaml from "https://cdn.jsdelivr.net/npm/js-yaml@4/+esm";
 
   const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
-
   const selectFolderBtn = document.getElementById("selectFolderBtn");
   const editorDiv = document.getElementById("editor");
   const successMessageDiv = document.getElementById("successMessage");
   const fileNameEl = document.getElementById("fileName");
   const titleForm = document.getElementById("titleForm");
   const titleInput = document.getElementById("titleInput");
+  const favoriteInput = document.getElementById("favoriteInput"); // NEU
   const referenceImage = document.getElementById("referenceImage");
   const autoDescribeProgress = document.getElementById("autoDescribeProgress");
   const progressIndicator = document.getElementById("progressIndicator");
@@ -88,7 +92,6 @@
     const yamlFile = await yamlHandle.getFile();
     return jsyaml.load(await yamlFile.text());
   }
-
 
   async function collectMarkdownContent(folderHandle) {
     if (folderHandle === null) return "";
@@ -119,6 +122,7 @@
           try {
             yamlHandle = await folderHandle.getFileHandle(yamlFileName, { "mode": "read" });
             const data = await readYaml(yamlHandle);
+            // Wenn der Titel bereits existiert, überspringen
             if (data && typeof data.title === "string" && data.title.trim().length > 0) {
               continue;
             }
@@ -133,7 +137,6 @@
             context: await collectMarkdownContent(parentFolderHandle) + await collectMarkdownContent(folderHandle)
           };
           files.push(item);
-
         }
       }
       if (entry.kind === "directory") {
@@ -143,9 +146,7 @@
     return files;
   }
 
-
   function updateProgress() {
-    // Gesamte Anzahl ist die aktuelle + die Anzahl der verbleibenden im Stack (inkl. aktuellem)
     const remaining = filesToProcess.length + (editorDiv.style.display === "block" ? 1 : 0);
     if (remaining > 0) {
       progressIndicator.textContent = `Noch ${remaining} Bild${remaining !== 1 ? "er" : ""} zu bearbeiten`;
@@ -166,7 +167,6 @@
       alert("Der Ordner konnte nicht ausgewählt werden. Bitte versuchen Sie es erneut.");
     }
   });
-
 
   const redoDescriptionBtn = document.getElementById("redoDescriptionBtn");
   redoDescriptionBtn.addEventListener("click", async () => {
@@ -196,21 +196,22 @@
     const fileObj = filesToProcess.shift();
     const context = fileObj.context;
     const needsCreation = fileObj.handle === null;
-
     updateProgress();
 
     try {
-      const data = needsCreation ? {} : readYaml(fileObj.handle);
+      // BUGFIX: await hinzugefügt
+      const data = needsCreation ? {} : await readYaml(fileObj.handle);
+
       if (data && (data.title === null || data.title === "" || typeof data.title === "undefined")) {
         fileNameEl.textContent = fileObj.relativePath;
-        // Alt vor SRC setzen
-        referenceImage.alt = "Pfad zum Bild: " + fileNameEl.textContent + (context !== null ? ". Inhalt des Artikels als weiterer Hinweis: "
-          + context : "");
+        referenceImage.alt = "Pfad zum Bild: " + fileNameEl.textContent + (context !== null ? ". Inhalt des Artikels als weiterer Hinweis: " + context : "");
         titleInput.value = "";
+
+        // NEU: Favorite Toggle initialisieren
+        favoriteInput.checked = data.favorite === true;
 
         // Bild anzeigen, falls vorhanden
         let imageName = fileObj.associatedJpgName;
-
         try {
           const imageHandle = await fileObj.parentHandle.getFileHandle(imageName, { "mode": "read" });
           const imageFile = await imageHandle.getFile();
@@ -225,10 +226,25 @@
 
         titleForm.onsubmit = async (event) => {
           event.preventDefault();
-          data.title = titleInput.value;
-          const newYamlContent = jsyaml.dump(data);
-          let targetFileHandle = fileObj.handle;
 
+          // NEU: Daten aktualisieren und Favorite behandeln
+          data.title = titleInput.value;
+          if (favoriteInput.checked) {
+            data.favorite = true;
+          } else {
+            delete data.favorite;
+          }
+
+          // NEU: Sortierung erzwingen, damit 'title' und 'favorite' ganz oben stehen
+          const sortedData = {
+            title: data.title,
+            ...(data.favorite ? { favorite: true } : {}),
+            ...data
+          };
+
+          const newYamlContent = jsyaml.dump(sortedData);
+
+          let targetFileHandle = fileObj.handle;
           if (needsCreation) {
             targetFileHandle = await fileObj.parentHandle.getFileHandle(
               fileObj.relativePath.split("/").pop(),
@@ -236,12 +252,11 @@
             );
           }
 
-
           assertYamlFileHandle(targetFileHandle);
-
           const writable = await targetFileHandle.createWritable();
           await writable.write(newYamlContent);
           await writable.close();
+
           await processNextFile();
         };
       } else {
@@ -263,15 +278,12 @@
       image.onerror = reject;
       image.src = URL.createObjectURL(blob);
     });
-
     let { width, height } = img;
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext("2d");
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-    // Convert to Base64
     const dataUrl = canvas.toDataURL("image/webp", quality);
     return dataUrl.split(",")[1];
   }
@@ -282,52 +294,28 @@
   ];
   let curModelIndex = 0;
 
-  // 2. Describe image using Gemini Vision API
   async function describeImageWithGemini(imgElement) {
     if (curModelIndex >= MODELS_USED.length) {
       return { type: "error", message: "Gemini API Rate Limit Exceeded" };
     }
     const model = MODELS_USED[curModelIndex];
     currentModelEl.textContent = model;
-
     const base64Content = await getCompressedBase64(imgElement);
     try {
       const content = {
         model,
         contents: [{
-          inlineData: {
-            mimeType: "image/webp",
-            data: base64Content
-          }
+          inlineData: { mimeType: "image/webp", data: base64Content }
         },
-          {
-            text:
-              `
-              Aus dem Pfad des Bildes, das beschrieben werden soll kann potentiell ein möglicher Kontext geschlossen werden.
-              Der folgende Kontext ist vertrauenswürdig: ${referenceImage.alt}
-              `
-          },
-          {
-            text:
-              `Beschreibe das Bild.
-              Es soll als ALT Tag des Bildes verwendet werden.
-              Gib nur die Beschreibung ohne Formatierung und keinen weiteren Text aus. Denke daran die Beschreibung zu SEO optimieren.
-              Vermeide es unter allen umständen Stichworte zu benutzen.
-              Antworte unbedingt auf Deutsch. Denk daran, dass die Antwort nicht zu lange sein sollte, eher ein Satz und nicht zwei sein soll.
-              Erwähne nicht den Rasen in einem Stadion als Teil der Beschreibung, außer wenn der Rasen ein wichtiger Teil des Bildes ist.
-              Wenn es eindeutig ist welches Objekt (Spieler bei Sport, Tierart bei Naturbildern) erwähne dies unbedingt.
-              Vermeide formulierungen wie 'auf dem Fußballfeld'
-              `
-          }
+          { text: `Aus dem Pfad des Bildes, das beschrieben werden soll kann potentiell ein möglicher Kontext geschlossen werden. Der folgende Kontext ist vertrauenswürdig: ${referenceImage.alt}` },
+          { text: `Beschreibe das Bild. Es soll als ALT Tag des Bildes verwendet werden. Gib nur die Beschreibung ohne Formatierung und keinen weiteren Text aus. Denke daran die Beschreibung zu SEO optimieren. Vermeide es unter allen umständen Stichworte zu benutzen. Antworte unbedingt auf Deutsch. Denk daran, dass die Antwort nicht zu lange sein sollte, eher ein Satz und nicht zwei sein soll. Erwähne nicht den Rasen in einem Stadion als Teil der Beschreibung, außer wenn der Rasen ein wichtiger Teil des Bildes ist. Wenn es eindeutig ist welches Objekt (Spieler bei Sport, Tierart bei Naturbildern) erwähne dies unbedingt. Vermeide formulierungen wie 'auf dem Fußballfeld'` }
         ]
       };
-
-      //  return new Promise(resolve => setTimeout(resolve, 100)); // Uncomment this line to not call Gemini
       const result = await ai.models.generateContent(content);
       const caption = (result?.candidates[0]?.content?.parts[0]?.text).trim();
       return caption.replace(/\.$/, "");
     } catch (err) {
-      if (err.status === 429|| err.status === 503) {
+      if (err.status === 429 || err.status === 503) {
         curModelIndex++;
         return describeImageWithGemini(imgElement);
       }
@@ -336,13 +324,10 @@
     }
   }
 
-  // After loading and successfully displaying the image, add this block:
   referenceImage.onload = async () => {
-    // Show progress
     autoDescribeProgress.classList.remove("hidden");
     redoDescriptionBtn.disabled = true;
     titleInput.placeholder = "";
-
     try {
       const caption = await describeImageWithGemini(referenceImage);
       if (caption?.type === "error") {

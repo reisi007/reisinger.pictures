@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Favouriten importieren" type="NodeJSConfigurationType" application-parameters="import" path-to-js-file="manage_favorites.mjs" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>

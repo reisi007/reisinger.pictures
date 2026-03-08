@@ -10,16 +10,19 @@
   },
   "include": [
     "*",
-    "src/**/*"
+    "src/**/*",
+    "editor/*",
+    "human-loop/*"
   ],
   "ignore": {
     "useGitignore": false,
     "useDefaultPatterns": true,
     "customPatterns": [
-      "editor*",
+      "editor/editor.css",
+      "human-loop/human-loop.css",
       "package-lock.json",
       ".gitignore",
-      "*.svg"
+      "**/*.svg"
     ]
   }
 }
