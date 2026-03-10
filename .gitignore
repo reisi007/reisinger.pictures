@@ -138,6 +138,7 @@ fabric.properties
 # End of https://www.toptal.com/developers/gitignore/api/webstorm,react,astro
 .cache
 dist
+context
 out
 editor/editor-api-key.js
 editor/editor.css

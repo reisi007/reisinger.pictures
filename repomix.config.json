@@ -12,7 +12,8 @@
     "*",
     "src/**/*",
     "editor/*",
-    "human-loop/*"
+    "human-loop/*",
+    "context/"
   ],
   "ignore": {
     "useGitignore": false,
@@ -21,6 +22,7 @@
       "editor/editor.css",
       "human-loop/human-loop.css",
       "package-lock.json",
+      "favorites*.json",
       ".gitignore",
       "**/*.svg"
     ]
