@@ -13,6 +13,7 @@
     "src/**/*",
     "editor/*",
     "human-loop/*",
+    "deployment/*",
     "context/"
   ],
   "ignore": {

@@ -94,3 +94,10 @@ the human user retains creative control. The tool is located at `human-loop/revi
 9. **Image Selection Volume & Motives:** When a user asks to review or select images for a component or page, the AI MUST provide a Human-in-the-Loop JSON payload. For 1-3 image slots, propose 10-20
    options per slot. For a larger number of slots, propose 4 times the amount of options per slot. The task object MUST use `label` for the title/name of the slot and `text` to explicitly define and
    describe the motive/purpose of the slot. The currently used image MUST always be included as the first option in the JSON array.
+
+## 9. Deployment & Hosting Strategy
+
+* **Architecture**: The project is a statically generated Astro site. Hosting is done via an Nginx container managed by Portainer.
+* **Synchronization**: Do not introduce complex CI/CD pipelines (like GitHub Actions) unless explicitly requested. The deployment relies on local builds synced via `rclone` to the remote host machine (`/home/webadmin/websites/reisinger.pictures`).
+* **Container Context**: The Nginx container maps the host directory as a read-only volume. Configuration regarding the Docker stack is kept in `deployment/docker-compose.yml`.
+* **Publishing**: The complete build and sync cycle is orchestrated via the `npm run publish` script defined in `package.json`.
