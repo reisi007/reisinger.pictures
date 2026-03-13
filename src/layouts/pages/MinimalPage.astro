@@ -10,13 +10,13 @@ import Breadcrumbs from "../Breadcrumbs.astro";
 import Footer from "../Footer.astro";
 import Header from "../Header.astro";
 
-type Props = {
+interface Props {
   showContact?: boolean;
-};
+}
 
 const footerProps = Astro.props;
 ---
-<html lang="de" class="scroll-smooth">
+<html lang="de">
 <head>
   <meta charset="utf-8">
   <ClientRouter />

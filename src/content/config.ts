@@ -136,7 +136,7 @@ const courses = defineCollection({
 });
 
 const tfp = defineCollection({
-  loader: glob({ pattern: "**/*.md", base: "./src/content/tfp" }),
+  type: "content",
   schema: z.object({
     title: z.string(),
     priority: z.number()

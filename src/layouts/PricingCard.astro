@@ -1,7 +1,7 @@
 ---
-import { generateContactLink, type ContactFormPrefill } from "../utils";
+import { type ContactFormPrefill,generateContactLink } from "../utils";
 
-type Props = {
+interface Props {
   title: string;
   subtitle?: string;
   price: string;
@@ -12,7 +12,7 @@ type Props = {
   highlight?: boolean; // Für das "Creative Special" (ändert Farben)
   footerText?: string[];
   subjectPrefix?: ContactFormPrefill["subject_prefix"];
-};
+}
 
 const {
   title,

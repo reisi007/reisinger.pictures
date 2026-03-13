@@ -6,7 +6,7 @@ import { tryGetImage } from "../../images/Images";
 import AiSummaryCard from "../../layouts/AiSummaryCard.astro";
 import BaseHead from "../../layouts/BaseHead.astro";
 import MinimalPage from "../../layouts/pages/MinimalPage.astro";
-import ResponsiveImage from "../../layouts/ResponsiveImage.astro";
+import ReviewCards from "../../layouts/ReviewCards.astro";
 import SocialImage from "../../layouts/SocialImage.astro";
 import { groupBy, slugToName } from "../../utils";
 
@@ -31,41 +31,23 @@ const heroImage = reviews.map(e => `${e.slug}-large`)
 const title = `${(slugToName(type))} Bewertungen`;
 
 const aiSummary = (await getEntry("testimonialSummary", type))?.data;
+
+// Slugs für die ReviewCards extrahieren
+const slugs = reviews.map(r => r.slug);
 ---
 <MinimalPage>
   <BaseHead title={title} slot="head">
     <SocialImage name={heroImage} />
   </BaseHead>
-  <h1 class="mb-8">{title}</h1>
+  <h1 class="mb-8 text-center">{title}</h1>
 
   {aiSummary !== undefined &&
-    <AiSummaryCard summary={aiSummary.summary} reviewCount={aiSummary.reviewCount} />}
-  <div class="mx-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
-    {reviews.map(async e => {
-      const smallName = `${e.slug}-small`;
-      const small = tryGetImage(smallName);
-      return (
-        <>
-          {
-            small &&
-            <div class="avatar">
-              <a href={`/testimonials/${e.slug}`} aria-label={e.data.name}>
-                <ResponsiveImage class="rounded-full !size-32" sizes="128px" widths={[128]} name={smallName} />
-              </a>
-            </div>
-          }
-          {
-            !small &&
-            <div class="avatar avatar-placeholder">
-              <div class="size-32 bg-neutral rounded-full">
-                <a class="text-neutral-content text-center wrap-break-word no-underline" href={`/testimonials/${e.slug}`}
-                >
-                  {e.data.name}
-                </a>
-              </div>
-            </div>
-          }
-        </>);
-    })}
-  </div>
+    <div class="mb-12">
+      <AiSummaryCard summary={aiSummary.summary} reviewCount={aiSummary.reviewCount} />
+    </div>
+  }
+
+  {/* Hier nutzen wir jetzt die ReviewCards Komponente mit den großen Bildern */}
+  <ReviewCards slugs={slugs} displayLargeImage={true} />
+
 </MinimalPage>

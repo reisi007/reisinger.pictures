@@ -1,4 +1,5 @@
 import { createMemo, createSignal, For, Show } from "solid-js";
+
 import { calculatePackagePrice } from "../content/pricing";
 import { formatPsychologicalPrice } from "../utils";
 
