@@ -136,10 +136,11 @@ const courses = defineCollection({
 });
 
 const tfp = defineCollection({
-  type: "content",
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/tfp" }),
   schema: z.object({
     title: z.string(),
-    priority: z.number()
+    priority: z.number(),
+    heroImage: z.string().optional()
   })
 });
 
