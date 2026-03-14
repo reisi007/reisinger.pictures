@@ -1,9 +1,10 @@
 ---
-import { type ContactFormPrefill,generateContactLink } from "../utils";
+import { type ContactFormPrefill, generateContactLink } from "../utils";
 
 interface Props {
   title: string;
   subtitle?: string;
+  class?: string;
   price: string;
   originalPrice?: string;
   description?: string;
@@ -23,8 +24,9 @@ const {
   features,
   ribbon,
   highlight = false,
-  footerText=[],
-  subjectPrefix
+  footerText = [],
+  subjectPrefix,
+  class: clazz
 } = Astro.props;
 
 // Dynamische Klassen basierend auf "highlight" Status
@@ -40,7 +42,7 @@ const contactUrl = generateContactLink({
 });
 ---
 
-<div class={`card shadow-xl relative overflow-hidden ${cardBg} h-full transition-transform hover:-translate-y-1`}>
+<div class={`card shadow-xl relative overflow-hidden ${cardBg} h-full transition-transform hover:-translate-y-1 ${clazz ?? ""}`}>
 
   <div class="card-body p-8">
     <div class="text-center mb-6">
@@ -83,11 +85,11 @@ const contactUrl = generateContactLink({
       ))}
     </ul>
 
-    <div class="mt-6 gap-y-2 flex flex-col">
+    <div class="mt-6 gap-y-2 flex flex-col @container">
       {footerText.map((f) => (
-        <div class={`${footerBgColor} border grid grid-cols-8 gap-x-2 items-center text-xs font-bold opacity-70  py-2 rounded-lg justify-center px-3`}>
+        <div class={`${footerBgColor} border grid grid-cols-8 @md:grid-cols-24 gap-x-2 items-center text-xs font-bold opacity-70  py-2 rounded-lg justify-center px-3`}>
           <span class="mdi--information-outline">️</span>
-          <span class="col-span-7">{f}</span>
+          <span class="col-span-7 @md:col-span-23">{f}</span>
         </div>)
       )}
     </div>

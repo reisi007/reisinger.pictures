@@ -1,7 +1,6 @@
 import { file, glob } from "astro/loaders";
 import { defineCollection, reference, z } from "astro:content";
 
-
 const einblicke = defineCollection({
   type: "content",
   schema: z.object({
@@ -135,11 +134,14 @@ const courses = defineCollection({
   })
 });
 
+
 const tfp = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/tfp" }),
   schema: z.object({
     title: z.string(),
     priority: z.number(),
+    description: z.string().optional(),
+    keywords: z.array(z.string()).optional(),
     heroImage: z.string().optional()
   })
 });
