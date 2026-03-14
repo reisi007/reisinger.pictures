@@ -44,8 +44,8 @@ This document summarizes key architectural decisions and workflow rules for this
 ## 6. Content & Images
 
 * **ResponsiveImage**: NEVER use standard `<img>` or Astro's `<Image>`. Always use the custom `ResponsiveImage.astro` for optimization, EXIF handling, and responsive breakpoints.
-* **Content Collections**: Manage all data via collections and update Zod schemas in `src/content/config.ts` accordingly.
-* **JSON Collections ID**: Astro requires an `id` field in JSON content collection arrays for identification, but this `id` MUST NOT be explicitly defined in the Zod schema (`config.ts`). Astro
+* **Content Collections**: Manage all data via collections and update Zod schemas in `src/content/content.config.ts` accordingly.
+* **JSON Collections ID**: Astro requires an `id` field in JSON content collection arrays for identification, but this `id` MUST NOT be explicitly defined in the Zod schema (`content.config.ts`). Astro
   handles it automatically.
 
 ## 7. MDX & Markup Standards

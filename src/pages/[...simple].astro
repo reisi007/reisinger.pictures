@@ -1,7 +1,7 @@
 ---
 import type { GetImageResult } from "astro";
 import { getImage } from "astro:assets";
-import { type CollectionEntry, getCollection } from "astro:content";
+import { type CollectionEntry, getCollection, render } from "astro:content";
 
 import { getImage as getImageByName } from "../images/Images";
 import BaseHead from "../layouts/BaseHead.astro";
@@ -17,15 +17,16 @@ import { absoluteLink } from "../utils";
 export async function getStaticPaths() {
   const posts = await getCollection("simple");
   return posts.map((post) => ({
-    params: { simple: post.slug },
+    params: { simple: post.id },
     props: post
   }));
 }
 type Props = CollectionEntry<"simple">;
 
-const { render, data } = Astro.props;
+const post = Astro.props;
+const { data } = post;
 const { title, description, heroImage, showContact,showToc, index = true, ...dates } = data;
-const { Content } = await render();
+const { Content } = await render(post);
 
 let imageInfo: GetImageResult | undefined;
 if (heroImage !== undefined)

@@ -15,12 +15,6 @@ function titleOrUndefined(o: Record<string, unknown>): string | undefined {
   return undefined;
 }
 
-function getSlug(o: { id: string, slug?: string, data: Record<string, unknown> }) {
-  if (o.slug)
-    return o.slug;
-  return o.id;
-}
-
 function toName(input: string): string {
   const parts = input.split("/");
   const last = parts[parts.length - 1];
@@ -52,16 +46,17 @@ const matchingContent = (await Promise.all(
     collectionKeys
       .flatMap(async k => (await getCollection(k))
         .map(e => {
+          const cur = e as { id: string, data: Record<string, unknown> };
             let path = contentPrefixConfig[k];
             if (path.length > 0)
               path = `/${path}`;
-            const slug = getSlug(e);
+          const slug = cur.id
             if (slug !== "/")
               path += `/${slug}`;
 
             return {
               path,
-              name: titleOrUndefined(e.data) ?? toName(slug)
+              name: titleOrUndefined(cur.data) ?? toName(slug)
             };
           }
         )

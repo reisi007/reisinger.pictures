@@ -1,6 +1,6 @@
 ---
 import type { InferGetStaticPropsType, PaginateFunction } from "astro";
-import { getCollection } from "astro:content";
+import { getCollection, render } from "astro:content";
 
 import BaseHead from "../../../layouts/BaseHead.astro";
 import Einblicke from "../../../layouts/Einblicke.astro";
@@ -24,19 +24,21 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
   );
 
   return overviewPages.flatMap((e) => {
-    const relevantPosts = posts.filter(p => e.slug === "/" || p.slug.startsWith(e.slug));
+    const id = e.id;
+    const relevantPosts = posts.filter(p => id === "/" || p.id.startsWith(id));
     if (relevantPosts.length === 0) return [];
     return paginate(relevantPosts, {
       pageSize: 12,
-      params: { overview: e.slug },
-      props: { title: e.data.title, render: e.render, slug: e.slug }
+      params: { overview: id },
+      props: { title: e.data.title, entry: e,}
     });
   });
 }
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
-const { page, title, render, slug } = Astro.props;
-const { Content } = await render();
+const { page, title, entry } = Astro.props;
+const id = entry.id;
+const { Content } = await render(entry);
 const { data: posts } = page;
 const { heroImage, date, updated } = posts[0].data;
 
@@ -44,11 +46,12 @@ const createData: SchemaCreationFunction = (_, __, df) => createCollectionPageSc
   name: title,
   description: "Blog Beiträge",
   dateModified: df(updated ?? date),
-  items: posts.map((e) => ({ url: absoluteLink(Astro.url, `/einblicke/${e.slug}`), name: e.data.title, type: "BlogPosting" }))
+  items: posts.map((e) => ({ url: absoluteLink(Astro.url, `/einblicke/${e.id}`), name: e.data.title, type: "BlogPosting" }))
 });
+
 ---
 <MinimalPage>
-  <BaseHead title={title} noIndex={!(slug === "/" && page.url.prev === undefined)} slot="head">
+  <BaseHead title={title} noIndex={!(id === "/" && page.url.prev === undefined)} slot="head">
     <SocialImage name={heroImage} />
     <SchemaOrg createData={createData} />
   </BaseHead>
@@ -56,5 +59,3 @@ const createData: SchemaCreationFunction = (_, __, df) => createCollectionPageSc
   <Content />
   <Einblicke page={page} />
 </MinimalPage>
-
----

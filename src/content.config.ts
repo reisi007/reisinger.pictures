@@ -2,7 +2,7 @@ import { file, glob } from "astro/loaders";
 import { defineCollection, reference, z } from "astro:content";
 
 const einblicke = defineCollection({
-  type: "content",
+  loader: glob({ pattern: ["**/*.{md,mdx}", "!**/_*.{md,mdx}"], base: "./src/content/einblicke" }),
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
@@ -14,7 +14,7 @@ const einblicke = defineCollection({
 });
 
 const einblickeOverviews = defineCollection({
-  type: "content",
+  loader: glob({ pattern: ["**/*.{md,mdx}", "!**/_*.{md,mdx}"], base: "./src/content/einblickeOverviews" }),
   schema: z.object({
     title: z.string()
   })
@@ -33,7 +33,7 @@ export enum OrientationEnum {
 }
 
 const testimonials = defineCollection({
-  type: "content",
+  loader: glob({ pattern: ["**/*.{md,mdx}", "!**/_*.{md,mdx}"], base: "./src/content/testimonials" }),
   schema: z.object({
     name: z.string(),
     type: z.nativeEnum(ReviewType),
@@ -45,7 +45,7 @@ const testimonials = defineCollection({
 });
 
 const areas = defineCollection({
-  type: "content",
+  loader: glob({ pattern: ["**/*.{md,mdx}", "!**/_*.{md,mdx}"], base: "./src/content/areas" }),
   schema: z.object({
     name: z.string(),
     priority: z.number().optional().default(9999),
@@ -56,7 +56,7 @@ const areas = defineCollection({
 });
 
 const simple = defineCollection({
-  type: "content",
+  loader: glob({ pattern: ["**/*.{md,mdx}", "!**/_*.{md,mdx}"], base: "./src/content/simple" }),
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
@@ -95,7 +95,7 @@ const dsb = defineCollection({
 });
 
 const imageMetadata = defineCollection({
-  loader: glob({ pattern: "**/*.yaml", base: "./src" }),
+  loader: glob({ pattern: ["**/*.yaml", "!**/_*.yaml"], base: "./src" }),
   schema: z.object({
     title: z.string().nullish(),
     darkInvert: z.boolean().default(false),
@@ -122,7 +122,7 @@ const categories = defineCollection({
 });
 
 const courses = defineCollection({
-  type: "content",
+  loader: glob({ pattern: ["**/*.{md,mdx}", "!**/_*.{md,mdx}"], base: "./src/content/courses" }),
   schema: z.object({
     title: z.string(),
     short: z.string(),
@@ -136,7 +136,7 @@ const courses = defineCollection({
 
 
 const tfp = defineCollection({
-  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/tfp" }),
+  loader: glob({ pattern: ["**/*.{md,mdx}", "!**/_*.{md,mdx}"], base: "./src/content/tfp" }),
   schema: z.object({
     title: z.string(),
     priority: z.number(),

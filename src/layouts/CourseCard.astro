@@ -14,7 +14,7 @@ const { course, imageSizeModifiers = GALLERY_BREAKPOINTS[GalleryLayout.Overview]
 const { title, description, price, duration, heroImage } = course.data;
 ---
 
-<a href={`/kurse/${course.slug}/`} class="not-prose card bg-base-200 shadow-sm hover:shadow-xl transition-shadow no-underline group h-full flex flex-col">
+<a href={`/kurse/${course.id}/`} class="not-prose card bg-base-200 shadow-sm hover:shadow-xl transition-shadow no-underline group h-full flex flex-col">
   <figure class="relative">
     <ResponsiveImage
       class="max-h-96"

@@ -1,6 +1,6 @@
 ---
 import { getImage } from "astro:assets";
-import { type CollectionEntry, getCollection } from "astro:content";
+import { type CollectionEntry, getCollection, render } from "astro:content";
 
 import { getImage as getImageByName } from "../../images/Images";
 import BaseHead from "../../layouts/BaseHead.astro";
@@ -22,12 +22,13 @@ interface Props {
 export async function getStaticPaths() {
   const areas = await getCollection("areas");
   const testimonials = groupBy(await getCollection("testimonials"), e => e.data.type);
-  return areas.map(entry => ({ params: { area: entry.slug }, props: { entry, reviews: testimonials[entry.slug] } }));
+  return areas.map(entry => ({ params: { area: entry.id }, props: { entry, reviews: testimonials[entry.id] } }));
 }
 
-const { entry: { slug, render, data: { name, testimonials, images, heroImage } }, reviews: categoryReviews } = Astro.props;
+const { entry, reviews: categoryReviews } = Astro.props;
+const { id: slug, data: { name, testimonials, images, heroImage } } = entry;
 const reviewSlugs: string[] | undefined = testimonials?.map(e => e.id);
-const { Content } = await render();
+const { Content } = await render(entry);
 
 const schemaOrgImage = await getImage({
   src: getImageByName("logo"),

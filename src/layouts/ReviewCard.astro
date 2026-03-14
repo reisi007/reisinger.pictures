@@ -1,5 +1,5 @@
 ---
-import { type CollectionEntry } from "astro:content";
+import { type CollectionEntry, render } from "astro:content";
 
 import { tryGetImage } from "../images/Images";
 import ResponsiveImage from "./ResponsiveImage.astro";
@@ -7,17 +7,17 @@ import { type ReviewProps } from "./Types";
 
 type Props = CollectionEntry<"testimonials"> & ReviewProps;
 
+const entry = Astro.props;
 const {
-  slug,
+  id: slug,
   data: { name, source, large: optLargeImage },
-  render,
   displayLargeImage = true
-} = Astro.props;
+} = entry;
 const smallName = `${slug}-small`;
 const largeName = optLargeImage ?? `${slug}-large`;
 const small = tryGetImage(smallName);
 const large = tryGetImage(largeName);
-const { Content } = await render();
+const { Content } = await render(entry);
 ---
 
 <div data-slug={import.meta.env.DEV ? slug : undefined} class="card bg-base-300 shadow-sm">

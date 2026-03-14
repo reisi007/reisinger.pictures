@@ -1,5 +1,5 @@
 ---
-import { type CollectionEntry } from "astro:content";
+import { type CollectionEntry, render } from "astro:content";
 
 import { filterInvalidImageName } from "../images/Images";
 import ResponsiveImage from "./ResponsiveImage.astro";
@@ -7,19 +7,19 @@ import { type ReviewProps } from "./Types";
 
 type Props = CollectionEntry<"testimonials"> & ReviewProps;
 
+const entry = Astro.props;
 const {
-  slug,
+  id: slug,
   data: { name, source },
-  render,
   displayLargeImage = true
-} = Astro.props;
+} = entry;
 
 const smallName = `${slug}-small`;
 const largeName = `${slug}-large`;
 
 const small = filterInvalidImageName(smallName);
 const large = filterInvalidImageName(largeName);
-const { Content } = await render();
+const { Content } = await render(entry);
 ---
 
 <div data-slug={import.meta.env.DEV ? slug : undefined}>

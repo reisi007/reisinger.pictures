@@ -10,7 +10,7 @@ import SocialImage from "../../layouts/SocialImage.astro";
 
 export async function getStaticPaths() {
   return (await getCollection("testimonials")).map(r => ({
-    params: { slug: r.slug },
+    params: { slug: r.id },
     props: r
   }));
 
@@ -19,7 +19,7 @@ export async function getStaticPaths() {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 const props = Astro.props;
-const { data, slug } = props;
+const { data, id: slug } = props;
 const { name, large } = data;
 const title = `Eine ehrliche Bewertung von ${name}`;
 const socialImage = filterInvalidImageName(large ?? `${slug}-large`);

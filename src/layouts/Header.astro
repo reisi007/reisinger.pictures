@@ -6,7 +6,6 @@ import ResponsiveImage from "./ResponsiveImage.astro";
 import { ResponsiveImageLoading } from "./ResponsiveImageLoading";
 
 const reviewItem: MenueItem = { name: "Bewertungen", href: "/testimonials" };
-const images: MenueItem = { name: "Bilder", href: "/images", visibility: Visibility.DEV_ONLY };
 
 
 const menue: Menue = [
@@ -15,7 +14,6 @@ const menue: Menue = [
     baseHref: "/beauty",
     items: [
       { name: "Dein Fotoshooting", href: "" },
-      images,
       { name: "Einblicke", href: "/einblicke/beauty", absolute: true },
       reviewItem]
   }, {
@@ -23,7 +21,6 @@ const menue: Menue = [
     baseHref: "/akt",
     items: [
       { name: "Alle Information", href: "" },
-      images,
       { name: "Einblicke", href: "/einblicke/akt", absolute: true },
       reviewItem,
       {
@@ -36,7 +33,6 @@ const menue: Menue = [
     baseHref: "/couples",
     items: [
       { name: "Dein Erlebnis", href: "" },
-      images,
       reviewItem]
 
   }, {
@@ -49,11 +45,7 @@ const menue: Menue = [
       {
         name: "LASK - Linzer Allgemeiner Sportklub",
         href: "/lask"
-      }, {
-        name: "LASK Bilder",
-        href: "/lask/images",
-        visibility: Visibility.DEV_ONLY
-      }, {
+      },  {
         name: "Black Wings Linz",
         href: "/bwl"
       }, {
@@ -63,32 +55,16 @@ const menue: Menue = [
       }, {
         name: "ÖFB - Österreichischer Fußballbund",
         href: "/oefb"
-      }, {
-        name: "ÖFB Bilder",
-        href: "/oefb/images",
-        visibility: Visibility.DEV_ONLY
-      }, {
+      },  {
         name: "ACSL - Austrian Collegue Sport League",
         href: "/acsl"
-      }, {
-        name: "ACSL Bilder",
-        href: "/acsl/images",
-        visibility: Visibility.DEV_ONLY
-      }, {
+      },  {
         name: "SteelVolleys Linz",
         href: "/steelvolleys"
-      }, {
-        name: "SteelVolleys Linz Bilder",
-        href: "/steelvolleys/images",
-        visibility: Visibility.DEV_ONLY
-      }, {
+      },  {
         name: "SteelWings Linz",
         href: "/swl"
-      }, {
-        name: "SWL Bilder",
-        href: "/swl/images",
-        visibility: Visibility.DEV_ONLY
-      }
+      },
     ]
   }, {
     name: "Business",
@@ -101,7 +77,7 @@ const menue: Menue = [
     baseHref: "/kurse",
     items: [
       { name: "Übersicht", "href": "" },
-      ...(await getCollection("courses")).map(e => ({ name: e.data.short, href: `/${e.slug}` }))
+      ...(await getCollection("courses")).map(e => ({ name: e.data.short, href: `/${e.id}` }))
     ]
   }, {
     name: "Einblicke (Blog)",

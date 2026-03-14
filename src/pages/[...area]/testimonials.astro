@@ -24,7 +24,7 @@ export async function getStaticPaths() {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 const { type, reviews } = Astro.props;
-const heroImage = reviews.map(e => `${e.slug}-large`)
+const heroImage = reviews.map(e => `${e.id}-large`)
   .filter(e => tryGetImage(e) !== undefined)
   .find(e => e !== undefined);
 
@@ -33,7 +33,7 @@ const title = `${(slugToName(type))} Bewertungen`;
 const aiSummary = (await getEntry("testimonialSummary", type))?.data;
 
 // Slugs für die ReviewCards extrahieren
-const slugs = reviews.map(r => r.slug);
+const slugs = reviews.map(r => r.id);
 ---
 <MinimalPage>
   <BaseHead title={title} slot="head">
@@ -47,7 +47,6 @@ const slugs = reviews.map(r => r.slug);
     </div>
   }
 
-  {/* Hier nutzen wir jetzt die ReviewCards Komponente mit den großen Bildern */}
   <ReviewCards slugs={slugs} displayLargeImage={true} />
 
 </MinimalPage>
