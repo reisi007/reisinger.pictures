@@ -7,44 +7,48 @@ interface Props {
 const { showContact = true } = Astro.props;
 const today = new Date();
 ---
-<footer class="footer justify-center footer-vertical bg-base-200 text-base-content rounded-t-box p-8 md:p-10 gap-y-4">
-  <h3 id="kontakt" class="place-self-center footer-title">Lass uns unverbindlich reden</h3>
+<footer>
+  <div class="footer justify-center footer-vertical bg-base-200 text-base-content rounded-t-box p-8 md:p-10 gap-y-4">
+    <h3 id="kontakt" class="place-self-center footer-title">Lass uns unverbindlich reden</h3>
 
-  {showContact && (
-    <>
-      <p class="prose footer-text text-center container">
-        Du hast eine schnelle Frage oder möchtest unkompliziert den ersten Schritt machen? Schreib mir einfach auf WhatsApp oder schick mir eine E-Mail.
+    {showContact && (
+      <>
+        <p class="prose footer-text text-center container">
+          Du hast eine schnelle Frage oder möchtest unkompliziert den ersten Schritt machen? Schreib mir einfach auf WhatsApp oder schick mir eine E-Mail.
+        </p>
+
+        <div class="join join-vertical justify-stretch items-stretch mx-auto mt-4">
+          <a class="btn btn-lg btn-neutral join-item" target="_blank"
+             href="mailto:florian@reisinger.pictures?subject=%5BKONTAKTFORMULAR%5D%20Anfrage&body=%0D%0AMeine%20Telefonnummer%20f%C3%BCr%20R%C3%BCckfragen%3A">
+            <span class="mdi--email text-2xl mr-2"></span>
+            <span>Schicke mir eine E-Mail</span>
+          </a>
+          <a class="btn btn-lg bg-brand-whatsapp text-white join-item" target="_blank" href="https://wa.me/message/WCWIDNQAIYSGE1">
+            <span class="mdi--whatsapp text-2xl mr-2"></span>
+            <span>Schreib mir auf WhatsApp</span>
+          </a>
+        </div>
+        <Form/>
+      </>
+    )}
+  </div>
+
+  <div class="footer border-t bg-base-300 text-base-content border-base-300 px-4 py-4 items-center justify-center">
+    <div class="items-center justify-center text-center">
+      <p>
+        &copy; 2017 - {today.getFullYear()} Florian Reisinger. Mit
+        <span class="mdi--heart text-red-500 inline-block align-middle"></span>
+        erstellt in Linz, Österreich.
       </p>
-
-      <div class="join join-vertical justify-stretch items-stretch mx-auto mt-4">
-        <a class="btn btn-lg btn-neutral join-item" target="_blank"
-           href="mailto:florian@reisinger.pictures?subject=%5BKONTAKTFORMULAR%5D%20Anfrage&body=%0D%0AMeine%20Telefonnummer%20f%C3%BCr%20R%C3%BCckfragen%3A">
-          <span class="mdi--email text-2xl mr-2"></span>
-          <span>Schicke mir eine E-Mail</span>
-        </a>
-        <a class="btn btn-lg bg-brand-whatsapp text-white join-item" target="_blank" href="https://wa.me/message/WCWIDNQAIYSGE1">
-          <span class="mdi--whatsapp text-2xl mr-2"></span>
-          <span>Schreib mir auf WhatsApp</span>
-        </a>
+      <div class="flex gap-x-4 justify-center items-center w-full">
+        <a href="/impressum" class="link link-hover">Impressum</a>
+        <a href="/agb" class="link link-hover">AGBs</a>
+        <a href="/dsb" class="link link-hover">Datenschutz</a>
+        <a href="/preise" class="link link-hover">Preise</a>
+        <a href="/tfp" class="link link-hover">TFP</a>
       </div>
-      <Form />
-    </>
-  )}
-</footer>
-
-<footer class="footer border-t bg-base-300 text-base-content border-base-300 px-4 py-4 items-center justify-center">
-  <div class="items-center justify-center text-center">
-    <p>
-      &copy; 2017 - {today.getFullYear()} Florian Reisinger. Mit
-      <span class="mdi--heart text-red-500 inline-block align-middle"></span>
-      erstellt in Linz, Österreich.
-    </p>
-    <div class="flex gap-x-4 justify-center items-center w-full">
-      <a href="/impressum" class="link link-hover">Impressum</a>
-      <a href="/agb" class="link link-hover">AGBs</a>
-      <a href="/dsb" class="link link-hover">Datenschutz</a>
-      <a href="/preise" class="link link-hover">Preise</a>
-      <a href="/tfp" class="link link-hover">TFP</a>
     </div>
   </div>
 </footer>
+
+
