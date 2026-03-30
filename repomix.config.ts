@@ -1,0 +1,33 @@
+import { defineConfig } from "repomix";
+
+export default defineConfig({
+  output: {
+    style: "markdown",
+    filePath: "out/repomix-output.md",
+    removeComments: false,
+    removeEmptyLines: true,
+    showLineNumbers: false,
+    fileSummary: true,
+    directoryStructure: true,
+  },
+  include: [
+    "*",
+    "src/**/*",
+    "editor/*",
+    "human-loop/*",
+    "deployment/*",
+    "context/"
+  ],
+  ignore: {
+    useGitignore: false,
+    useDefaultPatterns: true,
+    customPatterns: [
+      "editor/editor.css",
+      "human-loop/human-loop.css",
+      "package-lock.json",
+      "favorites*.json",
+      ".gitignore",
+      "**/*.svg"
+    ]
+  }
+});

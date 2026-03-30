@@ -11,7 +11,7 @@ const excludedPages = [
 
 // https://astro.build/config
 export default defineConfig({
-  redirects: { "/live": "/portal", "/preise": { status: 302, destination: "/privat/preise" } },
+  redirects: { "/live": "/portal" },
   site: "https://reisinger.pictures",
   cacheDir: "./.cache",
   vite: { plugins: [tailwindcss()] },

@@ -4,8 +4,10 @@ export type NavItem = NavLink | NavGroup;
 
 export const businessLinks: NavItem[] = [
   { href: '/business/', label: 'Übersicht' },
-  { href: '/sport/', label: 'Sport Presse' },
-  { href: '/portal/', label: 'Info: Live-Portal' },
+  { href: '/business/corporate/', label: 'Corporate & Headshots' },
+  { href: '/business/sport/', label: 'Sport & Event-Reportagen' },
+  { href: '/business/kundenportal/', label: 'Portal & Lieferung' },
+  { href: '/business/preise/', label: 'Preise & Kalkulator' },
   { href: 'https://portal.reisinger.pictures', label: 'Portal Login', external: true },
 ];
 

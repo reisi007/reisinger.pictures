@@ -80,6 +80,16 @@
       // 1. Initiales Befüllen beim Laden der Seite (falls man von einer anderen Seite kommt)
       fillForm(new URLSearchParams(window.location.search));
 
+      // Modal EventListener zum Aufräumen der URL
+      if (modal) {
+        modal.addEventListener("close", () => {
+          // Nur aufräumen, wenn auch wirklich Kontakt-Parameter in der URL stehen
+          if (window.location.hash === "#kontakt" || window.location.search !== "") {
+            history.replaceState(null, "", window.location.pathname);
+          }
+        });
+      }
+
       // Prüfen ob das Modal direkt geöffnet werden soll
       if (window.location.hash === "#kontakt" && modal) {
         modal.showModal();

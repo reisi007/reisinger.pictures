@@ -24,30 +24,31 @@ const {
   class: className, // 'class' ist ein reserviertes Wort, wir benennen es um
 } = Astro.props;
 ---
-
 <a href={href} class:list={[
-  "card bg-base-200 shadow-sm hover:shadow-xl transition-shadow no-underline group",
+  "card bg-base-200 shadow-sm hover:shadow-xl transition-shadow no-underline group h-full flex flex-col",
   className
 ]}>
-  <figure>
+  {/* 1. Einheitliche Container-Größe erzwingen (hier z. B. Aspect Ratio 4:3) */}
+  <figure class="aspect-3/2 w-full flex items-center justify-center bg-base-200/50">
     <ResponsiveImage
-      class="max-h-96"
+      class="w-full h-full object-contain p-2"
       sizeModifiers={imageSizeModifiers}
       alt={title}
       name={imageName}
     />
   </figure>
-  <div class="card-body">
+
+  <div class="card-body flex flex-col grow">
     <h3 class="card-title group-hover:text-primary transition-colors">{title}</h3>
 
-    {/* Das Datum wird nur gerendert, wenn es übergeben wird */}
     {date && (
       <p class="text-center text-sm text-base-content/70">
         <FormattedDate date={date} />
       </p>
     )}
 
-    <div class="card-actions justify-center mt-4">
+    {/* 4. mt-auto schiebt den Button immer an den unteren Rand der Karte */}
+    <div class="card-actions justify-center mt-auto pt-4">
       <span class="btn btn-primary">{ctaLabel}</span>
     </div>
   </div>
