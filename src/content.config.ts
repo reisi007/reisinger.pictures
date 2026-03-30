@@ -1,5 +1,6 @@
 import { file, glob } from "astro/loaders";
-import { defineCollection, reference, z } from "astro:content";
+import { defineCollection, reference } from "astro:content";
+import { z } from "astro/zod";
 
 const einblicke = defineCollection({
   // Verwende einen puren String-Glob: **/[^_]*.{md,mdx} schließt alle Dateien aus, die mit _ beginnen
@@ -37,10 +38,10 @@ const testimonials = defineCollection({
   loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: "./src/content/testimonials" }),
   schema: z.object({
     name: z.string(),
-    type: z.nativeEnum(ReviewType),
+    type: z.enum(ReviewType),
     date: z.coerce.date(),
     rating: z.number().optional(),
-    source: z.string().url("Must be a valid URL").optional(),
+    source: z.url("Must be a valid URL").optional(),
     large: z.string().optional()
   })
 });

@@ -64,6 +64,7 @@
   <script>
     document.addEventListener("astro:page-load", () => {
       const form = document.querySelector("form[action=\"https://form.reisinger.pictures\"]") as HTMLFormElement;
+      const modal = document.getElementById("contact_modal") as HTMLDialogElement;
       if (!form) return;
 
       // Funktion zum Befüllen des Formulars aus URL-Parametern
@@ -78,6 +79,11 @@
 
       // 1. Initiales Befüllen beim Laden der Seite (falls man von einer anderen Seite kommt)
       fillForm(new URLSearchParams(window.location.search));
+
+      // Prüfen ob das Modal direkt geöffnet werden soll
+      if (window.location.hash === "#kontakt" && modal) {
+        modal.showModal();
+      }
 
       // 2. Klicks auf der gleichen Seite abfangen
       document.querySelectorAll("a[href*=\"#kontakt\"]").forEach(link => {
@@ -94,10 +100,15 @@
             // URL in der Adressleiste sauber anpassen (ohne Page-Reload)
             history.pushState(null, "", targetUrl.href);
 
-            // Direkt und flüssig zum Formular scrollen
-            const targetElement = document.getElementById("kontakt");
-            if (targetElement) {
-              targetElement.scrollIntoView({ behavior: "smooth" });
+            // Modal öffnen falls es geschlossen ist
+            if (modal && !modal.open) {
+              modal.showModal();
+            } else {
+              // Direkt und flüssig zum Formular scrollen falls kein Modal existiert
+              const targetElement = document.getElementById("kontakt");
+              if (targetElement) {
+                targetElement.scrollIntoView({ behavior: "smooth" });
+              }
             }
           }
         });

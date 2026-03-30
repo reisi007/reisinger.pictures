@@ -28,9 +28,9 @@ const footerProps = Astro.props;
   <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
   <slot name="head" />
 </head>
-<body>
+<body class="min-h-screen flex flex-col">
 <Header />
-<main class="container prose max-w-none mb-4">
+<main class="container prose max-w-none mb-4 flex-grow">
   <Breadcrumbs></Breadcrumbs>
   <slot />
 </main>

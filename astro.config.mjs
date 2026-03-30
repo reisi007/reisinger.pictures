@@ -6,11 +6,12 @@ import tailwindcss from "@tailwindcss/vite";
 import solidJs from "@astrojs/solid-js";
 
 const excludedPages = [
-  "preise/ogs/"
+  "privat/preise/ogs/"
 ];
 
 // https://astro.build/config
 export default defineConfig({
+  redirects: { "/live": "/portal", "/preise": { status: 302, destination: "/privat/preise" } },
   site: "https://reisinger.pictures",
   cacheDir: "./.cache",
   vite: { plugins: [tailwindcss()] },

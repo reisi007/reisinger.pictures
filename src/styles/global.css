@@ -1,6 +1,6 @@
-@import "tailwindcss" source("../../src");
-
-@source "../../src/content";
+@import "tailwindcss";
+@source "../content/";
+@source "../layouts/";
 
 @theme {
     --color-brand-whatsapp: #25D366;
@@ -86,11 +86,11 @@
 }
 
 @plugin "@iconify/tailwind4" {
-    prefixes: mdi, material-symbols;
+    prefixes: mdi, material-symbols, tabler;
 }
 
 @layer base {
-    [class*="mdi--"], [class*="material-symbols--"] {
+    [class*="mdi--"], [class*="tabler--"], [class*="material-symbols--"] {
         @apply iconify;
     }
 

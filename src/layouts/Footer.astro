@@ -7,48 +7,47 @@ interface Props {
 const { showContact = true } = Astro.props;
 const today = new Date();
 ---
+
 <footer>
-  <div class="footer justify-center footer-vertical bg-base-200 text-base-content rounded-t-box p-8 md:p-10 gap-y-4">
-    <h3 id="kontakt" class="place-self-center footer-title">Lass uns unverbindlich reden</h3>
-
-    {showContact && (
-      <>
-        <p class="prose footer-text text-center container">
-          Du hast eine schnelle Frage oder möchtest unkompliziert den ersten Schritt machen? Schreib mir einfach auf WhatsApp oder schick mir eine E-Mail.
-        </p>
-
-        <div class="join join-vertical justify-stretch items-stretch mx-auto mt-4">
-          <a class="btn btn-lg btn-neutral join-item" target="_blank"
-             href="mailto:florian@reisinger.pictures?subject=%5BKONTAKTFORMULAR%5D%20Anfrage&body=%0D%0AMeine%20Telefonnummer%20f%C3%BCr%20R%C3%BCckfragen%3A">
-            <span class="mdi--email text-2xl mr-2"></span>
-            <span>Schicke mir eine E-Mail</span>
-          </a>
-          <a class="btn btn-lg bg-brand-whatsapp text-white join-item" target="_blank" href="https://wa.me/message/WCWIDNQAIYSGE1">
-            <span class="mdi--whatsapp text-2xl mr-2"></span>
-            <span>Schreib mir auf WhatsApp</span>
-          </a>
-        </div>
-        <Form/>
-      </>
-    )}
-  </div>
-
-  <div class="footer border-t bg-base-300 text-base-content border-base-300 px-4 py-4 items-center justify-center">
-    <div class="items-center justify-center text-center">
-      <p>
-        &copy; 2017 - {today.getFullYear()} Florian Reisinger. Mit
-        <span class="mdi--heart text-red-500 inline-block align-middle"></span>
-        erstellt in Linz, Österreich.
-      </p>
-      <div class="flex gap-x-4 justify-center items-center w-full">
+  <div class="footer border-t bg-base-300 text-base-content border-base-300 px-4 py-8 items-center justify-center mt-10">
+    <div class="items-center justify-center text-center flex flex-col gap-2">
+      <div class="hidden md:flex gap-x-4 justify-center items-center w-full flex-wrap">
         <a href="/impressum" class="link link-hover">Impressum</a>
         <a href="/agb" class="link link-hover">AGBs</a>
         <a href="/dsb" class="link link-hover">Datenschutz</a>
-        <a href="/preise" class="link link-hover">Preise</a>
         <a href="/tfp" class="link link-hover">TFP</a>
       </div>
+      <p class="opacity-60 text-sm mt-2">
+        © 2017 - {today.getFullYear()} Florian Reisinger. Mit
+        <span class="mdi--heart text-error inline-block align-middle"></span>
+        erstellt in Linz, Österreich.
+      </p>
     </div>
   </div>
 </footer>
 
+{showContact && (
+  <>
+    <button 
+      onclick="document.getElementById('contact_modal').showModal()" 
+      class="tooltip tooltip-left tooltip-primary btn btn-primary btn-circle fixed bottom-6 right-6 z-[90] shadow-2xl h-16 w-16 hidden sm:flex hover:scale-110 transition-transform group"
+      aria-label="Kontaktformular öffnen" data-tip="Lass uns unverbindlich reden!"
+    >
+      <span class="mdi--message-text text-3xl group-hover:animate-pulse"></span>
+    </button>
 
+    <dialog id="contact_modal" class="modal modal-bottom sm:modal-middle z-[100]">
+      <div class="modal-box bg-base-100">
+        <form method="dialog">
+          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+             <span class="mdi--close text-xl"></span>
+          </button>
+        </form>
+        <div class="mt-4">
+          <Form />
+        </div>
+      </div>
+      
+    </dialog>
+  </>
+)}

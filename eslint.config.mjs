@@ -6,7 +6,7 @@ import simpleImportSort from "eslint-plugin-simple-import-sort";
 import eslintConfigPrettier from "eslint-config-prettier";
 import comments from "@eslint-community/eslint-plugin-eslint-comments";
 
-export default tseslint.config(
+export default [
   // 1. Global Ignores
   {
     ignores: ["dist/**", ".astro/**", "node_modules/**", "coverage/**"]
@@ -77,4 +77,4 @@ export default tseslint.config(
 
   // 7. Prettier (Always last to override formatting rules)
   eslintConfigPrettier
-);
+];
