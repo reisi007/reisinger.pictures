@@ -7,15 +7,16 @@ import ContentCard from "./ContentCard.astro";
 interface Props {
   post: CollectionEntry<"einblicke">;
   imageSizeModifiers?: Partial<NumericBreakpoints>;
+  class?: string
 }
 
-const { post,imageSizeModifiers } = Astro.props;
+const { post,imageSizeModifiers, class: clazz } = Astro.props;
 ---
-
 <ContentCard
   href={`/einblicke/${post.id}/`}
   imageName={post.data.heroImage}
   title={post.data.title}
   date={post.data.updated ?? post.data.date}
   imageSizeModifiers={imageSizeModifiers}
+  class={clazz}
 />

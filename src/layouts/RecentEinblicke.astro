@@ -20,7 +20,7 @@ const posts = (await getCollection("einblicke"))
       const nextPost = posts.at((i + 1) % posts.length);
       return (
         <div id={post.id.replaceAll("/", "-")} class="carousel-item relative w-full">
-          <EinblickCard post={post} />
+          <EinblickCard class="mx-auto" post={post} />
           <div class="absolute left-5 right-5 top-1/3 sm:top-1/2 flex -translate-y-1/2 transform justify-between">
             {prevPost !== undefined && <a href={`#${prevPost.id.replaceAll("/", "-")}`} class="btn btn-circle btn-neutral not-prose">❮</a>}
             {nextPost !== undefined && <a href={`#${nextPost.id.replaceAll("/", "-")}`} class="btn btn-circle btn-neutral not-prose">❯</a>}
