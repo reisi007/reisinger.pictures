@@ -15,14 +15,6 @@ We enforce a strict separation of concerns via `AGENTS.todo.md`. An agent must f
     * **DoD:** Code validated. Zero tolerance for workarounds. Task checked off `[x]` in `AGENTS.todo.md`. If failed, change to `(Needs Fix)`.
 * **Silent TODO Rule:** Do not log or display TODOs in the chat that you create and immediately complete.
 
-## 2. Code Output & Script Generation (Node.js/MJS)
-This project heavily relies on `.mjs` scripts for automation (e.g., `manage_favorites.mjs`, `merge-content.mjs`, `add-metadata.mjs`).
-* **Full Code Output:** Always provide the complete, copy-pasteable code for any modified Astro/TS/TSX file.
-* **Scripting Rule (CRITICAL):** For complex file modifications across multiple files, output a single `import_gemini.mjs` Node.js script to apply changes.
-* **No Regex Rule (CRITICAL):** When writing `.mjs` scripts to modify files, use strict AST manipulation or exact string matching. Regex replacements for code are strictly forbidden.
-* **Robust File Patching:** Account for Windows (`\r\n`) vs Unix (`\n`) line endings.
-* **Escaping Rule:** NEVER double-escape newlines (`\n`) when injecting code via scripts.
-
 ## 3. Language Policy & Code Quality
 * **Language:** Technical Content (Code, Docs, Variables, Comments) = **English**. User Interface (Strings, Menus, Content) = **German**.
 * **Centralized Logic:** Math and calculation logic (e.g., pricing formulas) MUST reside in `src/content/pricing.ts` to ensure consistency between SSR and Client-side islands. Do not duplicate logic.
