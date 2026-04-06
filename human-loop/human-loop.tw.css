@@ -6,8 +6,8 @@
     prefersdark: false;
     /* Light mode colors (default) */
     --color-base-100: oklch(100% 0 0);
-    --color-base-200: oklch(98% 0 0);
-    --color-base-300: oklch(95% 0 0);
+    --color-base-200: oklch(98% 0.003 285.885);
+    --color-base-300: oklch(95% 0.005 285.885);
     --color-base-content: oklch(21% 0.006 285.885);
     --color-primary: #2A9D8F;
     --color-primary-content: oklch(100% 0 0);
@@ -38,14 +38,14 @@
 @plugin "daisyui/theme" {
     name: "reisinger-dark";
     prefersdark: true;
-    --color-base-100: oklch(20% 0 0);
-    --color-base-200: oklch(25% 0 0);
-    --color-base-300: oklch(30% 0 0);
+    --color-base-100: oklch(20% 0.008 285.885);
+    --color-base-200: oklch(25% 0.008 285.885);
+    --color-base-300: oklch(30% 0.008 285.885);
     --color-base-content: oklch(95% 0.006 285.885);
     --color-primary: #2A9D8F;
     --color-primary-content: oklch(100% 0 0);
     --color-secondary: oklch(15% 0 0);
-    --color-secondary-content: oklch(95% 0 0);
+    --color-secondary-content: oklch(95% 0.005 285.885);
     --color-accent: oklch(77% 0.152 181.912);
     --color-accent-content: oklch(95% 0.063 188.416);
     --color-neutral: oklch(86% 0.005 285.823);
