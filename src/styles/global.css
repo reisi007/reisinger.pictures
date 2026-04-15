@@ -1,6 +1,8 @@
-@import "tailwindcss";
-@source "../content/";
-@source "../layouts/";
+@import "tailwindcss" source(none);
+
+@source "../content/**/[^_]*.{md,mdx}";
+@source "../layouts/**/*.astro";
+@source "../solid/**/*.tsx";
 
 @theme {
     --color-brand-whatsapp: #25D366;

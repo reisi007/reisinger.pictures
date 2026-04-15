@@ -1,4 +1,6 @@
 import { createMemo, createSignal, For } from "solid-js";
+
+import { basePrice } from "../content/pricing";
 import { formatPsychologicalPrice } from "../utils";
 
 const b2bFeatures = [
@@ -12,9 +14,9 @@ export default function CustomPricingBuilderB2B() {
   // Wir setzen 4 Stunden (Halbtag) als Standard, da das im B2B ein gängiger Einstieg ist.
   const [hours, setHours] = createSignal(4);
 
-  // Einfache B2B-Logik: 150€ pro Stunde
-  const hourlyRate = 150;
-  const price = createMemo(() => hours() * hourlyRate);
+  // Einfache B2B-Logik: 120€ pro Stunde
+  const hourlyRate = 120;
+  const price = createMemo(() => basePrice + (hours() * hourlyRate));
 
   const contactLink = createMemo(() => {
     const durationText = hours() >= 8 ? 'Ganztages-Reportage (8h+)' : `${hours()} Stunden`;

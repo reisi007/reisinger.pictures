@@ -27,7 +27,7 @@ export default function CustomPricingBuilder() {
   const [isCopied, setIsCopied] = createSignal(false);
 
   const basePrice = createMemo(() => calculatePackagePrice(duration(), images()));
-  const finalPrice = createMemo(() => calculatePackagePrice(duration(), images(), isDiscounted() ? 0.5 : 1));
+  const finalPrice = createMemo(() => calculatePackagePrice(duration(), images(), isDiscounted() ? 0.6667 : 1));
   const formattedBasePrice = createMemo(() => formatPsychologicalPrice(basePrice()));
   const formattedFinalPrice = createMemo(() => formatPsychologicalPrice(finalPrice()));
 

@@ -30,10 +30,10 @@ export default defineConfig({
     customPatterns: [
       "editor/editor.css",
       "human-loop/human-loop.css",
-      "package-lock.json",
       "favorites*.json",
       ".gitignore",
-      "**/*.svg"
+      "**/*.svg",
+	  "pnpm*.yaml",
     ]
   }
 });

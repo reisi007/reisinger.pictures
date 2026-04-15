@@ -24,17 +24,20 @@ export function absoluteLink(url: URL, src: string): string {
  */
 function roundToPsychologicalValue(value: number): number {
   if (value < 12) {
-    // Bei sehr kleinen Beträgen (z.B. +1 Bild OG Rabatt) einfach auf volle Euro runden
     return Math.max(1, Math.round(value));
   }
-  // 1. Auf den nächsten 5er runden
-  let rounded = Math.round(value / 5) * 5;
-  // 2. Prüfen, ob die Zahl durch 10 teilbar ist (Endziffer 0)
-  if (rounded !== 0 && rounded % 10 === 0) {
+  let rounded;
+  if (value >= 1000) {
+    rounded = Math.round(value / 50) * 50;
+  } else {
+    rounded = Math.round(value / 5) * 5;
+  }
+  if (rounded !== 0 && (rounded % 10 === 0 || (value >= 1000 && rounded % 50 === 0))) {
     rounded -= 1;
   }
   return rounded;
 }
+
 /**
  * Basis-Optionen für ein konsistentes Aussehen (Währung, Sprache)
  */

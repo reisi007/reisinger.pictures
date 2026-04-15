@@ -24,9 +24,14 @@ export async function getStaticPaths() {
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
 const { type, reviews } = Astro.props;
-const heroImage = reviews.map(e => `${e.id}-large`)
-  .filter(e => tryGetImage(e) !== undefined)
-  .find(e => e !== undefined);
+let heroImage: string | undefined = undefined;
+for (const review of reviews) {
+  const name = `${review.id}-large`;
+  if (tryGetImage(name) !== undefined) {
+    heroImage = name;
+    break;
+  }
+}
 
 const title = `${(slugToName(type))} Bewertungen`;
 

@@ -1,6 +1,6 @@
 import { file, glob } from "astro/loaders";
-import { defineCollection, reference } from "astro:content";
 import { z } from "astro/zod";
+import { defineCollection, reference } from "astro:content";
 
 const einblicke = defineCollection({
   // Verwende einen puren String-Glob: **/[^_]*.{md,mdx} schließt alle Dateien aus, die mit _ beginnen

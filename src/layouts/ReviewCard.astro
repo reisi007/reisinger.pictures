@@ -15,8 +15,8 @@ const {
 } = entry;
 const smallName = `${slug}-small`;
 const largeName = optLargeImage ?? `${slug}-large`;
-const small = tryGetImage(smallName);
-const large = tryGetImage(largeName);
+const small =  tryGetImage(smallName);
+const large =  tryGetImage(largeName);
 const { Content } = await render(entry);
 ---
 

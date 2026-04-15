@@ -21,7 +21,7 @@ const { Content } = await render(entry);
 const { title, heroImage, description: frontmatterDesc, keywords } = entry.data;
 
 // NEU: Nimmt die explizite Description oder baut einen SEO-optimierten Fallback
-const description = frontmatterDesc || `Kostenloses TFP Fotoshooting in Linz: Bewirb dich jetzt für das kreative Fotoprojekt "${title}" und erweitere dein Model-Portfolio.`;
+const description = frontmatterDesc ?? `Kostenloses TFP Fotoshooting in Linz: Bewirb dich jetzt für das kreative Fotoprojekt "${title}" und erweitere dein Model-Portfolio.`;
 
 const contactUrl = generateContactLink({
   subject_prefix: "TFP",
