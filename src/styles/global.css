@@ -1,7 +1,8 @@
 @import "tailwindcss" source(none);
 
 @source "../content/**/[^_]*.{md,mdx}";
-@source "../layouts/**/*.astro";
+@source "../components/**/*.astro";
+@source "../pages/**/*.astro";
 @source "../solid/**/*.tsx";
 
 @theme {
@@ -92,14 +93,9 @@
     themes: reisinger-light --default, reisinger-dark --prefers-dark;
 }
 
-@plugin "@iconify/tailwind4" {
-    prefixes: mdi, material-symbols, tabler;
-}
+@plugin "@iconify/tailwind4";
 
 @layer base {
-    [class*="mdi--"], [class*="tabler--"], [class*="material-symbols--"] {
-        @apply iconify;
-    }
 
     img:not(.pswp__img) {
         @apply max-h-[80vh] object-contain;
@@ -190,7 +186,7 @@
         @apply h-auto;
     }
 
-    .footer>script {
+    .footer > script {
         @apply hidden;
     }
 }

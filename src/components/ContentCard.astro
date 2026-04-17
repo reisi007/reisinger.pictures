@@ -21,7 +21,7 @@ const {
   date,
   ctaLabel = "Jetzt lesen", // Standardwert für den Button
   imageSizeModifiers = GALLERY_BREAKPOINTS[GalleryLayout.Overview], // Standardwert für die Bildgrößen
-  class: className, // 'class' ist ein reserviertes Wort, wir benennen es um
+  class: className // 'class' ist ein reserviertes Wort, wir benennen es um
 } = Astro.props;
 ---
 <a href={href} class:list={[

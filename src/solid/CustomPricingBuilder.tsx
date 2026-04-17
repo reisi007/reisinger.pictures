@@ -118,7 +118,7 @@ export default function CustomPricingBuilder() {
           <For each={baseFeatures}>{(feature) => (
             <li class="flex items-start gap-3">
               <span class="size-6 shrink-0 rounded-full flex items-center justify-center text-xs mt-0.5 bg-primary/10 text-primary">
-                <span class="mdi--check"></span>
+                <span class="icon-[mdi--check]"></span>
               </span>
               <span class="font-medium text-sm leading-6">{feature}</span>
             </li>
@@ -129,7 +129,7 @@ export default function CustomPricingBuilder() {
               <For each={standardFeatures}>{(feature) => (
                 <li class="flex items-start gap-3">
                   <span class="size-6 shrink-0 rounded-full flex items-center justify-center text-xs mt-0.5 bg-primary/10 text-primary">
-                    <span class="mdi--check"></span>
+                    <span class="icon-[mdi--check]"></span>
                   </span>
                   <span class="font-medium text-sm leading-6">{feature}</span>
                 </li>
@@ -139,7 +139,7 @@ export default function CustomPricingBuilder() {
             <For each={discountFeatures}>{(feature) => (
               <li class="flex items-start gap-3">
                 <span class="size-6 shrink-0 rounded-full flex items-center justify-center text-xs mt-0.5 bg-primary/10 text-primary">
-                  <span class="mdi--check"></span>
+                  <span class="icon-[mdi--check]"></span>
                 </span>
                 <span class="font-medium text-sm leading-6">{feature}</span>
               </li>
@@ -152,7 +152,7 @@ export default function CustomPricingBuilder() {
             fallback={
               <For each={standardFooters}>{(footer) => (
                 <div class="border-base-300 border grid grid-cols-8 gap-x-2 items-center text-xs font-bold opacity-70 py-2 rounded-lg justify-center px-3">
-                  <span class="mdi--information-outline text-lg text-center"></span>
+                  <span class="icon-[mdi--information-outline] text-lg text-center"></span>
                   <span class="col-span-7">{footer}</span>
                 </div>
               )}</For>
@@ -160,7 +160,7 @@ export default function CustomPricingBuilder() {
           >
             <For each={discountFooters}>{(footer) => (
               <div class="border-base-300 border grid grid-cols-8 gap-x-2 items-center text-xs font-bold opacity-70 py-2 rounded-lg justify-center px-3">
-                <span class="mdi--information-outline text-lg text-center"></span>
+                <span class="icon-[mdi--information-outline] text-lg text-center"></span>
                 <span class="col-span-7">{footer}</span>
               </div>
             )}</For>
@@ -171,7 +171,7 @@ export default function CustomPricingBuilder() {
             onClick={handleCopyOffer}
             class="btn btn-block btn-outline border-base-300 hover:bg-base-200 hover:text-base-content hover:border-base-300"
           >
-            <span class={isCopied() ? "mdi--check text-success" : "mdi--content-copy"}></span>
+            <span class={isCopied() ? "icon-[mdi--check] text-success" : "icon-[mdi--content-copy]"}></span>
             {isCopied() ? "Angebot kopiert!" : "Angebot als Text kopieren"}
           </button>
           <a href={contactLink()} class="btn btn-block shadow-lg border-0 btn-primary">

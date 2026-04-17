@@ -67,7 +67,7 @@ export default function CustomPricingBuilderB2B() {
           <For each={b2bFeatures}>{(f) => (
             <li class="flex items-start gap-3">
               <span class="size-6 shrink-0 rounded-full flex items-center justify-center text-xs mt-0.5 bg-primary/20 text-primary">
-                <span class="mdi--check"></span>
+                <span class="icon-[mdi--check]"></span>
               </span>
               <span class="font-medium text-sm leading-6">{f}</span>
             </li>

@@ -17,15 +17,15 @@ const {
 const smallName = `${slug}-small`;
 const largeName = `${slug}-large`;
 
-const small =  filterInvalidImageName(smallName);
-const large =  filterInvalidImageName(largeName);
+const small = filterInvalidImageName(smallName);
+const large = filterInvalidImageName(largeName);
 const { Content } = await render(entry);
 ---
 
 <div data-slug={import.meta.env.DEV ? slug : undefined}>
   {source !== undefined && <a href={source} target="_blank" class:list={["absolute right-6 text-3xl", {
-    "mdi--google": source.indexOf("g.co") > 0 || source.indexOf("goo.gl") > 0,
-    "mdi--facebook": source.indexOf("facebook.com") > 0
+    "icon-[mdi--google]": source.indexOf("g.co") > 0 || source.indexOf("goo.gl") > 0,
+    "icon-[mdi--facebook]": source.indexOf("facebook.com") > 0
   }]}>
   </a>}
   {small !== undefined &&

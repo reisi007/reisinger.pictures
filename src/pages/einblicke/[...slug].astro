@@ -1,7 +1,7 @@
 ---
 import { type CollectionEntry, getCollection, render } from "astro:content";
 
-import BlogPost from "../../layouts/pages/BlogPost.astro";
+import BlogPost from "../../components/pages/BlogPost.astro";
 
 export async function getStaticPaths() {
   return (await getCollection("einblicke"))

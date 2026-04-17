@@ -64,7 +64,7 @@
   <script>
     document.addEventListener("astro:page-load", () => {
       const form = document.querySelector("form[action=\"https://form.reisinger.pictures\"]") as HTMLFormElement;
-      const modal = document.getElementById("contact_modal") as HTMLDialogElement;
+      const modal = document.getElementById(`contact_modal`) as HTMLDialogElement;
       if (!form) return;
 
       // Funktion zum Befüllen des Formulars aus URL-Parametern

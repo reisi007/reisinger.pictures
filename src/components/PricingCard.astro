@@ -78,7 +78,7 @@ const contactUrl = generateContactLink({
       {features.map((item) => (
         <li class="flex items-start gap-3">
           <span class={`size-6 shrink-0 rounded-full flex items-center justify-center text-xs mt-0.5 ${checkIconColor}`}>
-            <span class="mdi--check"></span>
+            <span class="icon-[mdi--check]"></span>
           </span>
           <span class="font-medium text-sm leading-6">{item}</span>
         </li>
@@ -88,7 +88,7 @@ const contactUrl = generateContactLink({
     <div class="mt-6 gap-y-2 flex flex-col @container">
       {footerText.map((f) => (
         <div class={`${footerBgColor} border grid grid-cols-8 @md:grid-cols-24 gap-x-2 items-center text-xs font-bold opacity-70  py-2 rounded-lg justify-center px-3`}>
-          <span class="mdi--information-outline">️</span>
+          <span class="icon-[mdi--information-outline]">️</span>
           <span class="col-span-7 @md:col-span-23">{f}</span>
         </div>)
       )}

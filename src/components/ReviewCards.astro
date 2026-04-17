@@ -10,7 +10,6 @@ const r = await Promise.all(slugs
   .filter(e => e !== undefined)
   .map(e => getEntry("testimonials", e))
   .filter(e => e !== undefined));
-
 ---
 <div class:list={[{ "mx-2 grid xl:grid-cols-2 xl:gap-x-4 gap-y-4": r.length > 1 }, clazz]}>
   {r.map((e) =>

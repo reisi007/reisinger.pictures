@@ -1,8 +1,8 @@
 ---
 import type { CollectionEntry } from "astro:content";
 
-import type { NumericBreakpoints } from "../styles/Breakpoints.ts"; // Pfad ggf. anpassen
-import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout.ts";
+import type { NumericBreakpoints } from "../styles/Breakpoints"; // Pfad ggf. anpassen
+import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
 import ResponsiveImage from "./ResponsiveImage.astro";
 
 interface Props {
@@ -35,7 +35,7 @@ const { title, description, price, duration, heroImage } = course.data;
 
     {/* Dauer Anzeige */}
     <div class="flex items-center justify-center gap-2 text-sm text-base-content/70 mb-2">
-      <span class="mdi--clock-outline"></span>
+      <span class="icon-[mdi--clock-outline]"></span>
       <span class="font-semibold">{duration}</span>
     </div>
 

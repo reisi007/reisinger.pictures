@@ -15,8 +15,8 @@ const {
 } = entry;
 const smallName = `${slug}-small`;
 const largeName = optLargeImage ?? `${slug}-large`;
-const small =  tryGetImage(smallName);
-const large =  tryGetImage(largeName);
+const small = tryGetImage(smallName);
+const large = tryGetImage(largeName);
 const { Content } = await render(entry);
 ---
 
@@ -36,8 +36,8 @@ const { Content } = await render(entry);
     <Content />
   </div>
   {source !== undefined && <a href={source} target="_blank" class:list={["absolute right-6 text-3xl", {
-    "mdi--google": source.indexOf("g.co") > 0 || source.indexOf("goo.gl") > 0,
-    "mdi--facebook": source.indexOf("facebook.com") > 0
+    "icon-[mdi--google]": source.indexOf("g.co") > 0 || source.indexOf("goo.gl") > 0,
+    "icon-[mdi--facebook]": source.indexOf("facebook.com") > 0
   }]}>
   </a>}
 </div>

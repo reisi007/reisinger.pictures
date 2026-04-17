@@ -46,7 +46,7 @@ const linkSections = [
                           {item.subItems.map(sub => (
                             <li>
                               <a href={sub.href} target={sub.external ? "_blank" : undefined} rel={sub.external ? "noopener noreferrer" : undefined} class={isActive(sub.href) ? "active" : ""}>
-                                {sub.label} {sub.external && <span class="mdi--open-in-new text-xs opacity-50"></span>}
+                                {sub.label} {sub.external && <span class="icon-[mdi--open-in-new] text-xs opacity-50"></span>}
                               </a>
                             </li>
                           ))}
@@ -54,7 +54,7 @@ const linkSections = [
                       </details>
                     ) : (
                       <a href={item.href} target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined} class={isActive(item.href) ? "active" : ""}>
-                        {item.label} {item.external && <span class="mdi--open-in-new text-xs opacity-50"></span>}
+                        {item.label} {item.external && <span class="icon-[mdi--open-in-new] text-xs opacity-50"></span>}
                       </a>
                     )}
                   </li>
@@ -69,7 +69,7 @@ const linkSections = [
               <li>
                 <a href={link.href} target={link.external ? "_blank" : undefined} rel={link.external ? "noopener noreferrer" : undefined}
                    class={isActive(link.href) ? "text-primary font-semibold" : ""}>
-                  {link.label} {link.external && <span class="mdi--open-in-new text-xs opacity-50"></span>}
+                  {link.label} {link.external && <span class="icon-[mdi--open-in-new] text-xs opacity-50"></span>}
                 </a>
               </li>
             );
@@ -79,75 +79,74 @@ const linkSections = [
     </div>
 
     <div class="navbar-end gap-2">
-      <button onclick="document.getElementById('contact_modal').showModal();" class="btn btn-primary btn-sm md:btn-md shadow-md hidden sm:flex">
+      <button onclick="document.getElementById(`contact_modal`).showModal();" class="btn btn-primary btn-sm md:btn-md shadow-md hidden sm:flex">
         Anfrage
       </button>
       <button id="mobile-menu-btn" aria-label="open menu" class="btn btn-ghost btn-circle lg:hidden">
-        <span class="mdi--menu text-2xl"></span>
+        <span class="icon-[mdi--menu] text-2xl"></span>
       </button>
     </div>
   </div>
 </header>
-
 
 <div id="mobile-menu-overlay" class="fixed inset-0 bg-base-100 z-100 hidden opacity-0 transition-opacity duration-300">
   <div class="bg-base-100 border-b border-base-200 sticky top-0 z-10 w-full min-h-16">
     <div class="container mx-auto px-4 flex justify-between items-center min-h-16">
       <HeaderLogo />
       <button id="mobile-menu-close" aria-label="close menu" class="btn btn-ghost btn-circle">
-        <span class="mdi--close text-2xl"></span>
+        <span class="icon-[mdi--close] text-2xl"></span>
       </button>
     </div>
   </div>
 
   <div class="grow overflow-y-auto pb-24">
-    <div class="container mx-auto px-4 py-4 flex flex-col">
-    <ul class="menu menu-lg w-full p-0 gap-2">
-      {linkSections.map((section, idx) => (
-        <li>
-          <details name="mobile-main-accordion" open={section.links.some(isItemActive) || (!linkSections.some(s => s.links.some(isItemActive)) && idx === 1)}>
-            <summary class="text-base uppercase tracking-widest text-base-content/50 font-bold mb-1">
-              {section.label}
-            </summary>
-            <ul>
-              {section.links.map(item => (
-                <li>
-                  {"subItems" in item ? (
-                    <details open={item.subItems.some(sub => isActive(sub.href))}>
-                      <summary class={item.subItems.some(sub => isActive(sub.href)) ? "text-primary font-bold" : ""}>{item.label}</summary>
-                      <ul>
-                        {item.subItems.map(sub => (
-                          <li>
-                            <a href={sub.href} target={sub.external ? "_blank" : undefined} rel={sub.external ? "noopener noreferrer" : undefined}
-                               class={isActive(sub.href) ? "active font-bold text-primary" : ""}>
-                              {sub.label} {sub.external && <span class="mdi--open-in-new text-base opacity-50"></span>}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </details>
-                  ) : (
-                    <a href={item.href} target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined}
-                       class={isActive(item.href) ? "active font-bold text-primary" : ""}>
-                      {item.label} {item.external && <span class="mdi--open-in-new text-base opacity-50"></span>}
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </details>
-        </li>
-      ))}
-    </ul>
+    <div class="container mx-auto px-4 py-4 flex flex-col h-full">
+      <ul class="menu menu-lg w-full p-0 gap-2">
+        {linkSections.map((section, idx) => (
+          <li>
+            <details name="mobile-main-accordion" open={section.links.some(isItemActive) || (!linkSections.some(s => s.links.some(isItemActive)) && idx === 1)}>
+              <summary class="text-base uppercase tracking-widest text-base-content/50 font-bold mb-1">
+                {section.label}
+              </summary>
+              <ul>
+                {section.links.map(item => (
+                  <li>
+                    {"subItems" in item ? (
+                      <details open={item.subItems.some(sub => isActive(sub.href))}>
+                        <summary class={item.subItems.some(sub => isActive(sub.href)) ? "text-primary font-bold" : ""}>{item.label}</summary>
+                        <ul>
+                          {item.subItems.map(sub => (
+                            <li>
+                              <a href={sub.href} target={sub.external ? "_blank" : undefined} rel={sub.external ? "noopener noreferrer" : undefined}
+                                 class={isActive(sub.href) ? "active font-bold text-primary" : ""}>
+                                {sub.label} {sub.external && <span class="icon-[mdi--open-in-new] text-base opacity-50"></span>}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </details>
+                    ) : (
+                      <a href={item.href} target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined}
+                         class={isActive(item.href) ? "active font-bold text-primary" : ""}>
+                        {item.label} {item.external && <span class="icon-[mdi--open-in-new] text-base opacity-50"></span>}
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          </li>
+        ))}
+      </ul>
 
-    <div class="mt-auto pt-8 border-t border-base-200">
-      <ul class="menu menu-md gap-1 flex-row flex-wrap justify-center w-full p-0">
+      <ul class="menu menu-lg w-full p-0 gap-2">
         {navigation.infoLinks.map(link => {
           if ("href" in link) {
             return (
               <li>
-                <a href={link.href} target={link.external ? "_blank" : undefined} rel={link.external ? "noopener noreferrer" : undefined} class={isActive(link.href) ? "text-primary font-bold" : ""}>
-                  {link.label} {link.external && <span class="mdi--open-in-new text-xs opacity-50"></span>}
+                <a href={link.href} target={link.external ? "_blank" : undefined} rel={link.external ? "noopener noreferrer" : undefined}
+                   class={isActive(link.href) ? "active font-bold text-primary" : ""}>
+                  {link.label} {link.external && <span class="icon-[mdi--open-in-new] text-base opacity-50"></span>}
                 </a>
               </li>
             );
@@ -155,19 +154,18 @@ const linkSections = [
         })}
       </ul>
       <div class="mt-6 text-center px-4">
-        <button onclick="document.getElementById('contact_modal').showModal(); document.getElementById('mobile-menu-close').click();" class="btn btn-primary btn-block shadow-md">
-          <span class="mdi--message-text text-xl"></span> Jetzt anfragen
+        <button onclick="document.getElementById(`contact_modal`).showModal(); document.getElementById(`mobile-menu-close`).click();" class="btn btn-primary btn-block shadow-md">
+          <span class="icon-[mdi--message-text] text-xl"></span> Jetzt anfragen
         </button>
       </div>
     </div>
-      </div>
   </div>
 </div>
 
 <script>
   document.addEventListener("astro:page-load", () => {
     const btnOpen = document.getElementById("mobile-menu-btn");
-    const btnClose = document.getElementById("mobile-menu-close");
+    const btnClose = document.getElementById(`mobile-menu-close`);
     const overlay = document.getElementById("mobile-menu-overlay");
 
     if (btnOpen && btnClose && overlay) {

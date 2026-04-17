@@ -46,11 +46,11 @@ const matchingContent = (await Promise.all(
     collectionKeys
       .flatMap(async k => (await getCollection(k))
         .map(e => {
-          const cur = e as { id: string, data: Record<string, unknown> };
+            const cur = e as { id: string, data: Record<string, unknown> };
             let path = contentPrefixConfig[k];
             if (path.length > 0)
               path = `/${path}`;
-          const slug = cur.id
+            const slug = cur.id;
             if (slug !== "/")
               path += `/${slug}`;
 
@@ -74,7 +74,7 @@ const matchingUrls = matchingContent.flatMap(k => k)
 {url !== "" &&
 <div class="breadcrumbs [scrollbar-gutter:stable] not-prose">
   <ul>
-    <li><a aria-label="Startseite" href="/"><span class="mdi--home" /> Startseite</a></li>
+    <li><a aria-label="Startseite" href="/"><span class="icon-[mdi--home]" /> Startseite</a></li>
     {matchingUrls.map(({ name, path }) => (
       <li>
         <a href={path}>{name}</a>

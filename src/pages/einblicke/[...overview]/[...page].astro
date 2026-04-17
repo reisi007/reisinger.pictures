@@ -2,13 +2,13 @@
 import type { InferGetStaticPropsType, PaginateFunction } from "astro";
 import { getCollection, render } from "astro:content";
 
-import BaseHead from "../../../layouts/BaseHead.astro";
-import Einblicke from "../../../layouts/Einblicke.astro";
-import MinimalPage from "../../../layouts/pages/MinimalPage.astro";
-import { type SchemaCreationFunction } from "../../../layouts/SchemaOrg";
-import SchemaOrg from "../../../layouts/SchemaOrg.astro";
-import { createCollectionPageSchema } from "../../../layouts/SchemaOrg.factory";
-import SocialImage from "../../../layouts/SocialImage.astro";
+import BaseHead from "../../../components/BaseHead.astro";
+import Einblicke from "../../../components/Einblicke.astro";
+import MinimalPage from "../../../components/pages/MinimalPage.astro";
+import { type SchemaCreationFunction } from "../../../components/SchemaOrg";
+import SchemaOrg from "../../../components/SchemaOrg.astro";
+import { createCollectionPageSchema } from "../../../components/SchemaOrg.factory";
+import SocialImage from "../../../components/SocialImage.astro";
 import { absoluteLink } from "../../../utils";
 
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
@@ -30,7 +30,7 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
     return paginate(relevantPosts, {
       pageSize: 12,
       params: { overview: id },
-      props: { title: e.data.title, entry: e,}
+      props: { title: e.data.title, entry: e }
     });
   });
 }
@@ -48,7 +48,6 @@ const createData: SchemaCreationFunction = (_, __, df) => createCollectionPageSc
   dateModified: df(updated ?? date),
   items: posts.map((e) => ({ url: absoluteLink(Astro.url, `/einblicke/${e.id}`), name: e.data.title, type: "BlogPosting" }))
 });
-
 ---
 <MinimalPage>
   <BaseHead title={title} noIndex={!(id === "/" && page.url.prev === undefined)} slot="head">

@@ -17,7 +17,8 @@ const { data: posts } = page;
 <Pagination page={page} />
 
 <section class="mx-auto my-4 grid gap-y-4 md:grid-cols-2 md:gap-x-4 xl:grid-cols-3">
-  {posts.map((post) => <EinblickCard {post} />)}
+  {posts.map((post) =>
+    <EinblickCard {post} />)}
 </section>
 
 <Pagination page={page} />

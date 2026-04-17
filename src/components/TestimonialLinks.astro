@@ -1,7 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 
-import { ReviewType } from "../content.config.ts";
+import { ReviewType } from "../content.config";
 import { groupBy, slugToName } from "../utils";
 
 const testimoinials = await getCollection("testimonials");

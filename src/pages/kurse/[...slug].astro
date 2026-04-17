@@ -1,7 +1,7 @@
 ---
 import { type CollectionEntry, getCollection, render } from "astro:content";
 
-import BlogPost from "../../layouts/pages/BlogPost.astro";
+import BlogPost from "../../components/pages/BlogPost.astro";
 
 export async function getStaticPaths() {
   const courses = await getCollection("courses");
@@ -20,7 +20,7 @@ const { price, duration } = data;
 ---
 <BlogPost {...data}>
   <div slot="start" class="alert flex justify-center items-center gap-4 p-4 shadow-sm">
-    <span class="text-xl mdi--information-variant-circle-outline"></span>
+    <span class="text-xl icon-[mdi--information-variant-circle-outline]"></span>
     <span class="text-sm font-bold uppercase tracking-wider opacity-70">Kurs-Infos</span>
 
     <span class="flex items-center gap-1.5 font-medium">

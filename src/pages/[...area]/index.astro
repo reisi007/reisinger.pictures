@@ -2,15 +2,15 @@
 import { getImage } from "astro:assets";
 import { type CollectionEntry, getCollection, render } from "astro:content";
 
+import BaseHead from "../../components/BaseHead.astro";
+import FeaturedTestimonials from "../../components/FeaturedTestimonials.astro";
+import Gallery from "../../components/Gallery.astro";
+import MinimalPage from "../../components/pages/MinimalPage.astro";
+import type { SchemaCreationFunction } from "../../components/SchemaOrg";
+import SchemaOrg from "../../components/SchemaOrg.astro";
+import { createWebPageSchema } from "../../components/SchemaOrg.factory";
+import SocialImage from "../../components/SocialImage.astro";
 import { getImage as getImageByName } from "../../images/Images";
-import BaseHead from "../../layouts/BaseHead.astro";
-import FeaturedTestimonials from "../../layouts/FeaturedTestimonials.astro";
-import Gallery from "../../layouts/Gallery.astro";
-import MinimalPage from "../../layouts/pages/MinimalPage.astro";
-import type { SchemaCreationFunction } from "../../layouts/SchemaOrg";
-import SchemaOrg from "../../layouts/SchemaOrg.astro";
-import { createWebPageSchema } from "../../layouts/SchemaOrg.factory";
-import SocialImage from "../../layouts/SocialImage.astro";
 import { LARGEST_IMAGE_SIZE } from "../../styles/Breakpoints";
 import { groupBy } from "../../utils";
 
@@ -30,8 +30,8 @@ const { id: slug, data: { name, testimonials, images, heroImage } } = entry;
 const reviewSlugs: string[] | undefined = testimonials?.map(e => e.id);
 const { Content } = await render(entry);
 
-const schemaOrgImage = heroImage === undefined? undefined: await getImage({
-  src: getImageByName( heroImage),
+const schemaOrgImage = heroImage === undefined ? undefined : await getImage({
+  src: getImageByName(heroImage),
   format: "webp",
   width: LARGEST_IMAGE_SIZE,
   fit: "scale-down"
@@ -56,5 +56,6 @@ const createData: SchemaCreationFunction = (o, me, _, url) => createWebPageSchem
   <Content />
 
   <FeaturedTestimonials slug={slug} categoryTestimonials={categoryReviews} featuredTestimonials={reviewSlugs} />
-  {images.length > 0 &&  <Gallery sorted={images} />}
+  {images.length > 0 &&
+    <Gallery sorted={images} />}
 </MinimalPage>

@@ -1,0 +1,28 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: clazz = "" } = Astro.props;
+---
+<div class={`collapse collapse-plus bg-base-200 border border-base-300 join-item ${clazz}`}>
+  <input type="radio" class="peer" name="info" />
+  <div class="collapse-title text-lg md:text-xl font-semibold pr-12">
+    <div class="flex items-baseline  gap-3">
+      <span class="text-2xl">📸</span>
+      <span>Transparenz bei Rabatten: Veröffentlichung vs. Privatsphäre</span>
+    </div>
+  </div>
+  <div class="collapse-content bg-base-100">
+    <p class="my-4">
+      Für bestimmte Pakete (wie z. B. das <em>n*xt Creative Special</em>) biete ich einen stark rabattierten Preis an. Der Deal dabei ist simpel: Ich komme dir preislich deutlich entgegen, dafür darf
+      ich <strong>einen Großteil der entstandenen Bilder (die besten Shots) für mein Portfolio</strong> (Website, Instagram, Social Media) nutzen. Wenn du ein solches Paket buchst, erklärst du dich
+      mit der Veröffentlichung einverstanden.
+    </p>
+
+    <p>
+      Natürlich klären wir absolute No-Gos vorher ab (speziell bei Akt & Boudoir). Solltest du dich jedoch nach dem Shooting umentscheiden und eine Veröffentlichung komplett ablehnen oder extrem stark
+      einschränken wollen, ist das dein gutes Recht – in diesem Fall <strong>entfällt jedoch der Rabatt</strong> und es wird der reguläre Paketpreis rückwirkend in Rechnung gestellt.
+    </p>
+  </div>
+</div>

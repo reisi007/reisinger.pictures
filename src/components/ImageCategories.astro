@@ -4,7 +4,10 @@ import { getEntry } from "astro:content";
 import type { Props as ContentCardProps } from "./ContentCard.astro";
 import ContentCard from "./ContentCard.astro";
 
-interface Props { categories: string[], urls: ContentCardProps[] }
+interface Props {
+  categories: string[],
+  urls: ContentCardProps[]
+}
 
 const { categories, urls } = Astro.props;
 ---

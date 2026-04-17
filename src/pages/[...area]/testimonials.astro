@@ -2,12 +2,12 @@
 import type { InferGetStaticPropsType } from "astro";
 import { getCollection, getEntry } from "astro:content";
 
+import AiSummaryCard from "../../components/AiSummaryCard.astro";
+import BaseHead from "../../components/BaseHead.astro";
+import MinimalPage from "../../components/pages/MinimalPage.astro";
+import ReviewCards from "../../components/ReviewCards.astro";
+import SocialImage from "../../components/SocialImage.astro";
 import { tryGetImage } from "../../images/Images";
-import AiSummaryCard from "../../layouts/AiSummaryCard.astro";
-import BaseHead from "../../layouts/BaseHead.astro";
-import MinimalPage from "../../layouts/pages/MinimalPage.astro";
-import ReviewCards from "../../layouts/ReviewCards.astro";
-import SocialImage from "../../layouts/SocialImage.astro";
 import { groupBy, slugToName } from "../../utils";
 
 export async function getStaticPaths() {

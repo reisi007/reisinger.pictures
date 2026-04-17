@@ -24,7 +24,9 @@ function formatDate(date?: Date): string | undefined {
   return `${year}-${paddedMonth}-${paddedDay}`;
 }
 
-export interface Props { createData: SchemaCreationFunction }
+export interface Props {
+  createData: SchemaCreationFunction;
+}
 
 const { createData } = Astro.props;
 

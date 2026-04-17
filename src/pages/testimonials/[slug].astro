@@ -2,11 +2,11 @@
 import type { InferGetStaticPropsType } from "astro";
 import { getCollection } from "astro:content";
 
+import BaseHead from "../../components/BaseHead.astro";
+import MinimalPage from "../../components/pages/MinimalPage.astro";
+import ReviewCard from "../../components/ReviewCard.astro";
+import SocialImage from "../../components/SocialImage.astro";
 import { filterInvalidImageName } from "../../images/Images";
-import BaseHead from "../../layouts/BaseHead.astro";
-import MinimalPage from "../../layouts/pages/MinimalPage.astro";
-import ReviewCard from "../../layouts/ReviewCard.astro";
-import SocialImage from "../../layouts/SocialImage.astro";
 
 export async function getStaticPaths() {
   return (await getCollection("testimonials")).map(r => ({

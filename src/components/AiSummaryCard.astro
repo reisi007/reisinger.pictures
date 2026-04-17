@@ -13,7 +13,7 @@ const { summary, reviewCount } = Astro.props;
 
     <div class="min-w-fit pt-0.5">
       <div class="p-2 aspect-square inline-flex items-center bg-primary/10 text-primary rounded-md">
-      <span class="text-xl material-symbols--smart-toy"></span>
+        <span class="text-xl material-symbols--smart-toy"></span>
       </div>
     </div>
 
@@ -28,17 +28,17 @@ const { summary, reviewCount } = Astro.props;
       <div
         class="prose prose-sm prose-p:my-0 prose-p:leading-snug text-base-content/80 line-clamp-3 peer-checked:line-clamp-none transition-all duration-200"
       >
-        <p class="whitespace-pre-line">{ summary }</p>
+        <p class="whitespace-pre-line">{summary}</p>
       </div>
 
       <div class="flex items-center gap-1 mt-1 text-xs font-medium text-primary peer-checked:hidden opacity-80 hover:opacity-100">
         <span>Mehr anzeigen</span>
-        <span class="mdi--chevron-down"></span>
+        <span class="icon-[mdi--chevron-down]"></span>
       </div>
 
       <div class="hidden peer-checked:flex items-center gap-1 mt-2 text-xs font-medium text-base-content/40 hover:text-primary transition-colors">
         <span>Weniger anzeigen</span>
-        <span class="mdi--chevron-up"></span>
+        <span class="icon-[mdi--chevron-up]"></span>
       </div>
 
     </label>

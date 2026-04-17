@@ -1,9 +1,9 @@
 ---
-import { type ContactFormPrefill, generateContactLink } from "../utils.ts";
+import { type ContactFormPrefill, generateContactLink } from "../utils";
 
 interface Props {
   text?: string;
-  design?: 'primary' | 'outline' | 'elegant-link';
+  design?: "primary" | "outline" | "elegant-link";
   class?: string;
   subjectPrefix?: ContactFormPrefill["subject_prefix"];
   message?: string;
@@ -20,11 +20,11 @@ const {
 const baseClasses = "group inline-flex items-center justify-center gap-2 transition-all cursor-pointer";
 let designClasses = "";
 
-if (design === 'primary') {
+if (design === "primary") {
   designClasses = "btn btn-primary shadow-lg hover:shadow-xl";
-} else if (design === 'outline') {
+} else if (design === "outline") {
   designClasses = "btn btn-outline border-base-300 hover:bg-base-300 hover:text-base-content";
-} else if (design === 'elegant-link') {
+} else if (design === "elegant-link") {
   designClasses = "text-primary font-bold hover:text-primary/80 uppercase tracking-widest text-sm border-b-2 border-primary/30 hover:border-primary pb-1 mt-4";
 }
 
@@ -32,7 +32,7 @@ const href = generateContactLink({ subject_prefix: subjectPrefix, message });
 ---
 
 <a href={href} class:list={[baseClasses, designClasses, className]}>
-  {design !== 'elegant-link' && <span class="mdi--message-text text-xl group-hover:scale-110 transition-transform"></span>}
+  {design !== "elegant-link" && <span class="icon-[mdi--message-text] text-xl group-hover:scale-110 transition-transform"></span>}
   {text}
-  {design === 'elegant-link' && <span class="mdi--arrow-right text-lg group-hover:translate-x-1 transition-transform"></span>}
+  {design === "elegant-link" && <span class="icon-[mdi--arrow-right] text-lg group-hover:translate-x-1 transition-transform"></span>}
 </a>

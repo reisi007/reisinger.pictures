@@ -3,14 +3,14 @@ import type { GetImageResult } from "astro";
 import { getImage } from "astro:assets";
 import { type CollectionEntry, getCollection, render } from "astro:content";
 
+import BaseHead from "../components/BaseHead.astro";
+import MinimalPage from "../components/pages/MinimalPage.astro";
+import Published from "../components/Published.astro";
+import type { SchemaCreationFunction } from "../components/SchemaOrg";
+import SchemaOrg from "../components/SchemaOrg.astro";
+import { createWebPageSchema } from "../components/SchemaOrg.factory";
+import SocialImage from "../components/SocialImage.astro";
 import { getImage as getImageByName } from "../images/Images";
-import BaseHead from "../layouts/BaseHead.astro";
-import MinimalPage from "../layouts/pages/MinimalPage.astro";
-import Published from "../layouts/Published.astro";
-import type { SchemaCreationFunction } from "../layouts/SchemaOrg";
-import SchemaOrg from "../layouts/SchemaOrg.astro";
-import { createWebPageSchema } from "../layouts/SchemaOrg.factory";
-import SocialImage from "../layouts/SocialImage.astro";
 import { LARGEST_IMAGE_SIZE } from "../styles/Breakpoints";
 import { absoluteLink } from "../utils";
 
@@ -25,7 +25,7 @@ type Props = CollectionEntry<"simple">;
 
 const post = Astro.props;
 const { data } = post;
-const { title, description, heroImage, showContact,showToc, index = true, ...dates } = data;
+const { title, description, heroImage, showContact, showToc, index = true, ...dates } = data;
 const { Content } = await render(post);
 
 let imageInfo: GetImageResult | undefined;
@@ -59,7 +59,8 @@ const createData: SchemaCreationFunction = (o, p, df, url) => createWebPageSchem
   <h1>{title}</h1>
   <Published {...dates} />
 
-  {showToc && <div data-toc />}
+  {showToc &&
+    <div data-toc />}
 
   <Content />
 </MinimalPage>
