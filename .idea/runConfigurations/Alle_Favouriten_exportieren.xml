@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Alle Favouriten exportieren" type="NodeJSConfigurationType" application-parameters="export " path-to-js-file="manage_favorites.mjs" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>

@@ -12,10 +12,12 @@
   <div class="card-body">
     <h1 class="card-title text-3xl">Metadaten Editor</h1>
     <p>Wähle einen Ordner aus, um alle darin enthaltenen Bilder zu überprüfen und die fehlende Titel zu ergänzen.</p>
+
     <p id="progressIndicator" class="font-semibold text-info"></p>
     <div class="card-actions">
       <button id="selectFolderBtn" class="btn btn-primary">Ordner auswählen</button>
     </div>
+
     <div id="editor" class="hidden mt-5">
       <p class="file-info italic text-sm mb-2">
         Bearbeite Datei: <b id="fileName"></b>
@@ -27,9 +29,9 @@
           class="max-w-full h-auto rounded my-4 mx-auto object-contain"
           style="display: none; max-height: 400px"
         >
-        <div id="autoDescribeProgress" class="flex items-center gap-2 my-2">
+        <div id="autoDescribeProgress" class="flex items-center gap-2 my-2 hidden">
           <span class="loading loading-spinner text-primary"></span>
-          <span>Bild wird automatisch beschrieben…</span>
+          <span>Bild wird analysiert (oder aus Cache geladen)…</span>
         </div>
 
         <div class="form-control w-max mb-4 mt-2">
@@ -50,8 +52,8 @@
 
         <div class="card-actions items-center">
           <button type="submit" class="btn btn-primary">Speichern und nächste Datei laden</button>
-          <button type="button" id="redoDescriptionBtn" class="btn btn-secondary" disabled>KI-Bildbeschreibung wiederholen</button>
-          <span id="currentModel" class="badge badge-primary badge-outline ml-2"></span>
+          <button type="button" id="redoDescriptionBtn" class="btn btn-secondary" disabled>KI-Bildbeschreibung neu generieren</button>
+          <span id="currentModel" class="badge badge-primary badge-outline ml-2">Modell wird geladen...</span>
         </div>
       </form>
     </div>
@@ -69,32 +71,71 @@
   </div>
 </div>
 <script type="module">
-  import { GoogleGenAI } from "https://cdn.jsdelivr.net/npm/@google/genai@1/+esm";
   import jsyaml from "https://cdn.jsdelivr.net/npm/js-yaml@4/+esm";
 
-  const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+  const LM_STUDIO_URL = "http://127.0.0.1:1234";
+
   const selectFolderBtn = document.getElementById("selectFolderBtn");
   const editorDiv = document.getElementById("editor");
   const successMessageDiv = document.getElementById("successMessage");
   const fileNameEl = document.getElementById("fileName");
   const titleForm = document.getElementById("titleForm");
   const titleInput = document.getElementById("titleInput");
-  const favoriteInput = document.getElementById("favoriteInput"); // NEU
+  const favoriteInput = document.getElementById("favoriteInput");
   const referenceImage = document.getElementById("referenceImage");
   const autoDescribeProgress = document.getElementById("autoDescribeProgress");
   const progressIndicator = document.getElementById("progressIndicator");
   const currentModelEl = document.getElementById("currentModel");
+  const redoDescriptionBtn = document.getElementById("redoDescriptionBtn");
 
   let directoryHandle = null;
   let filesToProcess = [];
+  let currentFileObj = null;
+  let currentImageUrl = null; // Für das Memory-Management
+  let activeModelId = "unknown";
 
+  // --- HELPER FUNCTIONS ---
   async function readYaml(yamlHandle) {
     const yamlFile = await yamlHandle.getFile();
     return jsyaml.load(await yamlFile.text());
   }
 
+  async function getCompressedBase64(imageFile, maxSide = 1024, quality = 0.8) {
+    const objectUrl = URL.createObjectURL(imageFile);
+    const img = await new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => {
+        URL.revokeObjectURL(objectUrl); // Memory Leak behoben
+        resolve(image);
+      };
+      image.onerror = (err) => {
+        URL.revokeObjectURL(objectUrl);
+        reject(err);
+      };
+      image.src = objectUrl;
+    });
+
+    let { width, height } = img;
+    if (width > maxSide || height > maxSide) {
+      if (width > height) {
+        height = Math.round((height * maxSide) / width);
+        width = maxSide;
+      } else {
+        width = Math.round((width * maxSide) / height);
+        height = maxSide;
+      }
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", quality);
+  }
+
   async function collectMarkdownContent(folderHandle) {
-    if (folderHandle === null) return "";
+    if (!folderHandle) return "";
     let content = "";
     for await (const entry of folderHandle.values()) {
       if (entry.kind === "file" && (entry.name.endsWith(".md") || entry.name.endsWith(".mdx"))) {
@@ -102,9 +143,7 @@
           const fileHandle = await folderHandle.getFileHandle(entry.name, { "mode": "read" });
           const file = await fileHandle.getFile();
           content += await file.text() + "\n";
-        } catch (e) {
-          // ignore errors reading individual files
-        }
+        } catch (e) {}
       }
     }
     return content.trim();
@@ -112,7 +151,6 @@
 
   const EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"];
 
-  // Rekursive Funktion, um YAML-Dateien inkl. Subordner zu sammeln
   async function collectYamlFilesInFolder(folderHandle, parentFolderHandle, files = [], relativePath = "") {
     for await (const entry of folderHandle.values()) {
       for (const ext of EXTENSIONS) {
@@ -122,21 +160,16 @@
           try {
             yamlHandle = await folderHandle.getFileHandle(yamlFileName, { "mode": "read" });
             const data = await readYaml(yamlHandle);
-            // Wenn der Titel bereits existiert, überspringen
-            if (data && typeof data.title === "string" && data.title.trim().length > 0) {
-              continue;
-            }
-          } catch (e) {
-            // ignore
-          }
-          const item = {
+            if (data && data.title) continue;
+          } catch (e) {}
+
+          files.push({
             handle: yamlHandle,
             parentHandle: folderHandle,
             relativePath: relativePath + yamlFileName,
             associatedJpgName: entry.name,
             context: await collectMarkdownContent(parentFolderHandle) + await collectMarkdownContent(folderHandle)
-          };
-          files.push(item);
+          });
         }
       }
       if (entry.kind === "directory") {
@@ -145,6 +178,135 @@
     }
     return files;
   }
+
+  // --- CORE AI LOGIC ---
+
+  async function fetchCurrentModelId() {
+    try {
+      const res = await fetch(`${LM_STUDIO_URL}/v1/models`);
+      const json = await res.json();
+      const modelId = json.data?.[0]?.id || "unknown-model";
+      currentModelEl.textContent = modelId;
+      return modelId;
+    } catch (e) {
+      currentModelEl.textContent = "Offline / Kein Modell";
+      return "unknown";
+    }
+  }
+
+  async function processSingleImage(fileObj, forceRedo = false) {
+    const cacheKey = `seo_alt_${fileObj.relativePath}`;
+
+    if (!forceRedo && localStorage.getItem(cacheKey)) {
+      return localStorage.getItem(cacheKey);
+    }
+
+    try {
+      const imageHandle = await fileObj.parentHandle.getFileHandle(fileObj.associatedJpgName);
+      const imageFile = await imageHandle.getFile();
+      const base64DataUrl = await getCompressedBase64(imageFile, 1024, 0.8);
+
+      // Sicherheit: System-Prompt und User-Daten sauber trennen (OpenAI kompatibles Format)
+      const response = await fetch(`${LM_STUDIO_URL}/v1/chat/completions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: activeModelId,
+          messages: [
+            {
+              role: "system",
+              content: "Du bist ein KI-Assistent für SEO-Bildbeschreibungen. Antworte ausschließlich auf Deutsch mit der eigentlichen Bildbeschreibung (max. 1 Satz). Vermeide Einleitungen wie 'Hier ist...' und Phrasen wie 'auf dem Feld'."
+            },
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: `Berücksichtige diesen Kontext bei der Beschreibung:\nDateipfad: ${fileObj.relativePath}\nArtikelinhalt: ${fileObj.context || 'Kein Kontext verfügbar.'}`
+                },
+                {
+                  type: "image_url",
+                  image_url: { url: base64DataUrl }
+                }
+              ]
+            }
+          ],
+          temperature: 0.2
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      }
+
+      const result = await response.json();
+      const textResponse = result.choices?.[0]?.message?.content;
+
+      if (!textResponse) {
+        throw new Error("Unerwartetes Antwortformat von der API.");
+      }
+
+      const finalCaption = textResponse.trim().replace(/\.$/, "");
+
+      // Fehlerbehandlung für Quota Exceeded im LocalStorage
+      try {
+        localStorage.setItem(cacheKey, finalCaption);
+      } catch (storageErr) {
+        console.warn("Konnte Cache nicht speichern (Limit erreicht?):", storageErr);
+      }
+
+      return finalCaption;
+
+    } catch (err) {
+      console.error("Fehler bei Bildanalyse:", fileObj.relativePath, err);
+      return { type: "error", message: `Fehler: ${err.message}` };
+    }
+  }
+
+  // --- SINGLE BACKGROUND WORKER QUEUE ---
+
+  let isWorkerRunning = false;
+
+  async function startBackgroundWorker() {
+    if (isWorkerRunning) return;
+
+    // Verhindert sinnloses Durchlaufen, wenn kein Modell geladen/erreichbar ist
+    if (activeModelId === "unknown") {
+      console.warn("Hintergrund-Worker gestoppt: Kein Modell verfügbar.");
+      return;
+    }
+
+    isWorkerRunning = true;
+
+    while (true) {
+      let fileToProcess = null;
+
+      if (currentFileObj && !localStorage.getItem(`seo_alt_${currentFileObj.relativePath}`)) {
+        fileToProcess = currentFileObj;
+      } else {
+        fileToProcess = filesToProcess.find(f => !localStorage.getItem(`seo_alt_${f.relativePath}`));
+      }
+
+      if (!fileToProcess) break;
+
+      const result = await processSingleImage(fileToProcess);
+
+      // Event-basiertes UI-Update (ersetzt das alte Polling)
+      if (fileToProcess === currentFileObj) {
+        if (typeof result === "object" && result.type === "error") {
+          titleInput.placeholder = result.message;
+        } else {
+          titleInput.value = result;
+        }
+        autoDescribeProgress.classList.add("hidden");
+        redoDescriptionBtn.disabled = false;
+      }
+    }
+
+    isWorkerRunning = false;
+  }
+
+  // --- UI APP FLOW ---
 
   function updateProgress() {
     const remaining = filesToProcess.length + (editorDiv.style.display === "block" ? 1 : 0);
@@ -155,191 +317,120 @@
     }
   }
 
-  selectFolderBtn.addEventListener("click", async () => {
-    try {
-      directoryHandle = await window.showDirectoryPicker();
-      filesToProcess = await collectYamlFilesInFolder(directoryHandle);
-      selectFolderBtn.style.display = "none";
-      updateProgress();
-      await processNextFile();
-    } catch (err) {
-      console.error("Fehler beim Auswählen des Ordners:", err);
-      alert("Der Ordner konnte nicht ausgewählt werden. Bitte versuchen Sie es erneut.");
+  async function loadUIForCurrentFile() {
+    const fileObj = currentFileObj;
+    const needsCreation = fileObj.handle === null;
+    const data = needsCreation ? {} : await readYaml(fileObj.handle);
+
+    fileNameEl.textContent = fileObj.relativePath;
+    titleInput.value = "";
+    titleInput.placeholder = "";
+    favoriteInput.checked = data.favorite === true;
+
+    // Alte Objekt-URL freigeben (Memory Leak Fix)
+    if (currentImageUrl) {
+      URL.revokeObjectURL(currentImageUrl);
+      currentImageUrl = null;
     }
-  });
 
-  const redoDescriptionBtn = document.getElementById("redoDescriptionBtn");
-  redoDescriptionBtn.addEventListener("click", async () => {
-    curModelIndex = 0;
-    referenceImage.onload();
-  });
+    try {
+      const imageHandle = await fileObj.parentHandle.getFileHandle(fileObj.associatedJpgName);
+      const imageFile = await imageHandle.getFile();
+      currentImageUrl = URL.createObjectURL(imageFile);
+      referenceImage.src = currentImageUrl;
+      referenceImage.style.display = "block";
+    } catch (e) {
+      referenceImage.style.display = "none";
+    }
 
-  function displaySuccessMessage() {
-    editorDiv.style.display = "none";
-    progressIndicator.style.display = "none";
-    successMessageDiv.style.display = "block";
-    updateProgress();
-  }
+    editorDiv.style.display = "block";
 
-  function assertYamlFileHandle(fileHandle) {
-    const valid = fileHandle.name.toLowerCase().endsWith(".yaml");
-    if (!valid) {
-      throw new Error(`Invalid file type: ${fileHandle.name}. Only .yaml files are allowed`);
+    const cacheKey = `seo_alt_${fileObj.relativePath}`;
+    const cached = localStorage.getItem(cacheKey);
+
+    if (cached) {
+      titleInput.value = cached;
+      autoDescribeProgress.classList.add("hidden");
+      redoDescriptionBtn.disabled = false;
+      startBackgroundWorker();
+    } else {
+      autoDescribeProgress.classList.remove("hidden");
+      redoDescriptionBtn.disabled = true;
+      startBackgroundWorker();
     }
   }
 
   async function processNextFile() {
     if (filesToProcess.length === 0) {
-      displaySuccessMessage();
+      editorDiv.style.display = "none";
+      successMessageDiv.style.display = "block";
+      progressIndicator.textContent = "";
       return;
     }
-    const fileObj = filesToProcess.shift();
-    const context = fileObj.context;
-    const needsCreation = fileObj.handle === null;
+
+    currentFileObj = filesToProcess.shift();
     updateProgress();
-
-    try {
-      // BUGFIX: await hinzugefügt
-      const data = needsCreation ? {} : await readYaml(fileObj.handle);
-
-      if (data && (data.title === null || data.title === "" || typeof data.title === "undefined")) {
-        fileNameEl.textContent = fileObj.relativePath;
-        referenceImage.alt = "Pfad zum Bild: " + fileNameEl.textContent + (context !== null ? ". Inhalt des Artikels als weiterer Hinweis: " + context : "");
-        titleInput.value = "";
-
-        // NEU: Favorite Toggle initialisieren
-        favoriteInput.checked = data.favorite === true;
-
-        // Bild anzeigen, falls vorhanden
-        let imageName = fileObj.associatedJpgName;
-        try {
-          const imageHandle = await fileObj.parentHandle.getFileHandle(imageName, { "mode": "read" });
-          const imageFile = await imageHandle.getFile();
-          referenceImage.src = URL.createObjectURL(imageFile);
-          referenceImage.style.display = "block";
-        } catch (e) {
-          referenceImage.style.display = "none";
-          console.warn(`Bild ${imageName} nicht gefunden.`);
-        }
-
-        editorDiv.style.display = "block";
-
-        titleForm.onsubmit = async (event) => {
-          event.preventDefault();
-
-          // NEU: Daten aktualisieren und Favorite behandeln
-          data.title = titleInput.value;
-          if (favoriteInput.checked) {
-            data.favorite = true;
-          } else {
-            delete data.favorite;
-          }
-
-          // NEU: Sortierung erzwingen, damit 'title' und 'favorite' ganz oben stehen
-          const sortedData = {
-            title: data.title,
-            ...(data.favorite ? { favorite: true } : {}),
-            ...data
-          };
-
-          const newYamlContent = jsyaml.dump(sortedData);
-
-          let targetFileHandle = fileObj.handle;
-          if (needsCreation) {
-            targetFileHandle = await fileObj.parentHandle.getFileHandle(
-              fileObj.relativePath.split("/").pop(),
-              { create: true }
-            );
-          }
-
-          assertYamlFileHandle(targetFileHandle);
-          const writable = await targetFileHandle.createWritable();
-          await writable.write(newYamlContent);
-          await writable.close();
-
-          await processNextFile();
-        };
-      } else {
-        await processNextFile();
-      }
-    } catch (e) {
-      console.error(`Fehler beim Parsen der YAML-Datei ${fileObj.relativePath}:`, e);
-      alert(`Die Datei ${fileObj.relativePath} konnte nicht gelesen werden. Sie ist möglicherweise fehlerhaft.`);
-      await processNextFile();
-    }
+    await loadUIForCurrentFile();
   }
 
-  async function getCompressedBase64(imgElement, maxSide = 2024, quality = 0.7) {
-    const response = await fetch(imgElement.src);
-    const blob = await response.blob();
-    const img = await new Promise((resolve, reject) => {
-      const image = new Image();
-      image.onload = () => resolve(image);
-      image.onerror = reject;
-      image.src = URL.createObjectURL(blob);
-    });
-    let { width, height } = img;
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    const dataUrl = canvas.toDataURL("image/webp", quality);
-    return dataUrl.split(",")[1];
-  }
+  // --- LISTENERS ---
 
-  const MODELS_USED = [
-    "gemini-3-flash-preview",
-    "gemini-2.5-flash"
-  ];
-  let curModelIndex = 0;
-
-  async function describeImageWithGemini(imgElement) {
-    if (curModelIndex >= MODELS_USED.length) {
-      return { type: "error", message: "Gemini API Rate Limit Exceeded" };
-    }
-    const model = MODELS_USED[curModelIndex];
-    currentModelEl.textContent = model;
-    const base64Content = await getCompressedBase64(imgElement);
+  selectFolderBtn.addEventListener("click", async () => {
     try {
-      const content = {
-        model,
-        contents: [{
-          inlineData: { mimeType: "image/webp", data: base64Content }
-        },
-          { text: `Aus dem Pfad des Bildes, das beschrieben werden soll kann potentiell ein möglicher Kontext geschlossen werden. Der folgende Kontext ist vertrauenswürdig: ${referenceImage.alt}` },
-          { text: `Beschreibe das Bild. Es soll als ALT Tag des Bildes verwendet werden. Gib nur die Beschreibung ohne Formatierung und keinen weiteren Text aus. Denke daran die Beschreibung zu SEO optimieren. Vermeide es unter allen umständen Stichworte zu benutzen. Antworte unbedingt auf Deutsch. Denk daran, dass die Antwort nicht zu lange sein sollte, eher ein Satz und nicht zwei sein soll. Erwähne nicht den Rasen in einem Stadion als Teil der Beschreibung, außer wenn der Rasen ein wichtiger Teil des Bildes ist. Wenn es eindeutig ist welches Objekt (Spieler bei Sport, Tierart bei Naturbildern) erwähne dies unbedingt. Vermeide formulierungen wie 'auf dem Fußballfeld'` }
-        ]
-      };
-      const result = await ai.models.generateContent(content);
-      const caption = (result?.candidates[0]?.content?.parts[0]?.text).trim();
-      return caption.replace(/\.$/, "");
+      directoryHandle = await window.showDirectoryPicker();
+      filesToProcess = await collectYamlFilesInFolder(directoryHandle);
+      selectFolderBtn.style.display = "none";
+
+      activeModelId = await fetchCurrentModelId();
+      processNextFile();
     } catch (err) {
-      if (err.status === 429 || err.status === 503) {
-        curModelIndex++;
-        return describeImageWithGemini(imgElement);
-      }
-      console.warn("Gemini Image Captioning Error:", err);
-      return { type: "error", message: "Beschreibung fehlgeschlagen" };
+      console.error("Fehler bei Ordnerauswahl:", err);
     }
-  }
+  });
 
-  referenceImage.onload = async () => {
+  redoDescriptionBtn.addEventListener("click", async () => {
+    if (!currentFileObj) return;
+
     autoDescribeProgress.classList.remove("hidden");
     redoDescriptionBtn.disabled = true;
-    titleInput.placeholder = "";
-    try {
-      const caption = await describeImageWithGemini(referenceImage);
-      if (caption?.type === "error") {
-        titleInput.placeholder = caption.message;
-      } else {
-        titleInput.value = caption;
-      }
-    } catch (e) {
-      titleInput.placeholder = "Fehler bei automatischer Beschreibung.";
+    titleInput.value = "";
+    titleInput.placeholder = "Generiere neu...";
+
+    const caption = await processSingleImage(currentFileObj, true);
+
+    if (typeof caption === "object" && caption.type === "error") {
+      titleInput.placeholder = caption.message;
+    } else {
+      titleInput.value = caption;
     }
+
     autoDescribeProgress.classList.add("hidden");
     redoDescriptionBtn.disabled = false;
+  });
+
+  titleForm.onsubmit = async (e) => {
+    e.preventDefault();
+    if (!currentFileObj) return;
+
+    const fileObj = currentFileObj;
+    const needsCreation = fileObj.handle === null;
+    const data = needsCreation ? {} : await readYaml(fileObj.handle);
+
+    data.title = titleInput.value;
+    if (favoriteInput.checked) data.favorite = true; else delete data.favorite;
+
+    const sortedData = { title: data.title, ...(data.favorite ? {favorite: true} : {}), ...data };
+    const yamlStr = jsyaml.dump(sortedData);
+
+    let targetHandle = fileObj.handle;
+    if (needsCreation) {
+      targetHandle = await fileObj.parentHandle.getFileHandle(fileObj.relativePath.split("/").pop(), {create: true});
+    }
+    const writable = await targetHandle.createWritable();
+    await writable.write(yamlStr);
+    await writable.close();
+
+    processNextFile();
   };
 </script>
 </body>
