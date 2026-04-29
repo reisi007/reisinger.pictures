@@ -29,4 +29,5 @@ export const infoLinks: NavItem[] = [
   { href: '/testimonials/', label: 'Bewertungen' },
   { href: '/kurse/', label: 'Kurse' },
   { href: '/einblicke/', label: 'Blog' },
+  { href: '/sport/', label: 'Sport' },
 ];
