@@ -19,6 +19,6 @@ const {
   widths = [128]
 } = Astro.props;
 ---
-<div class={`rounded-full bg-base-100 flex items-center justify-center overflow-hidden ${containerClass} ${imageFit === 'contain' ? paddingClass : ''}`}>
-  <ResponsiveImage class={`w-full h-full object-${imageFit}`} sizes={sizes} widths={widths} name={name} />
+<div class={`rounded-full aspect-square bg-base-100 flex items-center justify-center overflow-hidden ${containerClass} ${imageFit === 'contain' ? paddingClass : ''}`}>
+  <ResponsiveImage class={`size-full object-${imageFit}`} sizes={sizes} widths={widths} name={name} />
 </div>
