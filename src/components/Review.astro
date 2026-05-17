@@ -3,6 +3,7 @@ import { type CollectionEntry, render } from "astro:content";
 
 import { filterInvalidImageName } from "../images/Images";
 import ResponsiveImage from "./ResponsiveImage.astro";
+import ReviewSocialLink from "./ReviewSocialLink.astro";
 import { type ReviewProps } from "./Types";
 
 type Props = CollectionEntry<"testimonials"> & ReviewProps;
@@ -10,12 +11,12 @@ type Props = CollectionEntry<"testimonials"> & ReviewProps;
 const entry = Astro.props;
 const {
   id: slug,
-  data: { name, source },
+  data: { name, source, large: optLargeImage, small: optSmallImage },
   displayLargeImage = true
 } = entry;
 
-const smallName = `${slug}-small`;
-const largeName = `${slug}-large`;
+const smallName = optSmallImage ?? `${slug}-small`;
+const largeName = optLargeImage ?? `${slug}-large`;
 
 const small = filterInvalidImageName(smallName);
 const large = filterInvalidImageName(largeName);
@@ -23,11 +24,7 @@ const { Content } = await render(entry);
 ---
 
 <div data-slug={import.meta.env.DEV ? slug : undefined}>
-  {source !== undefined && <a href={source} target="_blank" class:list={["absolute right-6 text-3xl", {
-    "icon-[mdi--google]": source.indexOf("g.co") > 0 || source.indexOf("goo.gl") > 0,
-    "icon-[mdi--facebook]": source.indexOf("facebook.com") > 0
-  }]}>
-  </a>}
+  {source !== undefined && <ReviewSocialLink source={source} class="right-6" />}
   {small !== undefined &&
     <div>
       <ResponsiveImage sizes="128px" widths={[128]} name={smallName} />

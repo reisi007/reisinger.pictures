@@ -10,6 +10,9 @@ const excludedPages = [
 
 // https://astro.build/config
 export default defineConfig({
+  image: {
+    dangerouslyProcessSVG: true
+  },
   redirects: { "/live": "/portal" },
   site: "https://reisinger.pictures",
   cacheDir: "./.cache",

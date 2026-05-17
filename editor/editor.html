@@ -100,7 +100,7 @@
     return jsyaml.load(await yamlFile.text());
   }
 
-  async function getCompressedBase64(imageFile, maxSide = 1024, quality = 0.8) {
+  async function getCompressedBase64(imageFile, maxSide = 2048, quality = 0.8) {
     const objectUrl = URL.createObjectURL(imageFile);
     const img = await new Promise((resolve, reject) => {
       const image = new Image();

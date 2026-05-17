@@ -1,0 +1,24 @@
+---
+import ResponsiveImage from "./ResponsiveImage.astro";
+
+interface Props {
+  name: string;
+  imageFit: "cover" | "contain";
+  containerClass?: string;
+  paddingClass?: string;
+  sizes?: string;
+  widths?: number[];
+}
+
+const {
+  name,
+  imageFit,
+  containerClass = "size-32 shadow-sm",
+  paddingClass = "p-3",
+  sizes = "128px",
+  widths = [128]
+} = Astro.props;
+---
+<div class={`rounded-full bg-base-100 flex items-center justify-center overflow-hidden ${containerClass} ${imageFit === 'contain' ? paddingClass : ''}`}>
+  <ResponsiveImage class={`w-full h-full object-${imageFit}`} sizes={sizes} widths={widths} name={name} />
+</div>

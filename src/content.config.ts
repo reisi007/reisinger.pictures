@@ -38,11 +38,15 @@ const testimonials = defineCollection({
   loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: "./src/content/testimonials" }),
   schema: z.object({
     name: z.string(),
+    role: z.string().optional(),
+    layout: z.enum(["default", "quote"]).default("default"),
     type: z.enum(ReviewType),
     date: z.coerce.date(),
     rating: z.number().optional(),
     source: z.url("Must be a valid URL").optional(),
-    large: z.string().optional()
+    large: z.string().optional(),
+    small: z.string().optional(),
+    imageFit: z.enum(["cover", "contain"]).default("cover")
   })
 });
 

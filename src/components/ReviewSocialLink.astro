@@ -1,0 +1,26 @@
+---
+interface Props {
+  source: string;
+  class?: string;
+}
+
+const { source, class: className = "" } = Astro.props;
+
+let iconClass = "";
+try {
+  const url = new URL(source);
+  const host = url.hostname.toLowerCase();
+  if (host.includes("g.co") || host.includes("goo.gl") || host.includes("google")) {
+    iconClass = "icon-[mdi--google]";
+  } else if (host.includes("facebook.com")) {
+    iconClass = "icon-[mdi--facebook]";
+  }
+} catch {
+  // Invalid URL fallback
+}
+---
+{iconClass && (
+  <a href={source} target="_blank" rel="noopener noreferrer" class:list={["absolute text-3xl", iconClass, className]}>
+    <span class="sr-only">Quelle ansehen</span>
+  </a>
+)}
