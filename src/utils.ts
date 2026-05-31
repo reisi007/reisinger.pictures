@@ -11,12 +11,17 @@ export function groupBy<T>(
     return grouped;
   }, {} as Record<string, T[]>);
 }
+
 export function slugToName(slug: string) {
   return slug[0].toUpperCase() + slug.substring(1);
 }
+
 export function absoluteLink(url: URL, src: string): string {
-  return url.href.replace(/(\w\/).+/, "$1") + src.substring(1);
+  // Robuste URL-Auflösung statt fragilem Regex und manueller String-Manipulation
+  const base = new URL(url.href);
+  return new URL(src.replace(/^\//, ""), base).href;
 }
+
 /**
  * Berechnet den "psychologischen" Preis.
  * Rundet auf den nächsten 5er. Wenn das Ergebnis auf 0 endet (z.B. 100, 20),
@@ -46,6 +51,7 @@ const BASE_OPTIONS: Intl.NumberFormatOptions = {
   currency: "EUR",
   trailingZeroDisplay: "stripIfInteger" // Optional, je nach Browser-Support
 };
+
 /**
  * OPTION A: Psychologischer Preis (Rundung + Formatierung)
  * Beispiel: 103 -> 105 € | 98 -> 99 €
@@ -58,6 +64,7 @@ export function formatPsychologicalPrice(value: number, options: Partial<Intl.Nu
     ...options
   }).format(psychologicalValue);
 }
+
 /**
  * OPTION B: Exakter Preis (Centgenau)
  * Beispiel: 123.45 -> 123,45 €
@@ -69,6 +76,7 @@ export function formatExactPrice(value: number) {
     maximumFractionDigits: 2
   }).format(value);
 }
+
 export function psychologicalPriceAsNumber(value: number) {
   const string = formatPsychologicalPrice(value).replace(/[^\d.]/g, "");
   return parseFloat(string);

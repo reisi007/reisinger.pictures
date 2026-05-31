@@ -1,8 +1,8 @@
 ---
 import { getCollection } from "astro:content";
 
-import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
 import EinblickCard from "./EinblickCard.astro";
+import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
 
 const posts = (await getCollection("einblicke"))
   .sort((a, b) => {

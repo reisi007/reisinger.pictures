@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Metadaten Editor</title>
   <link rel="stylesheet" href="/editor/editor.css" />
-  <script src="/editor/editor-api-key.js"></script>
 </head>
 <body class="p-10">
 <div class="card bg-base-100 shadow-xl max-w-4xl mx-auto">
@@ -263,35 +262,48 @@
     }
   }
 
-  // --- SINGLE BACKGROUND WORKER QUEUE ---
+  // --- CONCURRENT BACKGROUND WORKER QUEUE ---
 
-  let isWorkerRunning = false;
+  const MAX_CONCURRENT_WORKERS = 3;
+  let activeWorkers = 0;
 
-  async function startBackgroundWorker() {
-    if (isWorkerRunning) return;
+  // Verhindert, dass zwei Worker dasselbe Bild bearbeiten
+  const processingFiles = new Set();
 
-    // Verhindert sinnloses Durchlaufen, wenn kein Modell geladen/erreichbar ist
-    if (activeModelId === "unknown") {
-      console.warn("Hintergrund-Worker gestoppt: Kein Modell verfügbar.");
-      return;
-    }
-
-    isWorkerRunning = true;
-
+  async function workerLoop(workerId) {
     while (true) {
       let fileToProcess = null;
 
-      if (currentFileObj && !localStorage.getItem(`seo_alt_${currentFileObj.relativePath}`)) {
+      // 1. Priorität: Das aktuell in der UI angezeigte Bild
+      if (
+        currentFileObj &&
+        !localStorage.getItem(`seo_alt_${currentFileObj.relativePath}`) &&
+        !processingFiles.has(currentFileObj.relativePath)
+      ) {
         fileToProcess = currentFileObj;
       } else {
-        fileToProcess = filesToProcess.find(f => !localStorage.getItem(`seo_alt_${f.relativePath}`));
+        // 2. Priorität: Das nächste noch unbearbeitete Bild aus der Liste
+        fileToProcess = filesToProcess.find(f =>
+          !localStorage.getItem(`seo_alt_${f.relativePath}`) &&
+          !processingFiles.has(f.relativePath)
+        );
       }
 
-      if (!fileToProcess) break;
+      // Wenn es nichts mehr zu tun gibt, beenden wir diesen Worker
+      if (!fileToProcess) {
+        break;
+      }
 
+      // Bild als "in Bearbeitung" markieren
+      processingFiles.add(fileToProcess.relativePath);
+
+      // API Call abwarten
       const result = await processSingleImage(fileToProcess);
 
-      // Event-basiertes UI-Update (ersetzt das alte Polling)
+      // Bild als "fertig" markieren (damit es aus dem Set fällt)
+      processingFiles.delete(fileToProcess.relativePath);
+
+      // Event-basiertes UI-Update (falls das gerade fertiggestellte Bild noch in der UI aktiv ist)
       if (fileToProcess === currentFileObj) {
         if (typeof result === "object" && result.type === "error") {
           titleInput.placeholder = result.message;
@@ -302,8 +314,24 @@
         redoDescriptionBtn.disabled = false;
       }
     }
+  }
 
-    isWorkerRunning = false;
+  function manageWorkers() {
+    // Verhindert sinnloses Starten, wenn kein Modell geladen/erreichbar ist
+    if (activeModelId === "unknown") {
+      console.warn("Hintergrund-Worker gestoppt: Kein Modell verfügbar.");
+      return;
+    }
+
+    // Starte neue Worker, bis das Limit (3) erreicht ist
+    while (activeWorkers < MAX_CONCURRENT_WORKERS) {
+      activeWorkers++;
+
+      // Worker starten und am Ende den Counter wieder reduzieren
+      workerLoop(activeWorkers).finally(() => {
+        activeWorkers--;
+      });
+    }
   }
 
   // --- UI APP FLOW ---
@@ -352,11 +380,11 @@
       titleInput.value = cached;
       autoDescribeProgress.classList.add("hidden");
       redoDescriptionBtn.disabled = false;
-      startBackgroundWorker();
+      manageWorkers();
     } else {
       autoDescribeProgress.classList.remove("hidden");
       redoDescriptionBtn.disabled = true;
-      startBackgroundWorker();
+      manageWorkers();
     }
   }
 

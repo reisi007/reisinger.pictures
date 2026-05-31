@@ -10,8 +10,7 @@ const baseFeatures = [
 const standardFeatures = [
   "Redaktionelle kommerzielle Nutzungsrechte inklusive"
 ];
-const discountFeatures: string[] = [
-];
+const discountFeatures: string[] = [];
 const standardFooters = [
   "Höchste Diskretion & Vertrauen inklusive"
 ];
@@ -33,13 +32,13 @@ export default function CustomPricingBuilder() {
 
   // Dynamischer Link zur Vorbelegung des Formulars (Nachrichten-Feld mit persönlicher Anrede)
   const contactLink = createMemo(() => {
-    const offerText = `Hallo Florian,\n\nich habe mir mit deinem Konfigurator ein individuelles Shooting-Paket zusammengestellt und würde das gerne anfragen:\n\n- Shooting-Zeit: ${duration()} Minuten\n- Bearbeitete Bilder: ${images()} Stück\n- N*xt Generation Rabatt (18-25 Jahre): ${isDiscounted() ? 'Ja' : 'Nein'}\n\nKalkulierter Preis: ${formattedFinalPrice()}\n\nLass uns gerne unverbindlich darüber sprechen!\n\nLiebe Grüße,\n`;
+    const offerText = `Hallo Florian,\n\nich habe mir mit deinem Konfigurator ein individuelles Shooting-Paket zusammengestellt und würde das gerne anfragen:\n\n- Shooting-Zeit: ${duration()} Minuten\n- Bearbeitete Bilder: ${images()} Stück\n- N*xt Generation Rabatt (18-25 Jahre): ${isDiscounted() ? "Ja" : "Nein"}\n\nKalkulierter Preis: ${formattedFinalPrice()}\n\nLass uns gerne unverbindlich darüber sprechen!\n\nLiebe Grüße,\n`;
     return `?message=${encodeURIComponent(offerText)}#kontakt`;
   });
 
   // Function to copy the current configuration to clipboard (hier bleibt es als Übersicht erhalten)
   const handleCopyOffer = async () => {
-    const offerText = `Dein Individuelles Angebot für:\n- ${duration()} Minuten\n- ${images()} bearbeitete Bilder\n- N*xt Generation Rabatt (18-25 Jahre): ${isDiscounted() ? 'Ja' : 'Nein'}\n\nPreis: ${formattedFinalPrice()}`;
+    const offerText = `Dein Individuelles Angebot für:\n- ${duration()} Minuten\n- ${images()} bearbeitete Bilder\n- N*xt Generation Rabatt (18-25 Jahre): ${isDiscounted() ? "Ja" : "Nein"}\n\nPreis: ${formattedFinalPrice()}`;
     try {
       await navigator.clipboard.writeText(offerText);
       setIsCopied(true);
