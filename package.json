@@ -47,7 +47,7 @@
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-regexp": "^3.1.0",
     "eslint-plugin-simple-import-sort": "^13.0.0",
-    "exifreader": "^4.38.1",
+    "exifreader": "^4.39.0",
     "js-yaml": "^4.1.1",
     "jsdom": "^29.0.2",
     "prettier": "^3.8.3",
