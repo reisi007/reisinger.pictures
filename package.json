@@ -6,8 +6,6 @@
     "astro": "astro",
     "dev": "astro dev",
     "build": "astro check && astro build",
-    "editor:css": "tailwindcss -i ./editor/editor.tw.css -o ./editor/editor.css --watch",
-    "human-loop:css": "tailwindcss -i ./human-loop/human-loop.tw.css -o human-loop/human-loop.css --watch",
     "prebuild": "node add-metadata.mjs",
     "postbuild": "node clean_output.mjs && node check_links.mjs",
     "preview": "astro preview",
@@ -15,7 +13,9 @@
     "lint:fix": "eslint src --fix",
     "publish": "pnpm run build ",
     "postpublish": "sync.bat",
-    "merge:llm": "repomix"
+    "merge:llm": "repomix",
+    "editor": "concurrently \"tailwindcss -i ./editor/editor.tw.css -o ./editor/editor.css --watch\" \"http-server . -p 8080 -c-1 -o /editor/editor.html\"",
+    "human-loop": "concurrently \"tailwindcss -i ./human-loop/human-loop.tw.css -o human-loop/human-loop.css --watch\" \"http-server . -p 8081 -c-1 -o /human-loop/human-loop.html\""
   },
   "dependencies": {
     "@astrojs/check": "^0.9.9",
@@ -55,6 +55,8 @@
     "repomix": "^1.13.1",
     "tailwindcss": "^4.2.2",
     "typescript": "5.9.3",
-    "typescript-eslint": "^8.58.2"
+    "typescript-eslint": "^8.58.2",
+    "concurrently": "^9.1.2",
+    "http-server": "^14.1.1"
   }
 }
