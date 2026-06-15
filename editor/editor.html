@@ -10,7 +10,7 @@
 <div class="card bg-base-100 shadow-xl max-w-4xl mx-auto">
   <div class="card-body">
     <h1 class="card-title text-3xl">Metadaten Editor</h1>
-    <p>Wähle einen Ordner aus, um alle darin enthaltenen Bilder zu überprüfen und die fehlende Titel zu ergänzen.</p>
+    <p>Wähle einen Ordner aus, um alle darin enthaltenen Bilder zu überprüfen und fehlende Titel zu ergänzen.</p>
 
     <p id="progressIndicator" class="font-semibold text-info"></p>
     <div class="card-actions">
@@ -18,9 +18,10 @@
     </div>
 
     <div id="editor" class="hidden mt-5">
-      <p class="file-info italic text-sm mb-2">
-        Bearbeite Datei: <b id="fileName"></b>
-      </p>
+      <div class="form-control w-full mb-2">
+        <label class="label"><span class="label-text italic font-medium">Bearbeite Datei (inklusive Dateiname):</span></label>
+        <input type="text" id="fileNameInput" class="input input-bordered input-sm w-full font-mono font-bold" />
+      </div>
       <form id="titleForm">
         <img
           id="referenceImage"
@@ -63,7 +64,7 @@
         </svg>
         <div>
           <h2 class="text-2xl font-bold">Alle Dateien wurden erfolgreich verarbeitet!</h2>
-          <p>Es gibt keine weiteren YAML-Dateien ohne Titel in diesem Ordner.</p>
+          <p>Es gibt keine weiteren Bilder ohne Metadaten in diesem Ordner.</p>
         </div>
       </div>
     </div>
@@ -77,7 +78,7 @@
   const selectFolderBtn = document.getElementById("selectFolderBtn");
   const editorDiv = document.getElementById("editor");
   const successMessageDiv = document.getElementById("successMessage");
-  const fileNameEl = document.getElementById("fileName");
+  const fileNameInput = document.getElementById("fileNameInput");
   const titleForm = document.getElementById("titleForm");
   const titleInput = document.getElementById("titleInput");
   const favoriteInput = document.getElementById("favoriteInput");
@@ -90,13 +91,17 @@
   let directoryHandle = null;
   let filesToProcess = [];
   let currentFileObj = null;
-  let currentImageUrl = null; // Für das Memory-Management
+  let currentImageUrl = null;
   let activeModelId = "unknown";
 
   // --- HELPER FUNCTIONS ---
   async function readYaml(yamlHandle) {
-    const yamlFile = await yamlHandle.getFile();
-    return jsyaml.load(await yamlFile.text());
+    try {
+      const yamlFile = await yamlHandle.getFile();
+      return jsyaml.load(await yamlFile.text());
+    } catch (e) {
+      return {};
+    }
   }
 
   async function getCompressedBase64(imageFile, maxSide = 2048, quality = 0.8) {
@@ -104,7 +109,7 @@
     const img = await new Promise((resolve, reject) => {
       const image = new Image();
       image.onload = () => {
-        URL.revokeObjectURL(objectUrl); // Memory Leak behoben
+        URL.revokeObjectURL(objectUrl);
         resolve(image);
       };
       image.onerror = (err) => {
@@ -136,43 +141,86 @@
   async function collectMarkdownContent(folderHandle) {
     if (!folderHandle) return "";
     let content = "";
-    for await (const entry of folderHandle.values()) {
-      if (entry.kind === "file" && (entry.name.endsWith(".md") || entry.name.endsWith(".mdx"))) {
-        try {
-          const fileHandle = await folderHandle.getFileHandle(entry.name, { "mode": "read" });
-          const file = await fileHandle.getFile();
-          content += await file.text() + "\n";
-        } catch (e) {}
+    try {
+      for await (const entry of folderHandle.values()) {
+        if (entry.kind === "file" && (entry.name.endsWith(".md") || entry.name.endsWith(".mdx"))) {
+          try {
+            const fileHandle = await folderHandle.getFileHandle(entry.name, { "mode": "read" });
+            const file = await fileHandle.getFile();
+            content += await file.text() + "\n";
+          } catch (e) {
+          }
+        }
       }
+    } catch (e) {
     }
     return content.trim();
   }
 
   const EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"];
 
-  async function collectYamlFilesInFolder(folderHandle, parentFolderHandle, files = [], relativePath = "") {
+  function computeKey(key) {
+    let slug = key.replaceAll("/", "-");
+    const prefixesToRemove = [
+      "images-testimonials-",
+      "images-",
+      "content-einblicke-",
+      "content-simple-"
+    ].flatMap(e => [`src-${e}`, `-src-${e}`]);
+
+    for (const prefix of prefixesToRemove) {
+      if (slug.startsWith(prefix)) {
+        slug = slug.substring(prefix.length);
+        break;
+      }
+    }
+
+    const lastDotIndex = slug.lastIndexOf(".");
+    if (lastDotIndex > 0) {
+      slug = slug.substring(0, lastDotIndex);
+    }
+    return slug;
+  }
+
+  async function collectYamlFilesInFolder(folderHandle, mdStack = [], relativePath = "", files = []) {
+    // Markdown-Inhalt des aktuellen Ordners auslesen
+    const currentMd = await collectMarkdownContent(folderHandle);
+    // Historie der übergeordneten Ordner + aktueller Ordner
+    const currentStack = [...mdStack, currentMd];
+
     for await (const entry of folderHandle.values()) {
       for (const ext of EXTENSIONS) {
-        if (entry.kind === "file" && entry.name.endsWith(ext)) {
-          const yamlFileName = entry.name.replace(new RegExp(`${ext.replace(".", "\.")}`), ".yaml");
+        if (entry.kind === "file" && entry.name.toLowerCase().endsWith(ext)) {
+          const yamlFileName = entry.name.substring(0, entry.name.length - ext.length) + ".yaml";
           let yamlHandle = null;
           try {
             yamlHandle = await folderHandle.getFileHandle(yamlFileName, { "mode": "read" });
             const data = await readYaml(yamlHandle);
-            if (data && data.title) continue;
-          } catch (e) {}
+            if (data && data.title) continue; // Bild hat schon einen Titel
+          } catch (e) {
+          }
+
+          // Logik: Gehe im Stack zurück nach oben. Sobald ein Ordner leer ist (kein MD), breche ab.
+          let contextParts = [];
+          for (let i = currentStack.length - 1; i >= 0; i--) {
+            if (!currentStack[i]) {
+              break; // Unterbricht die Kette, wenn ein Parent keine MD hat
+            }
+            contextParts.unshift(currentStack[i]); // Vorne anfügen für logische Lesereihenfolge (Top-Down)
+          }
 
           files.push({
             handle: yamlHandle,
             parentHandle: folderHandle,
             relativePath: relativePath + yamlFileName,
             associatedJpgName: entry.name,
-            context: await collectMarkdownContent(parentFolderHandle) + await collectMarkdownContent(folderHandle)
+            context: contextParts.join("\n\n")
           });
         }
       }
       if (entry.kind === "directory") {
-        await collectYamlFilesInFolder(entry, folderHandle, files, relativePath + entry.name + "/");
+        // Rekursiv in Unterordner gehen und aktuellen Stack weitergeben
+        await collectYamlFilesInFolder(entry, currentStack, relativePath + entry.name + "/", files);
       }
     }
     return files;
@@ -197,64 +245,111 @@
     const cacheKey = `seo_alt_${fileObj.relativePath}`;
 
     if (!forceRedo && localStorage.getItem(cacheKey)) {
-      return localStorage.getItem(cacheKey);
+      try {
+        return JSON.parse(localStorage.getItem(cacheKey));
+      } catch (e) {
+        return { title: localStorage.getItem(cacheKey), filename: fileObj.associatedJpgName };
+      }
     }
 
     try {
       const imageHandle = await fileObj.parentHandle.getFileHandle(fileObj.associatedJpgName);
       const imageFile = await imageHandle.getFile();
-      const base64DataUrl = await getCompressedBase64(imageFile, 1024, 0.8);
+      const base64DataUrl = await getCompressedBase64(imageFile);
 
-      // Sicherheit: System-Prompt und User-Daten sauber trennen (OpenAI kompatibles Format)
-      const response = await fetch(`${LM_STUDIO_URL}/v1/chat/completions`, {
+      // --- PRÜFEN, OB DATEINAME MANUELL VORGEGEBEN WURDE ---
+      const manualFilename = fileNameInput ? fileNameInput.value.trim() : "";
+      const originalFilename = fileNameInput ? fileNameInput.dataset.original : "";
+      const isManualFilename = forceRedo && manualFilename && manualFilename !== originalFilename;
+
+      const fileExt = fileObj.associatedJpgName.substring(fileObj.associatedJpgName.lastIndexOf("."));
+      const cleanedPathWords = computeKey(fileObj.relativePath).replace(/-/g, " ");
+
+      // --- EINZIGER REQUEST: BILD -> BESCHREIBUNG + DATEINAME (JSON) ---
+      let visionPrompt = `Berücksichtige diesen Artikelkontext:\n${fileObj.context || "Kein Kontext verfügbar."}\n\n`;
+
+      if (isManualFilename) {
+        visionPrompt += `WICHTIGE ANWEISUNG: Der Benutzer hat den Dateinamen bereits auf "${manualFilename}" festgelegt! Beschreibe das Bild in 1 bis 2 kurzen Sätzen für SEO-Zwecke und beziehe dich auf diesen Dateinamen.\n`;
+      } else if (forceRedo && titleInput && titleInput.value.trim() && titleInput.value.trim() !== "Generiere neu...") {
+        visionPrompt += `WICHTIGE ANWEISUNG: Nutze diese Keywords als Fokus für die Beschreibung: "${titleInput.value.trim()}". Beschreibe das Bild in 1-2 kurzen Sätzen.\n`;
+      } else {
+        visionPrompt += `Beschreibe dieses Bild in 1 bis maximal 2 kurzen Sätzen präzise für SEO-Zwecke (Alt-Text).\n`;
+      }
+
+      visionPrompt += `\nDeine Aufgabe:
+1. Erstelle die Bildbeschreibung.
+2. Erstelle aus dieser Beschreibung einen perfekten SEO-Dateinamen (kebab-case, alles klein, keine Umlaute/Sonderzeichen, max 6 Wörter).
+   REGEL für Dateinamen: Der übergeordnete Pfad lautet "${cleanedPathWords}". Wiederhole KEINE dieser Wörter! Keine Dateiendung anfügen.
+
+Gib das Ergebnis AUSSCHLIESSLICH als valides JSON aus. Nutze exakt dieses Format:
+{
+  "title": "deine generierte beschreibung",
+  "filename": "dein-generierter-dateiname"
+}
+Antworte NUR mit dem JSON. Keine Erklärungen, kein Markdown-Block um das JSON.`;
+
+      const visionResponse = await fetch(`${LM_STUDIO_URL}/v1/chat/completions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: activeModelId,
           messages: [
+            { role: "system", content: "Du bist ein präziser SEO-Assistent und antwortest ausschließlich mit validem JSON." },
             {
-              role: "system",
-              content: "Du bist ein KI-Assistent für SEO-Bildbeschreibungen. Antworte ausschließlich auf Deutsch mit der eigentlichen Bildbeschreibung (max. 1 Satz). Vermeide Einleitungen wie 'Hier ist...' und Phrasen wie 'auf dem Feld'."
-            },
-            {
-              role: "user",
-              content: [
-                {
-                  type: "text",
-                  text: `Berücksichtige diesen Kontext bei der Beschreibung:\nDateipfad: ${fileObj.relativePath}\nArtikelinhalt: ${fileObj.context || 'Kein Kontext verfügbar.'}`
-                },
-                {
-                  type: "image_url",
-                  image_url: { url: base64DataUrl }
-                }
+              role: "user", content: [
+                { type: "text", text: visionPrompt },
+                { type: "image_url", image_url: { url: base64DataUrl } }
               ]
             }
           ],
-          temperature: 0.2
+          temperature: 0.1, // Niedrige Temperatur für stabilere JSON-Ausgabe
+          response_format: { type: "json_object" } // Erzwingt native JSON-Struktur vom Modell
         })
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${await response.text()}`);
-      }
+      if (!visionResponse.ok) throw new Error(`HTTP ${visionResponse.status}: Fehler bei Bildanalyse`);
+      const visionResult = await visionResponse.json();
+      let responseText = visionResult.choices?.[0]?.message?.content?.trim() || "{}";
 
-      const result = await response.json();
-      const textResponse = result.choices?.[0]?.message?.content;
+      // Robustheit: Falls die lokale KI das JSON doch in Markdown-Ticks packt
+      responseText = responseText.replace(/```json/gi, "").replace(/```/g, "").trim();
 
-      if (!textResponse) {
-        throw new Error("Unerwartetes Antwortformat von der API.");
-      }
-
-      const finalCaption = textResponse.trim().replace(/\.$/, "");
-
-      // Fehlerbehandlung für Quota Exceeded im LocalStorage
+      let parsedResult;
       try {
-        localStorage.setItem(cacheKey, finalCaption);
-      } catch (storageErr) {
-        console.warn("Konnte Cache nicht speichern (Limit erreicht?):", storageErr);
+        parsedResult = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error("JSON Parse Error. KI Antwort war:", responseText);
+        throw new Error("KI hat kein valides JSON zurückgegeben.");
       }
 
-      return finalCaption;
+      // Absicherung des Destructurings mit expliziter Fehlermeldung
+      const { title: generatedTitle, filename: generatedFilename } = parsedResult;
+
+      if (!generatedTitle || !generatedFilename) {
+        throw new Error(`Fehlerhafte JSON-Struktur der KI: Es fehlen erforderliche Felder (title vorhanden: ${!!generatedTitle}, filename vorhanden: ${!!generatedFilename}).`);
+      }
+
+      let finalFilename = originalFilename || fileObj.associatedJpgName;
+
+      // Wenn kein manueller Dateiname vorgegeben war, nutzen wir den generierten
+      if (!isManualFilename && generatedFilename) {
+        let targetedFilename = generatedFilename;
+        // Sicherstellen, dass die Endung dran ist
+        if (!targetedFilename.endsWith(fileExt)) targetedFilename += fileExt;
+        finalFilename = targetedFilename;
+      } else if (isManualFilename) {
+        finalFilename = manualFilename;
+      }
+
+      const finalData = { title: generatedTitle, filename: finalFilename };
+
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify(finalData));
+      } catch (storageErr) {
+        console.warn("Konnte Cache nicht speichern:", storageErr);
+      }
+
+      return finalData;
 
     } catch (err) {
       console.error("Fehler bei Bildanalyse:", fileObj.relativePath, err);
@@ -262,76 +357,46 @@
     }
   }
 
-  // --- CONCURRENT BACKGROUND WORKER QUEUE ---
+  // --- SINGLE BACKGROUND WORKER QUEUE ---
 
-  const MAX_CONCURRENT_WORKERS = 3;
-  let activeWorkers = 0;
+  let isWorkerRunning = false;
 
-  // Verhindert, dass zwei Worker dasselbe Bild bearbeiten
-  const processingFiles = new Set();
+  async function startBackgroundWorker() {
+    if (isWorkerRunning) return;
 
-  async function workerLoop(workerId) {
-    while (true) {
-      let fileToProcess = null;
-
-      // 1. Priorität: Das aktuell in der UI angezeigte Bild
-      if (
-        currentFileObj &&
-        !localStorage.getItem(`seo_alt_${currentFileObj.relativePath}`) &&
-        !processingFiles.has(currentFileObj.relativePath)
-      ) {
-        fileToProcess = currentFileObj;
-      } else {
-        // 2. Priorität: Das nächste noch unbearbeitete Bild aus der Liste
-        fileToProcess = filesToProcess.find(f =>
-          !localStorage.getItem(`seo_alt_${f.relativePath}`) &&
-          !processingFiles.has(f.relativePath)
-        );
-      }
-
-      // Wenn es nichts mehr zu tun gibt, beenden wir diesen Worker
-      if (!fileToProcess) {
-        break;
-      }
-
-      // Bild als "in Bearbeitung" markieren
-      processingFiles.add(fileToProcess.relativePath);
-
-      // API Call abwarten
-      const result = await processSingleImage(fileToProcess);
-
-      // Bild als "fertig" markieren (damit es aus dem Set fällt)
-      processingFiles.delete(fileToProcess.relativePath);
-
-      // Event-basiertes UI-Update (falls das gerade fertiggestellte Bild noch in der UI aktiv ist)
-      if (fileToProcess === currentFileObj) {
-        if (typeof result === "object" && result.type === "error") {
-          titleInput.placeholder = result.message;
-        } else {
-          titleInput.value = result;
-        }
-        autoDescribeProgress.classList.add("hidden");
-        redoDescriptionBtn.disabled = false;
-      }
-    }
-  }
-
-  function manageWorkers() {
-    // Verhindert sinnloses Starten, wenn kein Modell geladen/erreichbar ist
     if (activeModelId === "unknown") {
       console.warn("Hintergrund-Worker gestoppt: Kein Modell verfügbar.");
       return;
     }
 
-    // Starte neue Worker, bis das Limit (3) erreicht ist
-    while (activeWorkers < MAX_CONCURRENT_WORKERS) {
-      activeWorkers++;
+    isWorkerRunning = true;
 
-      // Worker starten und am Ende den Counter wieder reduzieren
-      workerLoop(activeWorkers).finally(() => {
-        activeWorkers--;
-      });
+    while (true) {
+      let fileToProcess = null;
+
+      if (currentFileObj && !localStorage.getItem(`seo_alt_${currentFileObj.relativePath}`)) {
+        fileToProcess = currentFileObj;
+      } else {
+        fileToProcess = filesToProcess.find(f => !localStorage.getItem(`seo_alt_${f.relativePath}`));
+      }
+
+      if (!fileToProcess) break;
+
+      const result = await processSingleImage(fileToProcess);
+
+      if (fileToProcess === currentFileObj) {
+        if (result && result.type === "error") {
+          titleInput.placeholder = result.message;
+        } else {
+          titleInput.value = result.title || "";
+          fileNameInput.value = result.filename || fileToProcess.associatedJpgName;
+        }
+        autoDescribeProgress.classList.add("hidden");
+        redoDescriptionBtn.disabled = false;
+      }
     }
+
+    isWorkerRunning = false;
   }
 
   // --- UI APP FLOW ---
@@ -350,12 +415,12 @@
     const needsCreation = fileObj.handle === null;
     const data = needsCreation ? {} : await readYaml(fileObj.handle);
 
-    fileNameEl.textContent = fileObj.relativePath;
+    fileNameInput.value = fileObj.associatedJpgName;
+    fileNameInput.dataset.original = fileObj.associatedJpgName;
     titleInput.value = "";
     titleInput.placeholder = "";
     favoriteInput.checked = data.favorite === true;
 
-    // Alte Objekt-URL freigeben (Memory Leak Fix)
     if (currentImageUrl) {
       URL.revokeObjectURL(currentImageUrl);
       currentImageUrl = null;
@@ -374,17 +439,26 @@
     editorDiv.style.display = "block";
 
     const cacheKey = `seo_alt_${fileObj.relativePath}`;
-    const cached = localStorage.getItem(cacheKey);
+    const cachedStr = localStorage.getItem(cacheKey);
+    let cached = null;
+    if (cachedStr) {
+      try {
+        cached = JSON.parse(cachedStr);
+      } catch (e) {
+        cached = { title: cachedStr, filename: fileObj.associatedJpgName };
+      }
+    }
 
     if (cached) {
-      titleInput.value = cached;
+      titleInput.value = cached.title || "";
+      fileNameInput.value = cached.filename || fileObj.associatedJpgName;
       autoDescribeProgress.classList.add("hidden");
       redoDescriptionBtn.disabled = false;
-      manageWorkers();
+      startBackgroundWorker();
     } else {
       autoDescribeProgress.classList.remove("hidden");
       redoDescriptionBtn.disabled = true;
-      manageWorkers();
+      startBackgroundWorker();
     }
   }
 
@@ -426,10 +500,11 @@
 
     const caption = await processSingleImage(currentFileObj, true);
 
-    if (typeof caption === "object" && caption.type === "error") {
+    if (caption && caption.type === "error") {
       titleInput.placeholder = caption.message;
     } else {
-      titleInput.value = caption;
+      titleInput.value = caption.title || "";
+      fileNameInput.value = caption.filename || currentFileObj.associatedJpgName;
     }
 
     autoDescribeProgress.classList.add("hidden");
@@ -442,24 +517,104 @@
 
     const fileObj = currentFileObj;
     const needsCreation = fileObj.handle === null;
-    const data = needsCreation ? {} : await readYaml(fileObj.handle);
+    let data = {};
+    if (!needsCreation) {
+      data = await readYaml(fileObj.handle);
+    }
 
     data.title = titleInput.value;
     if (favoriteInput.checked) data.favorite = true; else delete data.favorite;
 
-    const sortedData = { title: data.title, ...(data.favorite ? {favorite: true} : {}), ...data };
+    const sortedData = { title: data.title, ...(data.favorite ? { favorite: true } : {}), ...data };
     const yamlStr = jsyaml.dump(sortedData);
 
-    let targetHandle = fileObj.handle;
-    if (needsCreation) {
-      targetHandle = await fileObj.parentHandle.getFileHandle(fileObj.relativePath.split("/").pop(), {create: true});
+    const requestedNewName = fileNameInput.value.trim();
+    const oldName = fileObj.associatedJpgName;
+
+    // Original-Endung sichern (z.B. '.jpg')
+    const lastDotIndex = oldName.lastIndexOf(".");
+    const oldExt = lastDotIndex !== -1 ? oldName.substring(lastDotIndex) : ".jpg";
+
+    // BaseName aus dem Input extrahieren, egal ob der User ".jpg" eingetippt hat oder nicht
+    let baseName = requestedNewName;
+    if (baseName.toLowerCase().endsWith(oldExt.toLowerCase())) {
+      baseName = baseName.substring(0, baseName.length - oldExt.length);
+    } else if (baseName.includes(".")) {
+      baseName = baseName.substring(0, baseName.lastIndexOf("."));
     }
-    const writable = await targetHandle.createWritable();
-    await writable.write(yamlStr);
-    await writable.close();
+
+    let finalBaseName = baseName;
+
+    // Unique-Check anhand der Bilddatei (.jpg)
+    if (finalBaseName + oldExt !== oldName) {
+      let counter = 1;
+      while (true) {
+        try {
+          await fileObj.parentHandle.getFileHandle(finalBaseName + oldExt);
+          // Datei existiert -> Zähler erhöhen
+          finalBaseName = `${baseName}-${counter}`;
+          counter++;
+        } catch (err) {
+          if (err.name === "NotFoundError") {
+            // Perfekt, Dateiname ist frei!
+            break;
+          }
+          throw err;
+        }
+      }
+    }
+
+    const finalImgName = finalBaseName + oldExt;
+    const finalYamlName = finalBaseName + ".yaml";
+
+    // 1. Neue YAML-Datei speichern
+    let targetYamlHandle = await fileObj.parentHandle.getFileHandle(finalYamlName, { create: true });
+    const writableYaml = await targetYamlHandle.createWritable();
+    await writableYaml.write(yamlStr);
+    await writableYaml.close();
+
+    // 2. Bild umbenennen (falls geändert)
+    if (finalImgName !== oldName) {
+      try {
+        const oldImgHandle = await fileObj.parentHandle.getFileHandle(oldName);
+
+        // Feature Detection für die native move() Methode (unterstützt z.B. in Chromium-Browsern)
+        if (typeof oldImgHandle.move === "function") {
+          await oldImgHandle.move(finalImgName);
+        } else {
+          // Fallback: Copy & Delete
+          const oldImgFile = await oldImgHandle.getFile();
+          const newImgHandle = await fileObj.parentHandle.getFileHandle(finalImgName, { create: true });
+          const writableImg = await newImgHandle.createWritable();
+          await writableImg.write(oldImgFile);
+          await writableImg.close();
+
+          // Altes Bild löschen
+          await fileObj.parentHandle.removeEntry(oldName);
+        }
+
+        // Alte YAML löschen (falls es nicht sowieso die ist, die wir grad erstellt haben)
+        if (!needsCreation && fileObj.relativePath.split("/").pop() !== finalYamlName) {
+          try {
+            await fileObj.parentHandle.removeEntry(fileObj.relativePath.split("/").pop());
+          } catch (ignore) {
+          }
+        }
+      } catch (e) {
+        console.error("Fehler beim Umbenennen der physischen Dateien:", e);
+        alert("Achtung: Konnte die alte Bilddatei nicht löschen oder verschieben. Bitte Console prüfen.");
+      }
+    } else if (!needsCreation && finalYamlName !== fileObj.relativePath.split("/").pop()) {
+      // Name des Bildes blieb gleich, aber vielleicht hatte die YAML vorher einen kaputten Namen (wie .jpg.yaml)
+      try {
+        await fileObj.parentHandle.removeEntry(fileObj.relativePath.split("/").pop());
+      } catch (ignore) {
+      }
+    }
 
     processNextFile();
   };
+
 </script>
 </body>
 </html>
