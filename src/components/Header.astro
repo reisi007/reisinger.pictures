@@ -1,6 +1,5 @@
 ---
-import type { NavItem } from "../data/Menue";
-import * as navigation from "../data/Menue";
+import { mainLinks } from "../data/Menue";
 import HeaderLogo from "./HeaderLogo.astro";
 
 const currentPath = Astro.url.pathname;
@@ -10,16 +9,6 @@ function isActive(href: string) {
   if (href !== "/" && currentPath.startsWith(href)) return true;
   return false;
 }
-
-function isItemActive(item: NavItem): boolean {
-  if ("href" in item) return isActive(item.href);
-  return item.subItems.some(sub => isActive(sub.href));
-}
-
-const linkSections = [
-  { label: "Business & Presse", links: navigation.businessLinks, b2b: true },
-  { label: "Privat & Emotion", links: navigation.privateLinks, b2b: false }
-];
 ---
 
 <header class="w-full bg-base-100/90 backdrop-blur-sm sticky top-0 z-50 border-b border-base-200 mb-4">
@@ -30,46 +19,13 @@ const linkSections = [
 
     <div class="navbar-center hidden lg:flex">
       <ul class="menu menu-horizontal px-1 gap-1 text-base font-medium z-50">
-        {linkSections.map(section => (
-          <li>
-            <details name="desktop-menu">
-              <summary class={section.links.some(isItemActive) ? "text-primary font-semibold" : ""}>
-                {section.label}
-              </summary>
-              <ul class="bg-base-100 rounded-box p-2 shadow-xl border border-base-200 z-1 min-w-max">
-                {section.links.map(item => (
-                  <li>
-                    {"subItems" in item ? (
-                      <details>
-                        <summary class={item.subItems.some(sub => isActive(sub.href)) ? "text-primary font-semibold" : ""}>{item.label}</summary>
-                        <ul>
-                          {item.subItems.map(sub => (
-                            <li>
-                              <a href={sub.href} target={sub.external ? "_blank" : undefined} rel={sub.external ? "noopener noreferrer" : undefined} class={isActive(sub.href) ? "active" : ""}>
-                                {sub.label} {sub.external && <span class="icon-[mdi--open-in-new] text-xs opacity-50"></span>}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </details>
-                    ) : (
-                      <a href={item.href} target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined} class={isActive(item.href) ? "active" : ""}>
-                        {item.label} {item.external && <span class="icon-[mdi--open-in-new] text-xs opacity-50"></span>}
-                      </a>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </details>
-          </li>
-        ))}
-        {navigation.infoLinks.map(link => {
-          if ("href" in link) {
+        {mainLinks.map(item => {
+          if ("href" in item) {
             return (
               <li>
-                <a href={link.href} target={link.external ? "_blank" : undefined} rel={link.external ? "noopener noreferrer" : undefined}
-                   class={isActive(link.href) ? "text-primary font-semibold" : ""}>
-                  {link.label} {link.external && <span class="icon-[mdi--open-in-new] text-xs opacity-50"></span>}
+                <a href={item.href} target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined}
+                   class={isActive(item.href) ? "text-primary font-semibold" : ""}>
+                  {item.label} {item.external && <span class="icon-[mdi--open-in-new] text-xs opacity-50"></span>}
                 </a>
               </li>
             );
@@ -79,7 +35,7 @@ const linkSections = [
     </div>
 
     <div class="navbar-end gap-2">
-      <button onclick="document.getElementById(`contact_modal`).showModal();" class="btn btn-primary btn-sm md:btn-md shadow-md lg:hidden flex">
+      <button onclick="document.getElementById(`contact_modal`).showModal();" class="btn btn-primary btn-sm md:btn-md shadow-md flex">
         Jetzt kontaktieren
       </button>
       <button id="mobile-menu-btn" aria-label="open menu" class="btn btn-ghost btn-circle lg:hidden">
@@ -102,51 +58,13 @@ const linkSections = [
   <div class="grow overflow-y-auto pb-24">
     <div class="container mx-auto px-4 py-4 flex flex-col h-full">
       <ul class="menu menu-lg w-full p-0 gap-2">
-        {linkSections.map((section, idx) => (
-          <li>
-            <details name="mobile-main-accordion" open={section.links.some(isItemActive) || (!linkSections.some(s => s.links.some(isItemActive)) && idx === 1)}>
-              <summary class="text-base uppercase tracking-widest text-base-content/50 font-bold mb-1">
-                {section.label}
-              </summary>
-              <ul>
-                {section.links.map(item => (
-                  <li>
-                    {"subItems" in item ? (
-                      <details open={item.subItems.some(sub => isActive(sub.href))}>
-                        <summary class={item.subItems.some(sub => isActive(sub.href)) ? "text-primary font-bold" : ""}>{item.label}</summary>
-                        <ul>
-                          {item.subItems.map(sub => (
-                            <li>
-                              <a href={sub.href} target={sub.external ? "_blank" : undefined} rel={sub.external ? "noopener noreferrer" : undefined}
-                                 class={isActive(sub.href) ? "active font-bold text-primary" : ""}>
-                                {sub.label} {sub.external && <span class="icon-[mdi--open-in-new] text-base opacity-50"></span>}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </details>
-                    ) : (
-                      <a href={item.href} target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined}
-                         class={isActive(item.href) ? "active font-bold text-primary" : ""}>
-                        {item.label} {item.external && <span class="icon-[mdi--open-in-new] text-base opacity-50"></span>}
-                      </a>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </details>
-          </li>
-        ))}
-      </ul>
-
-      <ul class="menu menu-lg w-full p-0 gap-2">
-        {navigation.infoLinks.map(link => {
-          if ("href" in link) {
+        {mainLinks.map(item => {
+          if ("href" in item) {
             return (
               <li>
-                <a href={link.href} target={link.external ? "_blank" : undefined} rel={link.external ? "noopener noreferrer" : undefined}
-                   class={isActive(link.href) ? "active font-bold text-primary" : ""}>
-                  {link.label} {link.external && <span class="icon-[mdi--open-in-new] text-base opacity-50"></span>}
+                <a href={item.href} target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined}
+                   class={isActive(item.href) ? "active font-bold text-primary" : ""}>
+                  {item.label} {item.external && <span class="icon-[mdi--open-in-new] text-base opacity-50"></span>}
                 </a>
               </li>
             );
@@ -165,7 +83,7 @@ const linkSections = [
 <script>
   document.addEventListener("astro:page-load", () => {
     const btnOpen = document.getElementById("mobile-menu-btn");
-    const btnClose = document.getElementById(`mobile-menu-close`);
+    const btnClose = document.getElementById("mobile-menu-close");
     const overlay = document.getElementById("mobile-menu-overlay");
 
     if (btnOpen && btnClose && overlay) {
@@ -196,31 +114,5 @@ const linkSections = [
         link.addEventListener("click", closeMenu);
       });
     }
-
-    // Schließen der Menüs, wenn ein interner Link geklickt wird (ViewTransitions)
-    const dropdownLinks = document.querySelectorAll("header .navbar-center details a");
-    dropdownLinks.forEach(link => {
-      link.addEventListener("click", (e) => {
-        let el = e.target as HTMLElement | null;
-        while (el) {
-          if (el.tagName === "DETAILS") el.removeAttribute("open");
-          el = el.parentElement;
-        }
-      });
-    });
-
-    // Schließen der Desktop-Menüs bei Klick außerhalb
-    document.addEventListener("click", (e) => {
-      const target = e.target as HTMLElement | null;
-      // Prüfen, ob der Klick in einem der Dropdowns stattfand
-      const isDropdown = target?.closest("header .navbar-center details");
-
-      // Wenn außerhalb geklickt wurde, alle offenen Details schließen
-      if (!isDropdown) {
-        document.querySelectorAll("header .navbar-center details[open]").forEach(details => {
-          details.removeAttribute("open");
-        });
-      }
-    });
   });
 </script>

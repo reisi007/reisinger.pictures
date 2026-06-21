@@ -2,24 +2,7 @@
 ---
 <h3 class="footer-title mx-auto mt-2">Erreiche mich über das Kontaktformular</h3>
 <form method="POST" action="https://form.reisinger.pictures" class="flex flex-col w-full max-w-lg mx-auto gap-y-2 not-prose">
-  <label for="form__subject_prefix" class="form-control w-full">
-    <span class="label ml-2 mb-1">
-      <span class="label-text">Art der Anfrage</span>
-    </span>
-    <select name="subject_prefix" id="form__subject_prefix" required class="select select-primary w-full">
-      <option value="" selected disabled>Bitte wähle eine Option</option>
-      <option value="BUSINESS">Business Shooting</option>
-      <option value="BEAUTY">Beauty Shooting</option>
-      <option value="AKT">Akt Shooting</option>
-      <option value="COUPLES">Couples Shooting</option>
-      <option value="TANZ">Tanz Shooting</option>
-      <option value="HOCHZEIT">Hochzeit</option>
-      <option value="REPORTAGE">Reportage</option>
-      <option value="TFP">TFP Shooting</option>
-      <option value="REVIEW">Bewertung</option>
-      <option value="">Andere Anfrage</option>
-    </select>
-  </label>
+  <input type="hidden" id="form-subject" name="subject" value="Allgemeine Anfrage" />
 
   <label for="form__name" class="form-control w-full">
     <span class="label ml-2 mb-1">
@@ -60,14 +43,12 @@
     <button type="submit" class="btn btn-lg btn-primary mt-4">Nachricht senden</button>
   </div>
 
-
   <script>
     document.addEventListener("astro:page-load", () => {
-      const form = document.querySelector("form[action=\"https://form.reisinger.pictures\"]") as HTMLFormElement;
+      const form = document.querySelector("form[action='https://form.reisinger.pictures']") as HTMLFormElement;
       const modal = document.getElementById(`contact_modal`) as HTMLDialogElement;
       if (!form) return;
 
-      // Funktion zum Befüllen des Formulars aus URL-Parametern
       const fillForm = (params: URLSearchParams) => {
         for (const [key, value] of params.entries()) {
           const element = form.elements.namedItem(key);
@@ -77,44 +58,32 @@
         }
       };
 
-      // 1. Initiales Befüllen beim Laden der Seite (falls man von einer anderen Seite kommt)
       fillForm(new URLSearchParams(window.location.search));
 
-      // Modal EventListener zum Aufräumen der URL
       if (modal) {
         modal.addEventListener("close", () => {
-          // Nur aufräumen, wenn auch wirklich Kontakt-Parameter in der URL stehen
           if (window.location.hash === "#kontakt" || window.location.search !== "") {
             history.replaceState(null, "", window.location.pathname);
           }
         });
       }
 
-      // Prüfen ob das Modal direkt geöffnet werden soll
       if (window.location.hash === "#kontakt" && modal) {
         modal.showModal();
       }
 
-      // 2. Klicks auf der gleichen Seite abfangen
-      document.querySelectorAll("a[href*=\"#kontakt\"]").forEach(link => {
+      document.querySelectorAll("a[href*='#kontakt']").forEach(link => {
         link.addEventListener("click", (e) => {
           const targetUrl = new URL((link as HTMLAnchorElement).href);
 
-          // Prüfen, ob der Link auf die aktuell geöffnete Seite verweist
           if (targetUrl.pathname === window.location.pathname) {
-            e.preventDefault(); // Verhindert das Neuladen / die Astro-Transition
-
-            // Formular sofort mit den neuen Parametern updaten
+            e.preventDefault();
             fillForm(targetUrl.searchParams);
-
-            // URL in der Adressleiste sauber anpassen (ohne Page-Reload)
             history.pushState(null, "", targetUrl.href);
 
-            // Modal öffnen falls es geschlossen ist
             if (modal && !modal.open) {
               modal.showModal();
             } else {
-              // Direkt und flüssig zum Formular scrollen falls kein Modal existiert
               const targetElement = document.getElementById("kontakt");
               if (targetElement) {
                 targetElement.scrollIntoView({ behavior: "smooth" });
