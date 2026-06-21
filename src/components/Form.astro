@@ -3,13 +3,20 @@
 <h3 class="footer-title mx-auto mt-2">Erreiche mich über das Kontaktformular</h3>
 <form method="POST" action="https://form.reisinger.pictures" class="flex flex-col w-full max-w-lg mx-auto gap-y-2 not-prose">
   <input type="hidden" id="form-subject" name="subject" value="Allgemeine Anfrage" />
+  <input type="hidden" id="form__subject_prefix" name="subject_prefix" value="" />
 
   <label for="form__name" class="form-control w-full">
     <span class="label ml-2 mb-1">
       <span class="label-text">Name</span>
       <span class="label-text-alt text-error">*</span>
     </span>
-    <input type="text" id="form__name" name="name" required class="input input-primary w-full" />
+    <input
+      type="text"
+      id="form__name"
+      name="name"
+      required
+      class="input input-primary w-full"
+    />
   </label>
 
   <label for="form_email" class="form-control w-full">
@@ -45,9 +52,21 @@
 
   <script>
     document.addEventListener("astro:page-load", () => {
-      const form = document.querySelector("form[action='https://form.reisinger.pictures']") as HTMLFormElement;
-      const modal = document.getElementById(`contact_modal`) as HTMLDialogElement;
+      const form = document.querySelector("form[action*='form.reisinger.pictures']") as HTMLFormElement;
+      const modal = document.getElementById("contact_modal") as HTMLDialogElement;
       if (!form) return;
+
+      // Referenzen auf die Felder holen
+      const nameInput = document.getElementById("form__name") as HTMLInputElement;
+      const subjectInput = document.getElementById("form-subject") as HTMLInputElement;
+
+      // Zentrale Funktion für das Subject
+      const updateSubject = () => {
+        if (!nameInput || !subjectInput) return;
+        subjectInput.value = nameInput.value.trim()
+          ? "Neue Nachricht von " + nameInput.value.trim()
+          : "Allgemeine Anfrage";
+      };
 
       const fillForm = (params: URLSearchParams) => {
         for (const [key, value] of params.entries()) {
@@ -56,9 +75,22 @@
             element.value = value;
           }
         }
+        // Update ausführen, falls Name via URL-Parameter kam
+        updateSubject();
       };
 
+      // Event-Listener für Tastatureingaben registrieren
+      if (nameInput) {
+        nameInput.addEventListener("input", updateSubject);
+      }
+
+      // 1. Initial aus URL-Parametern befüllen
       fillForm(new URLSearchParams(window.location.search));
+
+      // 2. WICHTIG FÜR BROWSER-BACK:
+      // Falls der Browser den Namen aus dem Cache wiederhergestellt hat,
+      // setzen wir das Subject jetzt einmalig beim Page-Load passend zum aktuellen Wert.
+      updateSubject();
 
       if (modal) {
         modal.addEventListener("close", () => {

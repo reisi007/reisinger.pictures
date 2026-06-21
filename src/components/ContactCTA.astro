@@ -31,7 +31,7 @@ if (design === "primary") {
 const href = generateContactLink({ subject_prefix: subjectPrefix, message });
 ---
 
-<a href={href} data-subject={subjectPrefix} onclick="const s=document.getElementById('form-subject'); if(s && this.dataset.subject) s.value=this.dataset.subject; const m=document.getElementById('contact_modal'); if(m) m.showModal();" class:list={[baseClasses, designClasses, className]}>
+<a href={href} data-subject={subjectPrefix} onclick="const s=document.getElementById('form__subject_prefix'); if(s && this.dataset.subject) s.value=this.dataset.subject; const m=document.getElementById('contact_modal'); if(m) m.showModal();" class:list={[baseClasses, designClasses, className]}>
   {design !== "elegant-link" && <span class="icon-[mdi--message-text] text-xl group-hover:scale-110 transition-transform"></span>}
   {text}
   {design === "elegant-link" && <span class="icon-[mdi--arrow-right] text-lg group-hover:translate-x-1 transition-transform"></span>}

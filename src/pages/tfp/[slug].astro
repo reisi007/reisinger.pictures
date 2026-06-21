@@ -19,10 +19,15 @@ export const getStaticPaths = (async () => {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 
-const { title, heroImage, description: frontmatterDesc, keywords } = entry.data;
+const {
+  title,
+  heroImage,
+  description: frontmatterDesc = `Kostenloses TFP Fotoshooting in Linz: Bewirb dich jetzt für das kreative Fotoprojekt "${title}" und erweitere dein Model-Portfolio.`,
+  keywords
+} = entry.data;
 
 // NEU: Nimmt die explizite Description oder baut einen SEO-optimierten Fallback
-const description = frontmatterDesc ?? `Kostenloses TFP Fotoshooting in Linz: Bewirb dich jetzt für das kreative Fotoprojekt "${title}" und erweitere dein Model-Portfolio.`;
+const description = frontmatterDesc;
 
 const contactUrl = generateContactLink({
   subject_prefix: "TFP",
@@ -36,7 +41,8 @@ const contactUrl = generateContactLink({
     {heroImage &&
       <SocialImage name={heroImage} />}
   </BaseHead>
-  {heroImage && <HeroBanner slot="hero" name={heroImage} alt={title} />}
+  {heroImage &&
+    <HeroBanner slot="hero" name={heroImage} alt={title} />}
 
   <div class="max-w-3xl mx-auto pt-4">
 
