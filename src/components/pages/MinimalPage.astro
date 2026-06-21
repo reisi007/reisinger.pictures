@@ -30,6 +30,7 @@ const footerProps = Astro.props;
 </head>
 <body class="min-h-screen flex flex-col">
 <Header />
+<slot name="hero" />
 <main class="container prose max-w-none mb-4 flex-grow">
   <Breadcrumbs></Breadcrumbs>
   <slot />

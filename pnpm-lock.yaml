@@ -51,9 +51,6 @@ importers:
       '@iconify-json/mdi':
         specifier: ^1.2.3
         version: 1.2.3
-      '@iconify-json/tabler':
-        specifier: ^1.2.33
-        version: 1.2.33
       '@iconify/tailwind4':
         specifier: ^1.2.3
         version: 1.2.3(tailwindcss@4.2.2)
@@ -612,9 +609,6 @@ packages:
 
   '@iconify-json/mdi@1.2.3':
     resolution: {integrity: sha512-O3cLwbDOK7NNDf2ihaQOH5F9JglnulNDFV7WprU2dSoZu3h3cWH//h74uQAB87brHmvFVxIOkuBX2sZSzYhScg==}
-
-  '@iconify-json/tabler@1.2.33':
-    resolution: {integrity: sha512-q9nUQfE/cjIrGh5bAKHTphitAZpT0kX9SxDgZo3Sx8ofeDTsaHVdRwrn+CfKiJ5vQ1b1btqVwizXzIgz9KEPjA==}
 
   '@iconify/tailwind4@1.2.3':
     resolution: {integrity: sha512-z8SKiMHRASJKF/IY//87MF88lcB7ulxh8vlhQXXLWsBkNtOh6ese9R41MyGpQeqXdRvQVt+/fX2glQtHFjQ+MA==}
@@ -4433,10 +4427,6 @@ snapshots:
       '@iconify/types': 2.0.0
 
   '@iconify-json/mdi@1.2.3':
-    dependencies:
-      '@iconify/types': 2.0.0
-
-  '@iconify-json/tabler@1.2.33':
     dependencies:
       '@iconify/types': 2.0.0
 

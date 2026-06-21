@@ -3,6 +3,7 @@ import type { GetStaticPaths } from "astro";
 import { getCollection, render } from "astro:content";
 
 import BaseHead from "../../components/BaseHead.astro";
+import HeroBanner from "../../components/HeroBanner.astro";
 import MinimalPage from "../../components/pages/MinimalPage.astro";
 import SocialImage from "../../components/SocialImage.astro";
 import { generateContactLink } from "../../utils";
@@ -35,6 +36,7 @@ const contactUrl = generateContactLink({
     {heroImage &&
       <SocialImage name={heroImage} />}
   </BaseHead>
+  {heroImage && <HeroBanner slot="hero" name={heroImage} alt={title} />}
 
   <div class="max-w-3xl mx-auto pt-4">
 

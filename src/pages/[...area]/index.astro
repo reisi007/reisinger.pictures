@@ -9,6 +9,7 @@ import MinimalPage from "../../components/pages/MinimalPage.astro";
 import type { SchemaCreationFunction } from "../../components/SchemaOrg";
 import SchemaOrg from "../../components/SchemaOrg.astro";
 import { createWebPageSchema } from "../../components/SchemaOrg.factory";
+import HeroBanner from "../../components/HeroBanner.astro";
 import SocialImage from "../../components/SocialImage.astro";
 import { getImage as getImageByName } from "../../images/Images";
 import { LARGEST_IMAGE_SIZE } from "../../styles/Breakpoints";
@@ -50,6 +51,7 @@ const createData: SchemaCreationFunction = (o, me, _, url) => createWebPageSchem
     <SocialImage name={heroImage} />
     <SchemaOrg createData={createData} />
   </BaseHead>
+  {heroImage && <HeroBanner slot="hero" name={heroImage} alt={name} />}
 
   <h1>{name}</h1>
 

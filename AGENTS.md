@@ -48,3 +48,8 @@ When tasks require subjective selection (e.g., curating images or testimonials),
 * **Architecture:** SSG Astro site, hosted via Nginx in a Portainer Docker stack.
 * **Sync:** Deployment relies on local builds synced via `rclone`.
 * **Publishing:** The complete build and sync cycle is orchestrated via `npm run publish`. Do not introduce GitHub Actions CI/CD unless explicitly requested.
+
+## Regelwerk & Grenzfälle (Rules)
+- **Konsultationspflicht:** Prüfe bei Unklarheiten, Strukturfragen, Daten-Mappings oder Namenskonventionen immer zuerst die Markdown-Dateien im Ordner `rules/`.
+- **Automatische Erweiterung:** Wenn bei der Entwicklung neue Grenzfälle, Konflikte (z.B. bei URLs, Bezeichnungen) oder Architektur-Entscheidungen auftreten, **muss** sofort eine neue Regel im Ordner `rules/` dokumentiert oder eine bestehende Regel erweitert werden.
+- **Ziel:** Ein konsistentes, sich selbst dokumentierendes System, das von allen KI-Agenten fehlerfrei verstanden und fortgeführt wird.

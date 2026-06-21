@@ -7,10 +7,10 @@ import { LARGEST_IMAGE_SIZE } from "../../styles/Breakpoints";
 import { absoluteLink } from "../../utils";
 import BaseHead from "../BaseHead.astro";
 import Published from "../Published.astro";
-import ResponsiveImage from "../ResponsiveImage.astro";
 import type { SchemaCreationFunction } from "../SchemaOrg";
 import SchemaOrg from "../SchemaOrg.astro";
 import { createBlogPostingSchema } from "../SchemaOrg.factory";
+import HeroBanner from "../HeroBanner.astro";
 import SocialImage from "../SocialImage.astro";
 import MinimalPage from "./MinimalPage.astro";
 
@@ -45,14 +45,12 @@ const schemaOrg: SchemaCreationFunction = (o, me, df, url) => createBlogPostingS
     <SocialImage name={heroImage} />
     <SchemaOrg createData={schemaOrg} />
   </BaseHead>
+  {heroImage &&
+    <HeroBanner slot="hero" name={heroImage} alt={title} />}
   <article>
     <section>
       <h1>{title}</h1>
       <Published date={date} updated={updated} />
-      {heroImage &&
-        <div>
-          <ResponsiveImage name={heroImage} alt={title} height="32rem" />
-        </div>}
     </section>
     <hr />
     <slot name="start"></slot>

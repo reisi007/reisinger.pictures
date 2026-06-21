@@ -8,6 +8,7 @@ import MinimalPage from "../../../components/pages/MinimalPage.astro";
 import { type SchemaCreationFunction } from "../../../components/SchemaOrg";
 import SchemaOrg from "../../../components/SchemaOrg.astro";
 import { createCollectionPageSchema } from "../../../components/SchemaOrg.factory";
+import HeroBanner from "../../../components/HeroBanner.astro";
 import SocialImage from "../../../components/SocialImage.astro";
 import { absoluteLink } from "../../../utils";
 
@@ -54,6 +55,7 @@ const createData: SchemaCreationFunction = (_, __, df) => createCollectionPageSc
     <SocialImage name={heroImage} />
     <SchemaOrg createData={createData} />
   </BaseHead>
+  {heroImage && <HeroBanner slot="hero" name={heroImage} alt={title} />}
   <h1>{title}</h1>
   <Content />
   <Einblicke page={page} />

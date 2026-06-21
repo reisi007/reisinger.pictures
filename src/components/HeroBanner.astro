@@ -1,0 +1,21 @@
+---
+import ResponsiveImage from "./ResponsiveImage.astro";
+
+interface Props {
+  name: string;
+  alt?: string;
+}
+
+const { name, alt = "" } = Astro.props;
+---
+<div class="w-full bg-base-200 border-b border-base-200 mb-8 relative">
+  <div class="mx-auto w-full max-w-[1920px] aspect-video md:aspect-[21/9] overflow-hidden relative shadow-sm">
+    <ResponsiveImage 
+      name={name} 
+      alt={alt} 
+      class="w-full h-full object-cover object-center !max-h-none !m-0" 
+      sizes="100vw"
+    />
+    {/* Das optionale Gradient-Overlay wurde entfernt, um das Bild ohne Schleier zu zeigen. */}
+  </div>
+</div>
