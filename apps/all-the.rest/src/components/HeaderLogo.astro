@@ -1,0 +1,13 @@
+---
+import ResponsiveImage from "./ResponsiveImage.astro";
+---
+<a href="/" class="flex items-center gap-3 no-underline group">
+  <ResponsiveImage
+    name="me"
+    alt="Florian Reisinger"
+    class="size-10 rounded-full object-cover group-hover:ring-2 ring-primary transition-all shadow"
+    sizes="40px"
+    widths={[40]}
+  />
+  <span class="text-xl font-bold text-base-content group-hover:text-primary transition-colors">Florian Reisinger</span>
+</a>

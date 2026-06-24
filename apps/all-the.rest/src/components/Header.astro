@@ -1,0 +1,157 @@
+---
+import { mainLinks, type NavLink, type NavGroup } from "../data/Menue";
+import HeaderLogo from "./HeaderLogo.astro";
+
+const currentPath = Astro.url.pathname;
+
+function isActive(href: string) {
+  if (href === "/" && currentPath === "/") return true;
+  if (href !== "/" && currentPath.startsWith(href)) return true;
+  return false;
+}
+---
+<header class="w-full bg-base-100/90 backdrop-blur-sm sticky top-0 z-50 border-b border-base-200 mb-4">
+  <div class="navbar container mx-auto px-4 sm:px-0">
+    <div class="navbar-start">
+      <HeaderLogo />
+    </div>
+
+    <div class="navbar-center hidden lg:flex">
+      <ul class="menu menu-horizontal px-1 gap-1 text-base font-medium z-50">
+        {mainLinks.map(item => {
+          if ("subItems" in item) {
+            const group = item as NavGroup;
+            const isGroupActive = group.subItems.some(sub => isActive(sub.href));
+            return (
+              <li>
+                <details>
+                  <summary class={isGroupActive ? "text-primary font-semibold" : ""}>{group.label}</summary>
+                  <ul class="p-2 bg-base-100 rounded-t-none z-50 shadow-xl border border-base-200 min-w-[200px]">
+                    {group.subItems.map(sub => (
+                      <li>
+                        <a href={sub.href} target={sub.external ? "_blank" : undefined} rel={sub.external ? "noopener noreferrer" : undefined} class={isActive(sub.href) ? "text-primary font-semibold" : ""}>
+                          {sub.label} {sub.external && <span class="icon-[mdi--open-in-new] text-xs opacity-50"></span>}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              </li>
+            );
+          } else {
+            const link = item as NavLink;
+            return (
+              <li>
+                <a href={link.href} target={link.external ? "_blank" : undefined} rel={link.external ? "noopener noreferrer" : undefined} class={isActive(link.href) ? "text-primary font-semibold" : ""}>
+                  {link.label} {link.external && <span class="icon-[mdi--open-in-new] text-xs opacity-50"></span>}
+                </a>
+              </li>
+            );
+          }
+        })}
+      </ul>
+    </div>
+
+    <div class="navbar-end gap-2">
+      <button onclick="document.getElementById('contact_modal').showModal();" class="btn btn-primary btn-sm md:btn-md shadow-md flex border-none">
+        Jetzt kontaktieren
+      </button>
+      <button id="mobile-menu-btn" aria-label="open menu" class="btn btn-ghost btn-circle lg:hidden">
+        <span class="icon-[mdi--menu] text-2xl"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="mobile-menu-overlay" class="fixed inset-0 bg-base-100 z-[100] hidden opacity-0 transition-opacity duration-300">
+  <div class="bg-base-100 border-b border-base-200 sticky top-0 z-10 w-full min-h-16">
+    <div class="container mx-auto px-4 flex justify-between items-center min-h-16">
+      <HeaderLogo />
+      <button id="mobile-menu-close" aria-label="close menu" class="btn btn-ghost btn-circle">
+        <span class="icon-[mdi--close] text-2xl"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="grow overflow-y-auto pb-24">
+    <div class="container mx-auto px-4 py-4 flex flex-col h-full">
+      <ul class="menu menu-lg w-full p-0 gap-2">
+        {mainLinks.map(item => {
+          if ("subItems" in item) {
+            const group = item as NavGroup;
+            const isGroupActive = group.subItems.some(sub => isActive(sub.href));
+            return (
+              <li>
+                <details open={isGroupActive}>
+                  <summary class={isGroupActive ? "text-primary font-bold" : ""}>{group.label}</summary>
+                  <ul>
+                    {group.subItems.map(sub => (
+                      <li>
+                        <a href={sub.href} target={sub.external ? "_blank" : undefined} rel={sub.external ? "noopener noreferrer" : undefined} class={isActive(sub.href) ? "active font-bold text-primary" : ""}>
+                          {sub.label} {sub.external && <span class="icon-[mdi--open-in-new] text-base opacity-50"></span>}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              </li>
+            );
+          } else {
+            const link = item as NavLink;
+            return (
+              <li>
+                <a href={link.href} target={link.external ? "_blank" : undefined} rel={link.external ? "noopener noreferrer" : undefined} class={isActive(link.href) ? "active font-bold text-primary" : ""}>
+                  {link.label} {link.external && <span class="icon-[mdi--open-in-new] text-base opacity-50"></span>}
+                </a>
+              </li>
+            );
+          }
+        })}
+      </ul>
+      <div class="mt-6 text-center px-4">
+        <button onclick="document.getElementById('contact_modal').showModal(); document.getElementById('mobile-menu-close').click();" class="btn btn-primary btn-block shadow-md">
+          <span class="icon-[mdi--message-text] text-xl"></span> Jetzt anfragen
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const btnOpen = document.getElementById("mobile-menu-btn");
+    const btnClose = document.getElementById("mobile-menu-close");
+    const overlay = document.getElementById("mobile-menu-overlay");
+
+    if (btnOpen && btnClose && overlay) {
+      const openMenu = () => {
+        overlay.classList.remove("hidden");
+        overlay.classList.add("flex", "flex-col");
+        void overlay.offsetWidth;
+        overlay.classList.remove("opacity-0");
+        overlay.classList.add("opacity-100");
+        document.body.style.overflow = "hidden";
+      };
+
+      const closeMenu = () => {
+        overlay.classList.remove("opacity-100");
+        overlay.classList.add("opacity-0");
+        document.body.style.overflow = "";
+        setTimeout(() => {
+          overlay.classList.remove("flex", "flex-col");
+          overlay.classList.add("hidden");
+        }, 300);
+      };
+
+      btnOpen.addEventListener("click", openMenu);
+      btnClose.addEventListener("click", closeMenu);
+
+      const links = overlay.querySelectorAll("a");
+      links.forEach(link => {
+        if(!link.closest('summary')) {
+            link.addEventListener("click", closeMenu);
+        }
+      });
+    }
+  });
+</script>

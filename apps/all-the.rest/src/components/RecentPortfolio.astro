@@ -1,0 +1,33 @@
+---
+import { getCollection } from "astro:content";
+
+import PortfolioCard from "./PortfolioCard.astro";
+import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
+
+const portfolio = (await getCollection("portfolio"))
+  .sort((a, b) => {
+    const aData = a.data;
+    const bData = b.data;
+
+    return Math.max(bData.date.valueOf(), bData.updated?.valueOf() ?? Number.MIN_VALUE) - Math.max(aData.date.valueOf(), aData.updated?.valueOf() ?? Number.MIN_VALUE);
+  })
+  .slice(0, 5);
+---
+
+<div class="carousel w-full">
+  {
+    portfolio.map((post, i) => {
+      const prevPost = portfolio.at(i - 1);
+      const nextPost = portfolio.at((i + 1) % portfolio.length);
+      return (
+        <div id={post.id.replaceAll("/", "-")} class="carousel-item relative w-full">
+          <PortfolioCard class="mx-auto w-full" post={post} imageSizeModifiers={GALLERY_BREAKPOINTS[GalleryLayout.Full]} />
+          <div class="absolute left-5 right-5 top-1/3 sm:top-1/2 flex -translate-y-1/2 transform justify-between">
+            {prevPost !== undefined && <a href={`#${prevPost.id.replaceAll("/", "-")}`} class="btn btn-circle btn-neutral not-prose">❮</a>}
+            {nextPost !== undefined && <a href={`#${nextPost.id.replaceAll("/", "-")}`} class="btn btn-circle btn-neutral not-prose">❯</a>}
+          </div>
+        </div>
+      );
+    })
+  }
+</div>

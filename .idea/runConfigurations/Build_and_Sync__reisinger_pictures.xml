@@ -1,0 +1,21 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Build &amp; Sync: reisinger.pictures" type="BatchConfigurationType" factoryName="Batch">
+    <module name="astro-reisinger.pictures" />
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="PARENT_ENVS" value="true" />
+    <option name="SCRIPT_NAME" value="sync_reisinger_pictures.bat" />
+    <option name="PARAMETERS" value="" />
+    <method v="2">
+      <option name="NpmBeforeRunTask" enabled="true">
+        <package-json value="$PROJECT_DIR$/package.json" />
+        <command value="run" />
+        <scripts>
+          <script value="build:reisinger.pictures" />
+        </scripts>
+        <node-interpreter value="project" />
+        <package-manager value="project" />
+      </option>
+    </method>
+  </configuration>
+</component>

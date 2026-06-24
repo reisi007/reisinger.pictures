@@ -1,0 +1,55 @@
+---
+import type { NumericBreakpoints } from "@reisinger/shared/utils/Breakpoints";
+import FormattedDate from "./FormattedDate.astro";
+import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
+import ResponsiveImage from "./ResponsiveImage.astro";
+
+export interface Props {
+  href: string;
+  imageName: string;
+  title: string;
+  date?: Date;
+  ctaLabel?: string;
+  imageSizeModifiers?: Partial<NumericBreakpoints>;
+  class?: string;
+}
+
+const {
+  href,
+  imageName,
+  title,
+  date,
+  ctaLabel = "Jetzt lesen", // Standardwert für den Button
+  imageSizeModifiers = GALLERY_BREAKPOINTS[GalleryLayout.Overview], // Standardwert für die Bildgrößen
+  class: className // 'class' ist ein reserviertes Wort, wir benennen es um
+} = Astro.props;
+---
+<a href={href} class:list={[
+  "card bg-base-200 shadow-sm hover:shadow-xl transition-shadow no-underline group h-full flex flex-col",
+  className
+]}>
+  {/* 1. Einheitliche Container-Größe erzwingen (hier z. B. Aspect Ratio 4:3) */}
+  <figure class="aspect-3/2 w-full flex items-center justify-center bg-base-200/50">
+    <ResponsiveImage
+      class="w-full h-full object-contain p-2"
+      sizeModifiers={imageSizeModifiers}
+      alt={title}
+      name={imageName}
+    />
+  </figure>
+
+  <div class="card-body flex flex-col grow">
+    <h3 class="card-title group-hover:text-primary transition-colors">{title}</h3>
+
+    {date && (
+      <p class="text-center text-sm text-base-content/70">
+        <FormattedDate date={date} />
+      </p>
+    )}
+
+    {/* 4. mt-auto schiebt den Button immer an den unteren Rand der Karte */}
+    <div class="card-actions justify-center mt-auto pt-4">
+      <span class="btn btn-primary">{ctaLabel}</span>
+    </div>
+  </div>
+</a>

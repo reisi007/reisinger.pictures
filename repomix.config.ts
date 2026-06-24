@@ -8,7 +8,7 @@ NEVER double-escape newlines (\`\\n\`) when injecting code via scripts.`;
 export default defineConfig({
   output: {
     style: "markdown",
-    filePath: "out/repomix-output.md",
+    filePath: "repomix-website.md",
     removeComments: false,
     removeEmptyLines: true,
     showLineNumbers: false,
@@ -28,12 +28,12 @@ export default defineConfig({
     useGitignore: false,
     useDefaultPatterns: true,
     customPatterns: [
-      "editor/editor.css",
-      "human-loop/human-loop.css",
+      "packages/tools/editor/editor.css",
+      "packages/tools/human-loop/human-loop.css",
       "favorites*.json",
       ".gitignore",
       "**/*.svg",
-	  "pnpm*.yaml",
+      "pnpm*.yaml"
     ]
   }
 });

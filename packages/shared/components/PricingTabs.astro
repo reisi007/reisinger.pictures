@@ -1,0 +1,85 @@
+---
+// src/components/PricingTabs.astro
+const uid = Math.random().toString(36).substring(2, 9);
+---
+
+<div class="pricing-tabs-wrapper mb-12 relative" id="pricing-tabs">
+  <input type="radio" name={`pricing_loc_${uid}`} id={`tab-outdoor-${uid}`} class="tab-radio-outdoor hidden" value="outdoor" checked />
+  <input type="radio" name={`pricing_loc_${uid}`} id={`tab-indoor-${uid}`} class="tab-radio-indoor hidden" value="indoor" />
+
+  <div class="flex flex-col items-center justify-center mt-12 mb-8 not-prose">
+    <div class="inline-flex bg-base-200 p-1 rounded-xl shadow-sm">
+      <label for={`tab-outdoor-${uid}`} class="label-outdoor text-xs font-bold uppercase tracking-wider px-8 py-3 transition-colors cursor-pointer rounded-lg text-base-content/70 hover:text-base-content">
+        OUTDOOR
+      </label>
+      <label for={`tab-indoor-${uid}`} class="label-indoor text-base-content/70 hover:text-base-content rounded-lg font-bold uppercase tracking-wider text-xs px-8 py-3 transition-colors cursor-pointer">
+        INDOOR
+      </label>
+    </div>
+    <p class="text-center text-xs opacity-60 font-medium mt-4 m-0">Wähle deine bevorzugte Location</p>
+  </div>
+
+  <div class="bg-base-200/30 border border-base-300 rounded-[2rem] p-4 sm:p-8 lg:p-12 shadow-sm transition-all duration-300">
+    <div class="content-outdoor hidden">
+      <slot name="outdoor" />
+    </div>
+    <div class="content-indoor hidden">
+      <slot name="indoor" />
+    </div>
+  </div>
+</div>
+
+<style>
+  @reference "../styles/base.css";
+  /* CSS-Logic für den Tab-Switch */
+  .tab-radio-outdoor:checked ~ div .label-outdoor {
+    @apply bg-primary text-primary-content shadow-sm;
+  }
+  .tab-radio-indoor:checked ~ div .label-indoor {
+    @apply bg-primary text-primary-content shadow-sm;
+  }
+  .tab-radio-outdoor:checked ~ div .content-outdoor {
+    display: block;
+  }
+  .tab-radio-indoor:checked ~ div .content-indoor {
+    display: block;
+  }
+</style>
+
+<script>
+
+  function initDeeplinkTabs() {
+    const wrappers = document.querySelectorAll('.pricing-tabs-wrapper');
+    
+    wrappers.forEach(wrapper => {
+      const outdoorRadio = wrapper.querySelector('.tab-radio-outdoor');
+      const indoorRadio = wrapper.querySelector('.tab-radio-indoor');
+      
+      if (!outdoorRadio || !indoorRadio) return;
+
+      // 1. Check URL Parameter on load
+      const params = new URLSearchParams(window.location.search);
+      const type = params.get('type');
+      if (type === 'indoor') {
+        (indoorRadio as HTMLInputElement).checked = true;
+      } else if (type === 'outdoor') {
+        (outdoorRadio as HTMLInputElement).checked = true;
+      }
+
+      // 2. Update URL silently when clicked
+      const updateUrl = (e: Event) => {
+        const val = (e.target as HTMLInputElement).value;
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set('type', val);
+        window.history.replaceState({}, '', newUrl);
+      };
+
+      outdoorRadio.addEventListener('change', updateUrl);
+      indoorRadio.addEventListener('change', updateUrl);
+    });
+  }
+
+  // Initial ausführen & in ViewTransitions verankern
+  initDeeplinkTabs();
+  document.addEventListener('astro:page-load', initDeeplinkTabs);
+</script>

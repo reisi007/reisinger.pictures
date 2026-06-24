@@ -1,17 +1,22 @@
-# Projekt-Roadmap: Professionalisierung reisinger.pictures
+# 🚀 Florian Reisinger Fotografie - Monorepo Backlog
 
-## Phase 2: "Human In The Loop" (HIL) Bildauswahl & Kuration (Fokus für Morgen) ⏳
-- [ ] **Hero- und Übersichts-Bilder:** Florian wählt für *jede* Übersichtsseite (Sport, Business, Privat, Unterkategorien) manuell die stärksten Highlight-Bilder aus.
-- [ ] **Galerien reduzieren ("Kill your Darlings"):** Quantität runter, Qualität hoch. Unterseiten auf max. 10–20 absolute Hero-Shots einkürzen - auch hier wählt Florian die Bilder.
+## Done ✅
+- [x] **Formular-UX & Fokus:** Dauerhaft sichtbare Rahmen für alle Eingabefelder im Kontaktformular von `all-the.rest`. Markanter, doppelter Rahmen bei aktivem Fokus (Kombination aus Border & Outline-Offset).
+- [x] **Tarif-Konfigurator V2 (all-the.rest):**
+  - Einzelpreise an Knöpfen und Sliders entfernt für ungestörte mathematische Übersicht.
+  - Leistungsmerkmale (1,5 - 2h Zeit & Bilderanzahl) permanent live in die Preis-Box gekoppelt.
+  - Native, hochkontrastierte DaisyUI-Komponenten (Schieberegler & Checkbox) ohne Behelfs-Workarounds integriert.
+  - Bidirektionalen Live-Sync der Einstellungen direkt in die URL-Query-Parameter scharfgeschaltet (Deep-Linking/Sharing bereit).
+- [x] **Schutzraum & Kundenpsychologie:** Internes `_gelb`/`_rot` System in verständliche Kundensprache übersetzt (🟢 Online-Portfolio-Modus vs. 🔴 Absolutes Online-Verbot). Strikte Schutzbarriere für unüberlegte Klicks eingeführt (+100 € Grundgebühr und +5 € pro Bild Aufpreis).
+- [x] **Startseiten-Reparatur:** Einleitungstext aus der Overview-Collection geladen, gerendert und nahtlos mit den drei Fokus-Karten verknüpft.
+- [x] **Dead-Code-Cleanup:** Nicht mehr genutzte Richtlinien-Dropdowns (`BadWeather.astro`, `DiscountPolicy.astro`) physisch gelöscht und Imports bereinigt.
+- [x] **Modularer Deployment-Stack:**
+  - Deployment-Lebenszyklen komplett entkoppelt. Unabhängige `docker-compose.yml` Dateien direkt dezentral in `apps/all-the.rest/deployment/` und `apps/reisinger.pictures/deployment/` abgelegt. Globalen Root-Ordner keimfrei gelöscht.
+  - Skripte in `package.json` um domainbasierte Aufrufe mit automatisiertem Vortask (`pnpm exec astro check`) erweitert.
+  - Vier maßgeschneiderte IntelliJ Run Configurations erstellt, um zwischen vollem `Build & Sync` (mit Astro Check Absicherung) und schnellem `Sync Only` (Express-Upload) wählen zu können.
 
-## Phase 4: Long-Term (Fine-Art & Editor) 🖼️
-- [ ] **Bildrechte klären:** TFP-Verträge und Model-Releases auf kommerzielle Verwertbarkeit für Print-Verkäufe prüfen.
-- [ ] **Übersichtsseite konzipieren:** Eine dedizierte Fine-Art-Print Übersichtsseite entwerfen (vorerst als reiner Showcase, später mit Kauf-Option).
-- [ ] **Editor-Integration:** Print-Verkaufs-Option in das Backend/den Editor aufnehmen, um später nahtlos Bilder in den Shop zu pushen.
-
-
-## Phase 5: UI-Standardisierung & Dialog-Formular 🎨
-- [x] **ContactCTA.astro refaktorisieren:** Die Komponente `src/components/ContactCTA.astro` so anpassen, dass sie konsistente Standard-Texte, Icons und Tooltips für die Props `type="b2b"` und `type="b2c"` nutzt. 
-- [x] **Modal/Dialog Trigger:** Sicherstellen, dass JEDER Button aus `ContactCTA.astro` ausschließlich den globalen Kontakt-Dialog öffnet (`<dialog>`), anstatt auf eine URL zu verlinken.
-- [x] **Form.astro Dropdown bereinigen:** In `src/components/Form.astro` das Auswahlfeld für die Anfrageart auf 3 Optionen beschränken: 1. "B2B: Sport, Event & Corporate", 2. "B2C: Privat, Portrait & Fine-Art", 3. "TFP / Model-Anfrage".
-- [x] **Globale CTA-Checks:** Alle `.mdx` Dateien in `src/content/areas/` prüfen und die `<ContactCTA />` Aufrufe an das neue Schema (ohne harte Text-Vorgaben im MDX, sondern via Typ) anpassen.
+## Open / Next Up ⏳
+- [ ] **Tailwind Source-Paths dynamisieren (`all-the.rest`):** In `apps/all-the.rest/src/styles/global.css` relative Pfad-Ketten durch robuste Workspace-Pfad-Zuweisungen oder die `@source`-Direktive ersetzen, um relative Pfad-Instabilitäten zu eliminieren.
+- [ ] **B2B Landingpage implementieren (`reisinger.pictures`):** In `apps/reisinger.pictures/src/pages/index.astro` das minimale Platzhalter-Skelett durch die finale, kommerziell ausgerichtete Premium-B2B-Landingpage (Corporate-, Industrie- und Eventfotografie) unter Verwendung des vorbereiteten `theme-b2b` ersetzen.
+- [ ] **Deployment-Ports absichern (`127.0.0.1` Isolation):** Die dezentralen Ports `8081` (`all-the.rest`) und `8082` (`reisinger.pictures`) in den jeweiligen `docker-compose.yml`-Dateien explizit an `127.0.0.1` binden, damit sie nicht öffentlich über die Server-IP erreichbar sind. Dokumentation pflegen und sicherstellen, dass der vorgelagerte, zentrale Host-Reverse-Proxy das TLS-Mapping sauber durchreicht.
+- [ ] **WKO-Wirtschaftskammer-Profil verlinken:** Sobald das B2B-Portal online ist, den Text- und Backlink-Payload des offiziellen WKO-Firmenprofils überarbeiten, um gezielt Corporate-Entscheider auf `reisinger.pictures` zu lenken und Premium-Positionierung zu spiegeln.

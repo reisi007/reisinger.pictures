@@ -1,0 +1,37 @@
+---
+import { getImage } from "astro:assets";
+
+import { getImage as getImageByName } from "../images/Images";
+import { absoluteLink } from "@reisinger/shared/utils";
+import { getMetadataForImageSlug } from "./image.utils";
+
+interface Props {
+  name?: string;
+}
+
+const { name } = Astro.props;
+
+if (name === undefined) return;
+
+
+const alt = (await getMetadataForImageSlug(name))?.title;
+
+const imageInfo = await getImage({
+  src: getImageByName(name),
+  format: "webp",
+  width: 1200,
+  height: 630,
+  fit: "cover"
+});
+
+const { src, options } = imageInfo;
+const fullSrc = absoluteLink(Astro.url, src);
+const { width, height, format } = options;
+---
+<meta property="og:image" content={fullSrc} />
+<meta property="og:image:width" content={`${width}`} />
+<meta property="og:image:height" content={`${height}`} />
+<meta property="og:image:type" content={format} />
+<meta property="twitter:image" content={fullSrc} />
+<meta property="twitter:image:alt" content={alt} />
+<meta property="twitter:card" content={fullSrc} />

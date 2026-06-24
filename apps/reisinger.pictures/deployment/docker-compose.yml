@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  web:
+    image: nginx:alpine
+    container_name: web_web_reisinger_pictures
+    restart: unless-stopped
+    ports:
+      - "8082:80"
+    volumes:
+      - /var/www/reisinger.pictures:/usr/share/nginx/html:ro

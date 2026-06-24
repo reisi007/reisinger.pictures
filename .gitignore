@@ -136,15 +136,15 @@ fabric.properties
 .idea/**/azureSettings.xml
 
 # End of https://www.toptal.com/developers/gitignore/api/webstorm,react,astro
-.cache
-dist
-context
+**/.cache
+**/dist
 out
-editor/editor-api-key.js
-editor/editor.css
-human-loop/human-loop.css
-public/agb
-public/dsb
+**/out
+packages/tools/editor/editor.css
+packages/tools/human-loop/human-loop.css
+apps/all-the.rest/public/agb
+apps/all-the.rest/public/dsb
 favorites_response.json
 favorites_hitl.json
 import-gemini.mjs
+repomix-website.md
