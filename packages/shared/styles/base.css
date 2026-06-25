@@ -3,73 +3,9 @@
 @plugin "@tailwindcss/typography";
 
 /* --- B2C THEME: all-the.rest (Wild, Kreativ, Start-up-Türkis) --- */
-@plugin "daisyui/theme" {
-    name: "theme-b2c";
-    default: true;
-    --color-base-100: oklch(100% 0 0);
-    --color-base-200: oklch(98% 0.003 285.885);
-    --color-base-300: oklch(95% 0.005 285.885);
-    --color-base-content: oklch(21% 0.006 285.885);
-    --color-primary: #2A9D8F; /* Das laute Original-Türkis */
-    --color-primary-content: #ffffff;
-    --color-secondary: #E9C46A;
-    --color-secondary-content: #264653;
-    --radius-selector: 1rem;
-    --radius-field: 0.5rem;
-    --radius-box: 0.5rem;
-}
 
-/* --- B2B THEME: reisinger.pictures (Premium, Manufaktur, Smaragd-/Waldgrün) --- */
-@plugin "daisyui/theme" {
-    name: "theme-b2b";
-    --color-base-100: oklch(18% 0.005 250); /* Dunkles Schiefergrau */
-    --color-base-200: oklch(22% 0.005 250);
-    --color-base-300: oklch(26% 0.005 250);
-    --color-base-content: oklch(95% 0 0);
-    --color-primary: #1E5631; /* Tiefes, edles Wald-/Smaragdgrün */
-    --color-primary-content: #ffffff;
-    --color-secondary: #A4B494; /* Mattes Salbeigrün für Akzente */
-    --color-secondary-content: #1a1a1a;
-    --radius-selector: 0.25rem; /* Eckiger, seriöser */
-    --radius-field: 0.25rem;
-    --radius-box: 0.25rem;
-}
-
-@plugin "daisyui" {
-    themes: theme-b2c --default, theme-b2b;
-}
-
-/* Gemeinsame Base Utilities */
-@layer base {
-    /* Globaler Fix: Verhindert weiße Ränder bei Light-Themes */
-    .btn {
-        border-style: none !important;
-    }
-
-    h1, h2, h3, h4 {
-        @apply text-center break-words;
-    }
-}
-
-@layer base {
-    /* Buttons ohne störende DaisyUI-Standardränder */
-    .btn, .btn-circle, button {
-        border-style: none !important;
-        border-width: 0px !important;
-    }
-    
-    /* Eingabefelder mit dauerhaft sichtbarem Rahmen und genialem doppelten Fokus-Rahmen */
-    .input, .textarea, input[type="text"], input[type="email"], textarea {
-        border: 2px solid oklch(0.3 0 0 / 0.2) !important;
-        background-color: oklch(1 0 0) !important;
-        color: oklch(0.2 0 0) !important;
-        transition: all 0.2s ease-in-out !important;
-    }
-    
-    .input:focus, .textarea:focus, input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
-        border-color: var(--color-primary) !important;
-        outline: 2px solid var(--color-primary) !important;
-        outline-offset: 3px !important;
-        box-shadow: 0 0 0 4px oklch(from var(--color-primary) l r h / 0.1) !important;
+@layer components {
+    .btn:not(.btn-outline) {
+        @apply border-none;
     }
 }

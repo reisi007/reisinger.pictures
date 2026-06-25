@@ -18,11 +18,8 @@ export default defineConfig({
   },
   include: [
     "*",
-    "src/**/*",
-    "editor/*",
-    "human-loop/*",
-    "deployment/*",
-    "context/"
+    "**/apps/**/*",
+    "**/packages/**/**",
   ],
   ignore: {
     useGitignore: false,
@@ -30,6 +27,9 @@ export default defineConfig({
     customPatterns: [
       "packages/tools/editor/editor.css",
       "packages/tools/human-loop/human-loop.css",
+      "**/apps/*/.cache",
+      "**/apps/*/.astro",
+      "**/apps/*/dist",
       "favorites*.json",
       ".gitignore",
       "**/*.svg",

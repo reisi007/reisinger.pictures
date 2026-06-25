@@ -1,7 +1,12 @@
 ---
+const siteUrl = Astro.site?.hostname || "all-the.rest";
+const isB2B = siteUrl.includes("reisinger.pictures");
+const actionUrl = isB2B ? "https://form.reisinger.pictures" : "https://form.all-the.rest";
+const nextUrl = new URL('/thankyou', Astro.url).href;
 ---
 <h3 class="footer-title mx-auto mt-2">Erreiche mich über das Kontaktformular</h3>
-<form method="POST" action="https://form.reisinger.pictures" class="flex flex-col w-full max-w-lg mx-auto gap-y-2 not-prose">
+<form id="reisinger-contact-form" method="POST" action={actionUrl} class="flex flex-col w-full max-w-lg mx-auto gap-y-2 not-prose">
+  <input type="hidden" name="_next" value={nextUrl} />
   <input type="hidden" id="form-subject" name="subject" value="Allgemeine Anfrage" />
   <input type="hidden" id="form__subject_prefix" name="subject_prefix" value="" />
 
@@ -15,7 +20,7 @@
       id="form__name"
       name="name"
       required
-      class="input input-primary w-full"
+      class="input w-full border-2 border-base-content/20 bg-base-100 text-base-content focus:border-primary focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all"
     />
   </label>
 
@@ -24,14 +29,14 @@
       <span class="label-text">Email</span>
       <span class="label-text-alt text-error">*</span>
     </span>
-    <input type="email" id="form_email" name="email" required class="input input-primary w-full" />
+    <input type="email" id="form_email" name="email" required class="input w-full border-2 border-base-content/20 bg-base-100 text-base-content focus:border-primary focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all" />
   </label>
 
   <label for="form__phone" class="form-control w-full">
     <span class="label ml-2 mb-1">
       <span class="label-text">Telefonnummer</span>
     </span>
-    <input type="tel" id="form__phone" name="phone" class="input input-primary w-full" />
+    <input type="tel" id="form__phone" name="phone" class="input w-full border-2 border-base-content/20 bg-base-100 text-base-content focus:border-primary focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all" />
   </label>
 
   <label for="form_msg" class="form-control w-full">
@@ -39,7 +44,7 @@
       <span class="label-text">Nachricht</span>
       <span class="label-text-alt text-error">*</span>
     </span>
-    <textarea name="message" id="form_msg" rows="5" required class="textarea textarea-primary w-full"></textarea>
+    <textarea name="message" id="form_msg" rows="5" required class="textarea w-full border-2 border-base-content/20 bg-base-100 text-base-content focus:border-primary focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all"></textarea>
   </label>
 
   <span class="hidden">
@@ -52,7 +57,7 @@
 
   <script>
     document.addEventListener("astro:page-load", () => {
-      const form = document.querySelector("form[action*='form.reisinger.pictures']") as HTMLFormElement;
+      const form = document.getElementById("reisinger-contact-form") as HTMLFormElement;
       const modal = document.getElementById("contact_modal") as HTMLDialogElement;
       if (!form) return;
 

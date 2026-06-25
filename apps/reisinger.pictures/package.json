@@ -5,11 +5,20 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro check && astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "sync": "astro sync",
+    "prebuild": "node ../../packages/tools/scripts/add-metadata.mjs",
+    "postbuild": "node ../../packages/tools/scripts/clean_output.mjs && node ../../packages/tools/scripts/check_links.mjs"
   },
   "dependencies": {
     "astro": "^6.4.7",
     "@astrojs/check": "^0.9.9",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "sharp": "^0.34.5",
+    "@astrojs/sitemap": "^3.7.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.2",
+    "tailwindcss": "^4.2.2"
   }
 }

@@ -2,9 +2,9 @@
   <configuration default="false" name="Build &amp; Sync: all-the.rest" type="BatchConfigurationType" factoryName="Batch">
     <module name="astro-reisinger.pictures" />
     <option name="INTERPRETER_OPTIONS" value="" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="WORKING_DIRECTORY" value="./apps/all-the.rest" />
     <option name="PARENT_ENVS" value="true" />
-    <option name="SCRIPT_NAME" value="sync_all_the_rest.bat" />
+    <option name="SCRIPT_NAME" value="sync.bat" />
     <option name="PARAMETERS" value="" />
     <method v="2">
       <option name="NpmBeforeRunTask" enabled="true">
@@ -15,6 +15,7 @@
         </scripts>
         <node-interpreter value="project" />
         <package-manager value="project" />
+        <envs />
       </option>
     </method>
   </configuration>

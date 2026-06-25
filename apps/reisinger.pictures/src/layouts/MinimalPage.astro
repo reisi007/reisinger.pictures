@@ -1,0 +1,64 @@
+---
+import Form from "@reisinger/shared/components/Form.astro";
+import "../styles/global.css";
+---
+<html lang="de">
+  <slot name="head" />
+  <body class="min-h-screen bg-base-100 flex flex-col text-base-content selection:bg-primary/20">
+    <slot name="hero" />
+    
+    <main class="container mx-auto px-6 py-12 md:py-16 prose prose-lg max-w-3xl text-center space-y-10 flex-grow">
+      <slot />
+    </main>
+
+    <footer class="bg-base-200 text-base-content py-8 mt-auto border-t border-base-300">
+      <div class="max-w-3xl mx-auto px-6 flex flex-col items-center gap-4 text-center">
+        
+        <div class="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm font-medium opacity-70">
+          <a href="https://all-the.rest" class="hover:underline hover:opacity-100 text-primary transition-opacity">Privatkunden (all-the.rest)</a>
+          <a href="/impressum" class="hover:underline hover:opacity-100 transition-opacity">Impressum</a>
+          <a href="/datenschutz" class="hover:underline hover:opacity-100 transition-opacity">Datenschutz</a>
+        </div>
+        
+        <p class="text-xs opacity-50 m-0">© {new Date().getFullYear()} Florian Reisinger</p>
+      </div>
+    </footer>
+  
+    <button
+      onclick="document.getElementById('contact_modal').showModal();"
+      class="tooltip tooltip-left tooltip-primary btn btn-primary btn-circle fixed bottom-6 right-6 z-[90] shadow-2xl h-16 w-16 flex items-center justify-center hover:scale-110 transition-transform group border-none"
+      aria-label="Kontaktformular öffnen" data-tip="Lass uns über dein Projekt sprechen!"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-7 group-hover:animate-pulse"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    </button>
+
+    <dialog id="contact_modal" class="modal modal-bottom sm:modal-middle z-[9999]">
+      <div class="modal-box bg-base-100">
+        <form method="dialog">
+          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" aria-label="Schließen">
+            ✕
+          </button>
+        </form>
+        <div class="mt-4 text-left not-prose">
+          <h3 class="font-bold text-2xl mb-6 text-base-content">Projekt anfragen</h3>
+          <Form />
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button>Schließen</button>
+      </form>
+    </dialog>
+  
+    <script>
+      document.addEventListener("astro:page-load", () => {
+        const btn = document.getElementById('btn-projekt-anfragen');
+        if (btn) {
+          btn.addEventListener('click', () => {
+            const modal = document.getElementById('contact_modal') as HTMLDialogElement;
+            if (modal) modal.showModal();
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

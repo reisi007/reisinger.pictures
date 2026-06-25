@@ -5,7 +5,7 @@ import ExifReader from "exifreader";
 import sharp from "sharp";
 
 // The root folder to start searching from
-const FOLDER_PATH = "./src";
+const FOLDER_PATH = path.join(process.cwd(), "src");
 const CATEGORIES_PATH = path.join(FOLDER_PATH, "content", "categories.json");
 
 /**

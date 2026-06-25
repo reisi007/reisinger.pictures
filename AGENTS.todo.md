@@ -16,6 +16,10 @@
   - Vier maßgeschneiderte IntelliJ Run Configurations erstellt, um zwischen vollem `Build & Sync` (mit Astro Check Absicherung) und schnellem `Sync Only` (Express-Upload) wählen zu können.
 
 ## Open / Next Up ⏳
+- [ ] **ResponsiveImage-Komponente generalisieren:** `ResponsiveImage.astro` inkl. `Images.ts` aus `all-the.rest` in das `shared`-Paket migrieren, um sie auf der B2B-Seite für den Fullscreen-Eyecatcher nutzbar zu machen (Image-Globbing Architektur beachten).
+- [ ] **Logos erneuern:** Neues Logo für `all-the.rest` entwerfen und bestehendes Logo für `reisinger.pictures` aktualisieren.
+- [ ] **B2B Theme & Colors:** B2B-Design zwingend auf ein helles, klares Theme (Light Mode) ausrichten. Dunkle Hintergründe kollidieren zu stark mit klinisch-weißen Business/Arzt-Fotos.
+- [x] **Skripte generalisieren (Monorepo):** Folgende Skripte müssen allgemein gehalten werden und für beides (B2B/B2C) genutzt werden: `apps/all-the.rest/add-metadata.mjs`, `apps/all-the.rest/check_links.mjs`, `apps/all-the.rest/clean_output.mjs`.
 - [ ] **Tailwind Source-Paths dynamisieren (`all-the.rest`):** In `apps/all-the.rest/src/styles/global.css` relative Pfad-Ketten durch robuste Workspace-Pfad-Zuweisungen oder die `@source`-Direktive ersetzen, um relative Pfad-Instabilitäten zu eliminieren.
 - [ ] **B2B Landingpage implementieren (`reisinger.pictures`):** In `apps/reisinger.pictures/src/pages/index.astro` das minimale Platzhalter-Skelett durch die finale, kommerziell ausgerichtete Premium-B2B-Landingpage (Corporate-, Industrie- und Eventfotografie) unter Verwendung des vorbereiteten `theme-b2b` ersetzen.
 - [ ] **Deployment-Ports absichern (`127.0.0.1` Isolation):** Die dezentralen Ports `8081` (`all-the.rest`) und `8082` (`reisinger.pictures`) in den jeweiligen `docker-compose.yml`-Dateien explizit an `127.0.0.1` binden, damit sie nicht öffentlich über die Server-IP erreichbar sind. Dokumentation pflegen und sicherstellen, dass der vorgelagerte, zentrale Host-Reverse-Proxy das TLS-Mapping sauber durchreicht.

@@ -1,0 +1,50 @@
+---
+import { getCollection, render } from "astro:content";
+import { Image } from "astro:assets";
+import BaseHead from "../components/BaseHead.astro";
+import MinimalPage from "../layouts/MinimalPage.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("simple");
+  return posts.map((post) => ({
+    params: { simple: post.id === "index" ? undefined : post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { title, description, heroImage, noIndex } = post.data;
+const { Content } = await render(post);
+
+// Temporärer Workaround für das Hero-Bild, bis ResponsiveImage im Shared-Ordner liegt:
+const images = import.meta.glob<{ default: ImageMetadata }>('/src/images/*.{jpeg,jpg,png,gif,webp}');
+let heroImgSrc;
+if (heroImage) {
+  const imagePath = `/src/images/${heroImage}.jpg`;
+  if (images[imagePath]) {
+    heroImgSrc = (await images[imagePath]()).default;
+  }
+}
+---
+<MinimalPage>
+  <BaseHead slot="head" title={title} description={description} noIndex={noIndex} />
+  
+  {heroImgSrc && (
+    <section slot="hero" class="relative w-full h-[70vh] min-h-[500px] flex items-center justify-center bg-base-300 overflow-hidden">
+      <Image 
+        src={heroImgSrc} 
+        alt={title} 
+        class="absolute inset-0 w-full h-full object-cover object-center" 
+        widths={[720, 1280, 1920]} 
+        sizes="100vw" 
+      />
+      <div class="absolute inset-0 bg-base-300/10"></div>
+      
+      <div class="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-base-100 from-0% via-base-100/10 via-50% to-transparent"></div>
+    </section>
+  )}
+  
+  <article class="w-full flex flex-col items-center">
+    <Content />
+  </article>
+</MinimalPage>

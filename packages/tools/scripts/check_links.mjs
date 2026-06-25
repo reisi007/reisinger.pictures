@@ -1,7 +1,9 @@
 import { readdir, readFile } from "fs/promises";
 import { join, resolve } from "path";
 import { JSDOM } from "jsdom";
-import config from "./astro.config.mjs";
+import { pathToFileURL } from "url";
+const configPath = resolve(process.cwd(), "astro.config.mjs");
+const config = (await import(pathToFileURL(configPath).href)).default;
 
 /**
  * Removes all elements from the array that match the given predicate.
@@ -147,8 +149,8 @@ export async function extractLocsFromSitemap(sitemapPath) {
   }
 }
 
-const knownUrlsPromise = extractLocsFromSitemap("./dist/sitemap-0.xml");
-const crossRefLinksPromise = extractAllLinksRecursivelyWithJSDOM("./dist", config.site);
+const knownUrlsPromise = extractLocsFromSitemap(resolve(process.cwd(), "dist/sitemap-0.xml")).catch(() => []);
+const crossRefLinksPromise = extractAllLinksRecursivelyWithJSDOM(resolve(process.cwd(), "dist"), config.site).catch(() => ({ links: [], anchors: [] }));
 
 const sitemapUrls = await knownUrlsPromise;
 const { links: crossRefLinks, anchors } = await crossRefLinksPromise;

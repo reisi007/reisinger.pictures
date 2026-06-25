@@ -1,0 +1,47 @@
+@import "@reisinger/shared/styles/base.css";
+
+/* Tailwind anweisen, auch in der B2B App nach Klassen zu scannen! */
+@source "../content/**/[^_]*.{md,mdx}";
+@source "../layouts/**/*.astro";
+@source "../pages/**/*.astro";
+@source "../components/**/*.astro";
+@source "../../../../packages/shared/components/**/*.astro";
+@source "../../../../packages/shared/solid/**/*.tsx";
+
+
+@plugin "daisyui/theme" {
+    name: "b2b-light";
+    default: true;
+    prefersdark: false;
+    --color-base-100: oklch(100% 0 0);
+    --color-base-200: oklch(96% 0 0);
+    --color-base-300: oklch(92% 0 0);
+    --color-base-content: oklch(20% 0 0);
+    --color-primary: #1E5631;
+    --color-primary-content: #ffffff;
+    --color-secondary: #A4B494;
+    --color-secondary-content: #1a1a1a;
+    --radius-selector: 0.25rem;
+    --radius-field: 0.25rem;
+    --radius-box: 0.25rem;
+}
+
+@plugin "daisyui/theme" {
+    name: "b2b-dark";
+    prefersdark: true;
+    --color-base-100: oklch(18% 0.005 250); /* Dunkles Schiefergrau */
+    --color-base-200: oklch(22% 0.005 250);
+    --color-base-300: oklch(26% 0.005 250);
+    --color-base-content: oklch(95% 0 0);
+    --color-primary: #1E5631; /* Smaragdgrün */
+    --color-primary-content: #ffffff;
+    --color-secondary: #A4B494; /* Mattes Salbeigrün */
+    --color-secondary-content: #1a1a1a;
+    --radius-selector: 0.25rem;
+    --radius-field: 0.25rem;
+    --radius-box: 0.25rem;
+}
+
+@plugin "daisyui" {
+    themes: b2b-light --default, b2b-dark --prefers-dark;
+}

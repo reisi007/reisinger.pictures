@@ -14,7 +14,7 @@ import HeroBanner from "../HeroBanner.astro";
 import SocialImage from "../SocialImage.astro";
 import MinimalPage from "./MinimalPage.astro";
 
-type Props = CollectionEntry<"portfolio">["data"] | CollectionEntry<"courses">["data"];
+type Props = CollectionEntry<"portfolio">["data"];
 
 const { title, description, heroImage, ...dates } = Astro.props;
 

@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Deploy: All (Complete)" type="js.build_tools.npm">
+  <configuration default="false" name="Dev: all-the.rest" type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/package.json" />
     <command value="run" />
     <scripts>
-      <script value="deploy:all" />
+      <script value="dev:b2c" />
     </scripts>
     <node-interpreter value="project" />
     <package-manager value="pnpm" />
