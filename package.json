@@ -7,15 +7,15 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:b2c": "pnpm --filter all-the.rest dev",
-    "build:b2c": "pnpm --filter all-the.rest build",
+    "dev:b2c": "pnpm --filter story.reisinger.pictures dev",
+    "build:b2c": "pnpm --filter story.reisinger.pictures build",
     "dev:b2b": "pnpm --filter reisinger.pictures dev",
     "build:b2b": "pnpm --filter reisinger.pictures build",
-    "build:all": "pnpm --filter all-the.rest build && pnpm --filter reisinger.pictures build",
+    "build:all": "pnpm --filter story.reisinger.pictures build && pnpm --filter reisinger.pictures build",
     "editor": "concurrently \"tailwindcss -i ./packages/tools/editor/editor.tw.css -o ./packages/tools/editor/editor.css --watch\" \"http-server packages/tools -p 8080 -c-1 -o /editor/editor.html\"",
     "human-loop": "concurrently \"tailwindcss -i ./packages/tools/human-loop/human-loop.tw.css -o ./packages/tools/human-loop/human-loop.css --watch\" \"http-server packages/tools -p 8081 -c-1 -o /human-loop/human-loop.html\"",
     "merge:llm": "repomix",
-    "build:all-the.rest": "pnpm --filter all-the.rest exec astro check && pnpm --filter all-the.rest build",
+    "build:story.reisinger.pictures": "pnpm --filter story.reisinger.pictures exec astro check && pnpm --filter story.reisinger.pictures build",
     "build:reisinger.pictures": "pnpm --filter reisinger.pictures exec astro check && pnpm --filter reisinger.pictures build"
   },
   "devDependencies": {

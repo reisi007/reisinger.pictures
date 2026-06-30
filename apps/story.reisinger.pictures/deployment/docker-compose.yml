@@ -3,10 +3,10 @@ version: '3'
 services:
   website:
     image: nginx:alpine
-    container_name: all-the-rest
+    container_name: story-reisinger-pictures
     restart: unless-stopped
     volumes:
-      - /home/webadmin/websites/all-the.rest:/usr/share/nginx/html:ro
+      - /home/webadmin/websites/story.reisinger.pictures:/usr/share/nginx/html:ro
     networks:
       webnet:
         ipv4_address: 172.18.0.50

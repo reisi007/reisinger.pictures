@@ -142,8 +142,8 @@ out
 **/out
 packages/tools/editor/editor.css
 packages/tools/human-loop/human-loop.css
-apps/all-the.rest/public/agb
-apps/all-the.rest/public/dsb
+apps/story.reisinger.pictures/public/agb
+apps/story.reisinger.pictures/public/dsb
 favorites_response.json
 favorites_hitl.json
 import-gemini.mjs

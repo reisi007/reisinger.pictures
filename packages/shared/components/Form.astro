@@ -1,7 +1,5 @@
 ---
-const siteUrl = Astro.site?.hostname || "all-the.rest";
-const isB2B = siteUrl.includes("reisinger.pictures");
-const actionUrl = isB2B ? "https://form.reisinger.pictures" : "https://form.all-the.rest";
+const actionUrl = "https://form.reisinger.pictures";
 const nextUrl = new URL('/thankyou', Astro.url).href;
 ---
 <h3 class="footer-title mx-auto mt-2">Erreiche mich über das Kontaktformular</h3>

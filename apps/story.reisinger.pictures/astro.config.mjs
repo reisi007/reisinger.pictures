@@ -14,7 +14,7 @@ export default defineConfig({
     dangerouslyProcessSVG: true
   },
   redirects: { "/live": "/portal", "/privat/preise": "/preise" },
-  site: "https://all-the.rest",
+  site: "https://story.reisinger.pictures",
   cacheDir: "./.cache",
   devToolbar: {
     enabled: false

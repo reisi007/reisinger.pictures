@@ -1,11 +1,9 @@
 ---
-title: "reisinger.pictures"
+title: "Florian Reisinger" 
 description: "Professionelle B2B & Corporate Fotografie von Florian Reisinger in Linz. Industrie, Business Portraits und hochwertige visuelle Medien."
 heroImage: "hero"
 noIndex: true
 ---
-
-# reisinger.pictures
 ## Corporate. Business. Industrie.
 
 Diese Seite wird aktuell von Grund auf neu entwickelt, um in Zukunft als exklusive Premium-Anlaufstelle für meine Geschäftskunden zu dienen. Hier entsteht ein moderner Raum für ausdrucksstarke Bildwelten, hochwertige Unternehmensportraits und industrielle Dokumentationen.

@@ -12,7 +12,32 @@ importers:
         specifier: ^1.13.1
         version: 1.13.1
 
-  apps/all-the.rest:
+  apps/reisinger.pictures:
+    dependencies:
+      '@astrojs/check':
+        specifier: ^0.9.9
+        version: 0.9.9(prettier@3.8.4)(typescript@5.9.3)
+      '@astrojs/sitemap':
+        specifier: ^3.7.3
+        version: 3.7.3
+      astro:
+        specifier: ^6.4.7
+        version: 6.4.8(@types/node@25.9.4)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.2)(yaml@2.9.0)
+      sharp:
+        specifier: ^0.34.5
+        version: 0.34.5
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.2.2
+        version: 4.3.1(vite@7.3.5(@types/node@25.9.4)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0))
+      tailwindcss:
+        specifier: ^4.2.2
+        version: 4.3.1
+
+  apps/story.reisinger.pictures:
     dependencies:
       '@astrojs/check':
         specifier: ^0.9.9
@@ -120,31 +145,6 @@ importers:
       typescript-eslint:
         specifier: ^8.58.2
         version: 8.62.0(eslint@10.5.0(jiti@2.7.0))(typescript@5.9.3)
-
-  apps/reisinger.pictures:
-    dependencies:
-      '@astrojs/check':
-        specifier: ^0.9.9
-        version: 0.9.9(prettier@3.8.4)(typescript@5.9.3)
-      '@astrojs/sitemap':
-        specifier: ^3.7.3
-        version: 3.7.3
-      astro:
-        specifier: ^6.4.7
-        version: 6.4.8(@types/node@25.9.4)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.2)(yaml@2.9.0)
-      sharp:
-        specifier: ^0.34.5
-        version: 0.34.5
-      typescript:
-        specifier: 5.9.3
-        version: 5.9.3
-    devDependencies:
-      '@tailwindcss/vite':
-        specifier: ^4.2.2
-        version: 4.3.1(vite@7.3.5(@types/node@25.9.4)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0))
-      tailwindcss:
-        specifier: ^4.2.2
-        version: 4.3.1
 
   packages/shared:
     dependencies:

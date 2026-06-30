@@ -2,7 +2,7 @@
 @plugin "@iconify/tailwind4";
 @plugin "@tailwindcss/typography";
 
-/* --- B2C THEME: all-the.rest (Wild, Kreativ, Start-up-Türkis) --- */
+/* --- B2C THEME: story.reisinger.pictures (Wild, Kreativ, Start-up-Türkis) --- */
 
 @layer components {
     .btn:not(.btn-outline) {

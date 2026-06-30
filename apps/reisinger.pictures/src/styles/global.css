@@ -29,14 +29,20 @@
 @plugin "daisyui/theme" {
     name: "b2b-dark";
     prefersdark: true;
-    --color-base-100: oklch(18% 0.005 250); /* Dunkles Schiefergrau */
-    --color-base-200: oklch(22% 0.005 250);
-    --color-base-300: oklch(26% 0.005 250);
-    --color-base-content: oklch(95% 0 0);
-    --color-primary: #1E5631; /* Smaragdgrün */
+    /* Ein tieferes, satteres Dunkelgrau für einen extrem edlen Kontrast */
+    --color-base-100: oklch(15% 0.005 250);
+    --color-base-200: oklch(19% 0.005 250);
+    --color-base-300: oklch(23% 0.005 250);
+    --color-base-content: oklch(95% 0.003 250);
+
+    /* Optimiertes Primärgrün für Darkmode: Mehr Leuchtkraft für Text/Icons, ohne "neon" zu wirken */
+    --color-primary: #2E7D46;
     --color-primary-content: #ffffff;
-    --color-secondary: #A4B494; /* Mattes Salbeigrün */
-    --color-secondary-content: #1a1a1a;
+
+    /* Das matte Salbeigrün ist perfekt als dezenter Text-Akkzent im Darkmode */
+    --color-secondary: #A4B494;
+    --color-secondary-content: #141914;
+
     --radius-selector: 0.25rem;
     --radius-field: 0.25rem;
     --radius-box: 0.25rem;
