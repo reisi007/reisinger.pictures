@@ -22,7 +22,6 @@ let ContentComponent = null;
 let indexTitle = "Florian Reisinger Fotografie";
 
 if (page.currentPage === 1) {
-  // Lädt dynamisch die Root-Overview aus der Portfolio-Collection
   const indexEntry = await getEntry("portfolioOverviews", "index");
   if (indexEntry) {
     indexTitle = indexEntry.data.title || indexTitle;

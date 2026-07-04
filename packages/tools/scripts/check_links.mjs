@@ -149,6 +149,10 @@ export async function extractLocsFromSitemap(sitemapPath) {
   }
 }
 
+// Subdomains nicht im SSG-Build (z.B. eigenständige Dienste)
+const siteHost = new URL(config.site).host;
+const excludedHosts = ["portal.reisinger.pictures", "buy.reisinger.pictures"];
+
 const knownUrlsPromise = extractLocsFromSitemap(resolve(process.cwd(), "dist/sitemap-0.xml")).catch(() => []);
 const crossRefLinksPromise = extractAllLinksRecursivelyWithJSDOM(resolve(process.cwd(), "dist"), config.site).catch(() => ({ links: [], anchors: [] }));
 
@@ -160,10 +164,12 @@ const knownUrls = [...new Set([...sitemapUrls, ...anchors])];
 let missingUrls = crossRefLinks
   .map(link => {
     try {
-      // Nutze config.site als Fallback-BaseURL, damit relative Links und "?..." Links nicht crashen
       const urlObj = new URL(link, config.site);
-      // Strip Query-Parameter für den Abgleich
       urlObj.search = '';
+      urlObj.hash = '';
+      if (!urlObj.pathname.endsWith('/') && !urlObj.pathname.includes('.')) {
+        urlObj.pathname += '/';
+      }
       return urlObj.href;
     } catch {
       return link;
@@ -173,7 +179,8 @@ let missingUrls = crossRefLinks
   .map(link => new URL(link, config.site));
 
 missingUrls = removeIf(missingUrls, link => link.protocol.includes("mailto") && link.pathname === "florian@reisinger.pictures");
-missingUrls = removeIf(missingUrls, link => link.protocol.includes("https") && !link.host.includes("//reisinger.pictures"));
+missingUrls = removeIf(missingUrls, link => link.protocol.includes("https") && !link.host.includes("reisinger.pictures"));
+missingUrls = removeIf(missingUrls, link => excludedHosts.includes(link.host) || (link.host.includes("reisinger.pictures") && link.host !== siteHost));
 missingUrls = removeIf(missingUrls, link => link.pathname.endsWith(".pdf") && (["agb", "dsb"].some(prefix => link.pathname.includes(prefix))));
 
 if (missingUrls.length > 0)

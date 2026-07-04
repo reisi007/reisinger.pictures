@@ -18,7 +18,7 @@ const { featuredTestimonials, categoryTestimonials, slug } = Astro.props;
       <ReviewCards slugs={featuredTestimonials}></ReviewCards>
       {categoryTestimonials.length > 2 &&
         <div class="flex justify-center mt-6">
-          <a class="btn btn-primary " href={`/${slug}/testimonials`}>Alle {categoryTestimonials.length} Bewertungen lesen</a>
+          <a class="btn btn-primary " href={`/shootings/${slug}/testimonials`}>Alle {categoryTestimonials.length} Bewertungen lesen</a>
         </div>
       }
     </>}

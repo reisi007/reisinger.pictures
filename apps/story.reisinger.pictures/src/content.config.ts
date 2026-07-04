@@ -15,13 +15,6 @@ const portfolio = defineCollection({
   })
 });
 
-const overviews_TBD = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: "./src/content/overviews_TBD" }),
-  schema: z.object({
-    title: z.string()
-  })
-});
-
 const portfolioOverviews = defineCollection({
   loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: "./src/content/portfolioOverviews" }),
   schema: z.object({
@@ -130,19 +123,6 @@ const categories = defineCollection({
   loader: file("src/content/categories.json"),
   schema: z.object({
     name: z.string()
-  })
-});
-
-const courses = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: "./src/content/courses" }),
-  schema: z.object({
-    title: z.string(),
-    short: z.string(),
-    description: z.string().optional(),
-    order: z.number().default(99),
-    price: z.string(),
-    duration: z.string(),
-    heroImage: z.string()
   })
 });
 

@@ -13,12 +13,5 @@ export const mainLinks: NavItem[] = [
       { href: '/shootings/couples/', label: 'Pärchen' }
     ]
   },
-  { href: '/preise/', label: 'Preise' },
-  {
-    label: 'Infos',
-    subItems: [
-      { href: '/tfp/', label: 'TFP & Projekte' },
-      { href: '/dsb/', label: 'Datenschutz' }
-    ]
-  }
+  { href: '/preise/', label: 'Preise' }
 ];
