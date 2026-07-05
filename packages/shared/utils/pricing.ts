@@ -6,6 +6,7 @@ const config = {
 
 export const basePrice = config.basePrice;
 export const flatrateMultiplier = 1.2;
+export const outdoorDiscountMultiplier = 0.5;
 
 /**
  * Zentralisierte Preis-Berechnung für Shootings
@@ -24,7 +25,7 @@ export function calculatePackagePrice(
   const timePrice = durationHours * config.hourlyRate;
 
   // Outdoor: Bilder kosten pro Stück nur die Hälfte (2x so viele fürs gleiche Geld)
-  const locationMultiplier = location === "outdoor" ? 0.5 : 1;
+  const locationMultiplier = location === "outdoor" ? outdoorDiscountMultiplier : 1;
   const imagesPrice = (config.hourlyRate / config.imagesPerHourPackage) * images * locationMultiplier;
 
   return (config.basePrice + timePrice + imagesPrice) * multiplier;
@@ -47,9 +48,9 @@ export const image1Indoor = image1;
 export const image5Indoor = image5;
 export const image10Indoor = image10;
 
-export const image1Outdoor = image1 * 0.5;
-export const image5Outdoor = image5 * 0.5;
-export const image10Outdoor = image10 * 0.5;
+export const image1Outdoor = image1 * outdoorDiscountMultiplier;
+export const image5Outdoor = image5 * outdoorDiscountMultiplier;
+export const image10Outdoor = image10 * outdoorDiscountMultiplier;
 
 export const express = 3 * config.hourlyRate;
 export const all = 2 * 8 * config.hourlyRate;
