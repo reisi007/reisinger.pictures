@@ -1,16 +1,16 @@
 ---
+import { absoluteLink } from "@reisinger/shared/utils";
+import { LARGEST_IMAGE_SIZE } from "@reisinger/shared/utils/Breakpoints";
 import { getImage } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 
 import { getImage as getImageByName } from "../../images/Images";
-import { LARGEST_IMAGE_SIZE } from "@reisinger/shared/utils/Breakpoints";
-import { absoluteLink } from "@reisinger/shared/utils";
 import BaseHead from "../BaseHead.astro";
+import HeroBanner from "../HeroBanner.astro";
 import Published from "../Published.astro";
 import type { SchemaCreationFunction } from "../SchemaOrg";
 import SchemaOrg from "../SchemaOrg.astro";
 import { createBlogPostingSchema } from "../SchemaOrg.factory";
-import HeroBanner from "../HeroBanner.astro";
 import SocialImage from "../SocialImage.astro";
 import MinimalPage from "./MinimalPage.astro";
 

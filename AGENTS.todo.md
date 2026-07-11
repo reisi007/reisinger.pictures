@@ -21,7 +21,12 @@
 - [ ] **B2B Theme & Colors:** B2B-Design zwingend auf ein helles, klares Theme (Light Mode) ausrichten. Dunkle Hintergründe kollidieren zu stark mit klinisch-weißen Business/Arzt-Fotos.
 - [x] **Skripte generalisieren (Monorepo):** Folgende Skripte müssen allgemein gehalten werden und für beides (B2B/B2C) genutzt werden: `apps/story.reisinger.pictures/add-metadata.mjs`, `apps/story.reisinger.pictures/check_links.mjs`, `apps/story.reisinger.pictures/clean_output.mjs`.
 - [ ] **Tailwind Source-Paths dynamisieren (`story.reisinger.pictures`):** In `apps/story.reisinger.pictures/src/styles/global.css` relative Pfad-Ketten durch robuste Workspace-Pfad-Zuweisungen oder die `@source`-Direktive ersetzen, um relative Pfad-Instabilitäten zu eliminieren.
-- [ ] **B2B Landingpage implementieren (`reisinger.pictures`):** In `apps/reisinger.pictures/src/pages/index.astro` das minimale Platzhalter-Skelett durch die finale, kommerziell ausgerichtete Premium-B2B-Landingpage (Corporate-, Industrie- und Eventfotografie) unter Verwendung des vorbereiteten `theme-b2b` ersetzen.
+- [x] **B2B Landingpage implementieren (`reisinger.pictures`):** 
+  - [x] **BaseLayout.astro erstellen:** Flexibles Basis-Layout (html/body/Footer/FormModal) ohne prose-Container, für volle Breitenkontrolle auf der Landing Page.
+  - [x] **`index.astro` erstellen:** Finale B2B-Landingpage mit: Hero (hero.jpg), 2 Service-Cards (Personal Branding, Event/PR → verlinken auf Unterseiten), Preis-Block ("ab 210€" mit Inklusivleistungen), USP-Band (3 Icons: Persönlich/Direkt/Transparent), About-Kurztext, CTA.
+  - [x] **`personal-branding.md` erstellen:** Detailseite für Personal-Branding-Service (Ablauf, Leistungsumfang, CTA).
+  - [x] **`eventfotografie.md` erstellen:** Detailseite für Event-/PR-Fotografie mit Portal-Verknüpfung.
+  - [x] **`index.md` entfernen:** Alten Platzhalter löschen, `[...simple].astro` von `index`-Mapping befreien.
 - [ ] **Deployment-Ports absichern (`127.0.0.1` Isolation):** Die dezentralen Ports `8081` (`story.reisinger.pictures`) und `8082` (`reisinger.pictures`) in den jeweiligen `docker-compose.yml`-Dateien explizit an `127.0.0.1` binden, damit sie nicht öffentlich über die Server-IP erreichbar sind. Dokumentation pflegen und sicherstellen, dass der vorgelagerte, zentrale Host-Reverse-Proxy das TLS-Mapping sauber durchreicht.
 - [ ] **WKO-Wirtschaftskammer-Profil verlinken:** Sobald das B2B-Portal online ist, den Text- und Backlink-Payload des offiziellen WKO-Firmenprofils überarbeiten, um gezielt Corporate-Entscheider auf `reisinger.pictures` zu lenken und Premium-Positionierung zu spiegeln.
 - [x] **Domain-Wechsel von `all-the.rest` zu `story.reisinger.pictures` in Konfigurations- und Quellcode-Dateien vollziehen:**

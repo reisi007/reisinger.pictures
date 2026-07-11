@@ -1,29 +1,10 @@
 import { promises as fs } from "fs";
 import path from "path";
 
-async function deleteFilesWithOneUnderscore(folderPath) {
-  try {
-    const files = await fs.readdir(folderPath);
-    const deletionPromises = files.map(async (fileName) => {
-      if (fileName.endsWith("jpg")) {
-        await fs.unlink(path.join(folderPath, fileName));
-      }
-    });
-    await Promise.all(deletionPromises);
-    console.log(`✅ Original files deleted successfully in ${folderPath}`);
-  } catch (error) {
-    if (error.code === 'ENOENT') {
-      console.log(`ℹ️ Skipping cleanup: Folder ${folderPath} does not exist.`);
-    } else {
-      console.error("❌ Error deleting files:", error);
-    }
-  }
-}
-
 async function ensureNoEmptyFiles(folderPath) {
   const emptyFilesFound = [];
   let files = [];
-  
+
   try {
     files = await fs.readdir(folderPath);
   } catch (error) {
@@ -57,5 +38,4 @@ async function ensureNoEmptyFiles(folderPath) {
 }
 
 console.log("🧹 Start cleanup out dir...");
-await deleteFilesWithOneUnderscore(path.join(process.cwd(), "dist", "_astro"));
 await ensureNoEmptyFiles(path.join(process.cwd(), ".cache", "assets"));

@@ -1,32 +1,73 @@
 ---
+import { groupBy } from "@reisinger/shared/utils";
+import { LARGEST_IMAGE_SIZE } from "@reisinger/shared/utils/Breakpoints";
 import { getImage } from "astro:assets";
 import { type CollectionEntry, getCollection, render } from "astro:content";
 
 import BaseHead from "../../../components/BaseHead.astro";
 import FeaturedTestimonials from "../../../components/FeaturedTestimonials.astro";
 import Gallery from "../../../components/Gallery.astro";
+import HeroBanner from "../../../components/HeroBanner.astro";
 import MinimalPage from "../../../components/pages/MinimalPage.astro";
+import PortfolioCard from "../../../components/PortfolioCard.astro";
 import type { SchemaCreationFunction } from "../../../components/SchemaOrg";
 import SchemaOrg from "../../../components/SchemaOrg.astro";
 import { createWebPageSchema } from "../../../components/SchemaOrg.factory";
-import HeroBanner from "../../../components/HeroBanner.astro";
 import SocialImage from "../../../components/SocialImage.astro";
 import { getImage as getImageByName } from "../../../images/Images";
-import { LARGEST_IMAGE_SIZE } from "@reisinger/shared/utils/Breakpoints";
-import { groupBy } from "@reisinger/shared/utils";
 
 interface Props {
   entry: CollectionEntry<"areas">,
-  reviews: CollectionEntry<"testimonials">[]
+  reviews: CollectionEntry<"testimonials">[],
+  relatedPosts: CollectionEntry<"portfolio">[],
+  portfolioPrefix: string | null
 }
 
 export async function getStaticPaths() {
+  const getPortfolioPrefix = (areaId: string): string | null => {
+    const directMap: Record<string, string> = {
+      akt: "akt",
+      beauty: "beauty",
+      sport: "sport",
+      "sport/american-football": "sport/football",
+      "sport/basketball": "sport",
+      "sport/eishockey": "sport/eishockey",
+      "sport/fussball": "sport/fussball",
+      "sport/volleyball": "sport",
+    };
+    if (areaId in directMap) return directMap[areaId];
+
+    const sportTeamMap: Record<string, string> = {
+      "sport/bwl": "sport/eishockey",
+      "sport/swl": "sport/eishockey",
+      "sport/lask": "sport/fussball",
+      "sport/oefb": "sport/fussball",
+      "sport/skv": "sport/fussball",
+      "sport/dragons": "sport/football",
+      "sport/vikings": "sport/football",
+      "sport/acsl": "sport/football",
+      "sport/steelvolleys": "sport",
+    };
+    if (areaId in sportTeamMap) return sportTeamMap[areaId];
+
+    if (areaId.startsWith("sport/")) return "sport";
+
+    return areaId;
+  };
   const areas = await getCollection("areas");
   const testimonials = groupBy(await getCollection("testimonials"), e => e.data.type);
-  return areas.map(entry => ({ params: { area: entry.id }, props: { entry, reviews: testimonials[entry.id] || [] } }));
+  const portfolioPosts = await getCollection("portfolio");
+  return areas.map(entry => {
+    const prefix = getPortfolioPrefix(entry.id);
+    const relatedPosts = prefix ? portfolioPosts
+      .filter(p => p.id.startsWith(prefix + "/") || p.id.startsWith(prefix))
+      .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+      .slice(0, 3) : [];
+    return { params: { area: entry.id }, props: { entry, reviews: testimonials[entry.id] || [], relatedPosts, portfolioPrefix: prefix ?? null } };
+  });
 }
 
-const { entry, reviews: categoryReviews } = Astro.props;
+const { entry, reviews: categoryReviews, relatedPosts, portfolioPrefix } = Astro.props;
 const { id: slug, data: { name, testimonials, images, heroImage } } = entry;
 const reviewSlugs: string[] | undefined = testimonials?.map(e => e.id);
 const { Content } = await render(entry);
@@ -63,4 +104,19 @@ const createData: SchemaCreationFunction = (o, me, _, url) => createWebPageSchem
   <FeaturedTestimonials slug={slug} categoryTestimonials={categoryReviews} featuredTestimonials={reviewSlugs} />
   {images.length > 0 &&
     <Gallery sorted={images} />}
+  {relatedPosts && relatedPosts.length > 0 && (
+    <div class="mt-16 border-t border-base-200 pt-10">
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="text-3xl font-black m-0">Aktuelle Einblicke</h2>
+        {portfolioPrefix && (
+          <a href={`/portfolio/${portfolioPrefix}/`} class="btn btn-outline btn-sm">
+            Alle Beiträge <span class="icon-[mdi--arrow-right] ml-1"></span>
+          </a>
+        )}
+      </div>
+      <div class="grid gap-y-4 md:grid-cols-2 md:gap-x-4 xl:grid-cols-3">
+        {relatedPosts.map(post => <PortfolioCard post={post} />)}
+      </div>
+    </div>
+  )}
 </MinimalPage>

@@ -13,5 +13,6 @@ export const mainLinks: NavItem[] = [
       { href: '/shootings/couples/', label: 'Pärchen' }
     ]
   },
-  { href: '/preise/', label: 'Preise' }
+  { href: '/preise/', label: 'Preise' },
+  { href: '/ueber-mich/', label: 'Über mich' }
 ];

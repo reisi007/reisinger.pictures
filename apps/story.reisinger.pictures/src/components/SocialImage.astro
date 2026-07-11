@@ -1,8 +1,8 @@
 ---
+import { absoluteLink } from "@reisinger/shared/utils";
 import { getImage } from "astro:assets";
 
 import { getImage as getImageByName } from "../images/Images";
-import { absoluteLink } from "@reisinger/shared/utils";
 import { getMetadataForImageSlug } from "./image.utils";
 
 interface Props {
@@ -34,4 +34,4 @@ const { width, height, format } = options;
 <meta property="og:image:type" content={format} />
 <meta property="twitter:image" content={fullSrc} />
 <meta property="twitter:image:alt" content={alt} />
-<meta property="twitter:card" content={fullSrc} />
+<meta name="twitter:card" content="summary_large_image" />

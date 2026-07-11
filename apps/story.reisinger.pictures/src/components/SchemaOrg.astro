@@ -1,8 +1,8 @@
 ---
+import { absoluteLink } from "@reisinger/shared/utils";
 import { getImage } from "astro:assets";
 
 import { getImage as getImageByName } from "../images/Images";
-import { absoluteLink } from "@reisinger/shared/utils";
 import type { Organization, Person, SchemaCreationFunction } from "./SchemaOrg";
 
 const url = Astro.url;

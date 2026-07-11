@@ -1,0 +1,14 @@
+---
+import { contactLink } from "../utils/links";
+---
+<nav class="navbar bg-base-100 border-b border-base-200">
+  <div class="flex-1">
+    <a href="/" class="btn btn-ghost text-xl font-black tracking-tight">Florian Reisinger</a>
+  </div>
+  <div class="flex-none">
+    <a href={contactLink('BUSINESS')} class="btn btn-primary btn-sm shadow-none border-none">
+      <span class="icon-[mdi--message-text] size-4"></span>
+      Projekt anfragen
+    </a>
+  </div>
+</nav>

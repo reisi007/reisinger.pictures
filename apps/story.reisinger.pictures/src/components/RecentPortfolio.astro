@@ -1,8 +1,8 @@
 ---
 import { getCollection } from "astro:content";
 
-import PortfolioCard from "./PortfolioCard.astro";
 import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
+import PortfolioCard from "./PortfolioCard.astro";
 
 const portfolio = (await getCollection("portfolio"))
   .sort((a, b) => {

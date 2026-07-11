@@ -9,9 +9,9 @@ export default function PricingCalculator() {
   onMount(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      if (params.has("type")) setShootingType(params.get("type") || "portrait");
-      if (params.has("setup")) setSetupType(params.get("setup") || "outdoor");
-      if (params.has("extra")) setExtraImages(parseInt(params.get("extra") || "0", 10));
+      if (params.has("type")) setShootingType(params.get("type") ?? "portrait");
+      if (params.has("setup")) setSetupType(params.get("setup") ?? "outdoor");
+      if (params.has("extra")) setExtraImages(parseInt(params.get("extra") ?? "0", 10));
       if (params.has("private")) setIsFullyPrivate(params.get("private") === "true");
     }
   });

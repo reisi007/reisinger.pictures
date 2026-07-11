@@ -8,12 +8,7 @@ import FormModal from "../components/FormModal.astro";
   <slot name="head" />
   <body class="min-h-screen bg-base-100 flex flex-col text-base-content selection:bg-primary/20">
     <Navbar />
-
-    <slot name="hero" />
-    
-    <main class="container mx-auto px-6 py-12 md:py-16 prose prose-lg max-w-3xl space-y-10 flex-grow [&_ul]:text-left [&_ol]:text-left">
-      <slot />
-    </main>
+    <slot />
 
     <Footer />
     <FormModal />

@@ -1,18 +1,20 @@
 ---
-import type { PaginateFunction } from "astro";
-import { getCollection, getEntry, render } from "astro:content";
+import type { Page, PaginateFunction } from "astro";
+import { type CollectionEntry, getCollection, getEntry, render } from "astro:content";
 
-import MinimalPage from "../components/pages/MinimalPage.astro";
 import BaseHead from "../components/BaseHead.astro";
-import PortfolioGrid from "../components/Portfolio.astro";
 import ContentCard from "../components/ContentCard.astro";
+import MinimalPage from "../components/pages/MinimalPage.astro";
+import PortfolioGrid from "../components/Portfolio.astro";
+import SocialImage from "../components/SocialImage.astro";
 
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
   const allPosts = (await getCollection("portfolio")).sort((a, b) => {
-    const aTime = Math.max(a.data.date.valueOf(), a.data.updated?.valueOf() || 0);
-    const bTime = Math.max(b.data.date.valueOf(), b.data.updated?.valueOf() || 0);
+    const aTime = Math.max(a.data.date.valueOf(), a.data.updated?.valueOf() ?? 0);
+    const bTime = Math.max(b.data.date.valueOf(), b.data.updated?.valueOf() ?? 0);
     return bTime - aTime;
   });
+
   return paginate(allPosts, { pageSize: 12 });
 }
 
@@ -33,11 +35,15 @@ if (page.currentPage === 1) {
 <MinimalPage>
   <BaseHead
     title={page.currentPage === 1 ? indexTitle : `Portfolio - Seite ${page.currentPage}`}
+    description="Fotograf Florian Reisinger aus Linz – authentische Portrait-, Beauty-, Akt-, Boudoir- und Pärchen-Shootings. Professionelle Sportfotografie aus der österreichischen Bundesliga."
     slot="head"
-  />
+  >
+    <SocialImage name="beauty-sarah-home2025-portrait-rothaarig-intensiver-blick" />
+  </BaseHead>
 
   {page.currentPage === 1 && (
     <>
+      <h1 class="text-4xl font-black mb-4 text-center">Florian Reisinger – Fotografie mit Leidenschaft</h1>
       {ContentComponent && (
         <div class="prose max-w-none mb-10 text-base md:text-lg leading-relaxed text-base-content/90">
           <ContentComponent />
@@ -70,6 +76,6 @@ if (page.currentPage === 1) {
 
   <div class="mt-16 border-t border-base-200 pt-10">
     <h2 class="text-3xl font-black mb-8 text-center">Neueste Einblicke aus dem Portfolio</h2>
-    <PortfolioGrid page={page as any} />
+    <PortfolioGrid page={page as Page<CollectionEntry<"portfolio">>} />
   </div>
 </MinimalPage>

@@ -1,16 +1,16 @@
 ---
+import { absoluteLink } from "@reisinger/shared/utils";
 import type { InferGetStaticPropsType, PaginateFunction } from "astro";
 import { getCollection, render } from "astro:content";
 
 import BaseHead from "../../../components/BaseHead.astro";
-import Portfolio from "../../../components/Portfolio.astro";
+import HeroBanner from "../../../components/HeroBanner.astro";
 import MinimalPage from "../../../components/pages/MinimalPage.astro";
+import Portfolio from "../../../components/Portfolio.astro";
 import { type SchemaCreationFunction } from "../../../components/SchemaOrg";
 import SchemaOrg from "../../../components/SchemaOrg.astro";
 import { createCollectionPageSchema } from "../../../components/SchemaOrg.factory";
-import HeroBanner from "../../../components/HeroBanner.astro";
 import SocialImage from "../../../components/SocialImage.astro";
-import { absoluteLink } from "@reisinger/shared/utils";
 
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
   const overviewPages = (await getCollection("portfolioOverviews"));

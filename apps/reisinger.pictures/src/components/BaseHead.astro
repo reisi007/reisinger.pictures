@@ -1,4 +1,6 @@
 ---
+import { ClientRouter } from "astro:transitions";
+
 interface Props {
   title: string;
   description?: string;
@@ -9,6 +11,7 @@ const { title, description, noIndex = false } = Astro.props;
 const url = Astro.url.href;
 ---
 <head>
+  <ClientRouter />
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="generator" content={Astro.generator} />
