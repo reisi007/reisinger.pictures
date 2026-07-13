@@ -4,6 +4,23 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import solidJs from "@astrojs/solid-js";
 
+function stripSourceImagesPlugin() {
+  return {
+    name: "strip-source-images",
+    apply: "build",
+    generateBundle(_, bundle) {
+      for (const fileName in bundle) {
+        if (
+          (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) &&
+          bundle[fileName].type === "asset"
+        ) {
+          delete bundle[fileName];
+        }
+      }
+    },
+  };
+}
+
 // https://astro.build/config
 export default defineConfig({
   image: {
@@ -20,7 +37,7 @@ export default defineConfig({
   },
   vite: {
     cacheDir: ".cache/.vite",
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), stripSourceImagesPlugin()],
     optimizeDeps: {
       include: [
         "astro/virtual-modules/transitions-router.js",
