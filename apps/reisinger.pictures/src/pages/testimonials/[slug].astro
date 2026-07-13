@@ -25,7 +25,15 @@ const title = `Eine ehrliche Bewertung von ${name}`;
 const socialImage = filterInvalidImageName(large ?? `${slug}-large`);
 
 // Extract plain-text review body from the raw markdown for structured data.
-const reviewBody = (body ?? "").replace(/[#*_`>~\[\]()!]/g, "").replace(/\s+/g, " ").trim();
+const reviewBody = (body ?? "")
+  .replace(/[#*_`>~[\]()!]/g, "")
+  .replace(/\s+/g, " ")
+  .trim()
+  .replace(/&/g, "&amp;")
+  .replace(/</g, "&lt;")
+  .replace(/>/g, "&gt;")
+  .replace(/"/g, "&quot;")
+  .replace(/'/g, "&#39;");
 
 // Map percentage rating (0-100) to a 5-star scale for Schema.org.
 const starRating = rating !== undefined ? (rating / 20).toFixed(1) : undefined;

@@ -77,7 +77,7 @@
 
       // Register a toggle button that shows/hides the caption.
       lightbox.on("uiRegister", () => {
-        const pswp = (lightbox as any).pswp;
+        const pswp = (lightbox as Record<string, any>).pswp;
         if (!pswp?.ui) return;
 
         // Toggle button — displayed in the top bar, before the close button.
