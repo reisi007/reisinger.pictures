@@ -1,4 +1,6 @@
 import { createEffect, createMemo, createSignal, onMount, Show } from "solid-js";
+import { flexBasePrice, flexImagesIncluded, flexImagePrice, flexSetupSurcharge, flexPrivacyBase, flexPrivacyPerImage } from "@reisinger/shared/utils/pricing";
+import { roundToPsychologicalValue } from "@reisinger/shared/utils";
 
 export default function PricingCalculator() {
   const [shootingType, setShootingType] = createSignal("portrait");
@@ -30,17 +32,16 @@ export default function PricingCalculator() {
     }
   });
 
-  const totalImages = createMemo(() => 20 + extraImages());
+  const totalImages = createMemo(() => flexImagesIncluded + extraImages());
 
   const finalPrice = createMemo(() => {
-    let total = 149;
-    // Sowohl mobiles Blitz-Setup draußen als auch Indoor-Studio kosten +50 € Aufpreis
-    if (setupType() === "outdoor_flash" || setupType() === "indoor") total += 50;
-    total += extraImages() * 15;
+    let total = flexBasePrice;
+    if (setupType() === "outdoor_flash" || setupType() === "indoor") total += flexSetupSurcharge;
+    total += extraImages() * flexImagePrice;
     if (shootingType() === "akt" && isFullyPrivate()) {
-      total += 100 + (totalImages() * 5);
+      total += flexPrivacyBase + (totalImages() * flexPrivacyPerImage);
     }
-    return total;
+    return roundToPsychologicalValue(total);
   });
 
   const contactLink = createMemo(() => {
@@ -78,8 +79,14 @@ export default function PricingCalculator() {
             </span>
             <span class="flex items-center justify-center gap-1.5">
               <span class="icon-[mdi--image-multiple-outline] text-primary text-base"></span>
-              {totalImages()} High-End-Bilder inklusive
+              {flexImagesIncluded} High-End-Bilder inklusive
             </span>
+            <Show when={extraImages() > 0}>
+              <span class="flex items-center justify-center gap-1.5 text-warning">
+                <span class="icon-[mdi--plus-circle-outline] text-warning text-base"></span>
+                +{extraImages()} Zusatzbilder (+{roundToPsychologicalValue(extraImages() * flexImagePrice)} €)
+              </span>
+            </Show>
           </div>
         </div>
 

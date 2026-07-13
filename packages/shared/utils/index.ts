@@ -27,7 +27,7 @@ export function absoluteLink(url: URL, src: string): string {
  * Rundet auf den nächsten 5er. Wenn das Ergebnis auf 0 endet (z.B. 100, 20),
  * wird 1 abgezogen (z.B. 99, 19). Bei Werten unter 12 Euro wird normal auf ganze Euros gerundet.
  */
-function roundToPsychologicalValue(value: number): number {
+export function roundToPsychologicalValue(value: number): number {
   if (value < 12) {
     return Math.max(1, Math.round(value));
   }

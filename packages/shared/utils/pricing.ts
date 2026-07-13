@@ -5,6 +5,7 @@ const config = {
 };
 
 export const basePrice = config.basePrice;
+export const hourlyRate = config.hourlyRate;
 export const reportageMultiplier = 1.2;
 export const outdoorDiscountMultiplier = 0.5;
 export const studentDiscountMultiplier = 0.7;
@@ -59,3 +60,11 @@ export const all = 2 * 8 * config.hourlyRate;
 
 export const maxReductionNext = Math.max(pricingNextIndoor - pricingNextIndoorReduced, pricingNextOutdoor - pricingNextOutdoorReduced);
 export const maxPriceImage5 = Math.max(image5Indoor, image5Outdoor);
+
+// Flex-Tarif (B2C)
+export const flexBasePrice = 149;
+export const flexImagesIncluded = 15;
+export const flexImagePrice = 15;
+export const flexSetupSurcharge = 50;
+export const flexPrivacyBase = 200;
+export const flexPrivacyPerImage = 0;
