@@ -68,3 +68,7 @@ export const flexImagePrice = 15;
 export const flexSetupSurcharge = 50;
 export const flexPrivacyBase = 200;
 export const flexPrivacyPerImage = 0;
+
+// Standard-Tarif
+export const standardImagePriceIndoor = config.hourlyRate / config.imagesPerHourPackage;
+export const standardImagePriceOutdoor = standardImagePriceIndoor * outdoorDiscountMultiplier;

@@ -2,6 +2,8 @@ import {
   basePrice,
   friendDiscountMultiplier,
   hourlyRate,
+  standardImagePriceIndoor,
+  standardImagePriceOutdoor,
   studentDiscountMultiplier
 } from "@reisinger/shared/utils/pricing";
 import { roundToPsychologicalValue } from "@reisinger/shared/utils";
@@ -9,6 +11,7 @@ import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from
 
 export default function PricingCalculatorProfi() {
   const [hours, setHours] = createSignal(1);
+  const [images, setImages] = createSignal(15);
   const [location, setLocation] = createSignal<"indoor" | "outdoor">("indoor");
   const [isStudent, setIsStudent] = createSignal(false);
   const [isFriend, setIsFriend] = createSignal(false);
@@ -21,6 +24,11 @@ export default function PricingCalculatorProfi() {
       if (params.has("code") && params.get("code") === "friend") {
         setShowFriend(true);
       }
+      if (params.has("h")) setHours(parseFloat(params.get("h") ?? "1"));
+      if (params.has("img")) setImages(parseInt(params.get("img") ?? "15", 10));
+      if (params.has("location")) setLocation(params.get("location") as "indoor" | "outdoor");
+      if (params.has("student")) setIsStudent(params.get("student") === "true");
+      if (params.has("friend")) setIsFriend(params.get("friend") === "true");
     }
   });
 
@@ -28,6 +36,7 @@ export default function PricingCalculatorProfi() {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams();
       if (hours() !== 1) params.set("h", hours().toString());
+      if (images() !== 15) params.set("img", images().toString());
       if (location() !== "indoor") params.set("location", location());
       if (isStudent()) params.set("student", "true");
       if (isFriend() && showFriend()) params.set("friend", "true");
@@ -41,14 +50,16 @@ export default function PricingCalculatorProfi() {
     onCleanup(() => clearTimeout(historyTimeout));
   });
 
-  const totalImages = createMemo(() => {
-    const baseImages = hours() * 6;
-    return location() === "outdoor" ? baseImages * 2 : baseImages;
-  });
+  const imagePrice = createMemo(() =>
+    location() === "outdoor" ? standardImagePriceOutdoor : standardImagePriceIndoor
+  );
+
+  const totalImages = createMemo(() => images());
 
   const finalPrice = createMemo(() => {
     const timePrice = hours() * hourlyRate;
-    let total = basePrice + timePrice;
+    const imagesPrice = images() * imagePrice();
+    let total = basePrice + timePrice + imagesPrice;
 
     if (isStudent()) total *= studentDiscountMultiplier;
     if (isFriend() && showFriend()) total *= friendDiscountMultiplier;
@@ -60,10 +71,10 @@ export default function PricingCalculatorProfi() {
     let msg = "Hallo Florian,\n\nich interessiere mich für ein Shooting im Profi-Tarif.\n\n";
     msg += "Konfiguration:\n";
     msg += "- Stunden: " + hours() + " (" + (hours() * 60) + " Minuten)\n";
+    msg += "- Bilder: " + images() + " Stück\n";
     msg += "- Location: " + (location() === "indoor" ? "Indoor Studio" : "Outdoor") + "\n";
     if (isStudent()) msg += "- Studenten-Rabatt (30%)\n";
     if (isFriend() && showFriend()) msg += "- Freunde-Rabatt (50%)\n";
-    msg += "- Erwartete Bilder: " + totalImages() + " Stück\n";
     msg += "\nErrechneter Preis: " + finalPrice() + " €\n\nIch freue mich auf deine Rückmeldung!\n";
     return "?subject_prefix=PROFI&message=" + encodeURIComponent(msg) + "#kontakt";
   });
@@ -85,7 +96,7 @@ export default function PricingCalculatorProfi() {
           </span>
           <span class="flex items-center justify-center gap-1.5">
             <span class="text-primary text-base">&#x1F5BC;</span>
-            {totalImages()} bearbeitete Bilder inkl.
+            {totalImages()} bearbeitete Bilder
           </span>
         </div>
       </div>
@@ -96,20 +107,28 @@ export default function PricingCalculatorProfi() {
             <span>1. Shooting-Dauer</span>
             <span class="text-primary font-black">{hours()} {hours() === 1 ? "Stunde" : "Stunden"}</span>
           </label>
-          <input type="range" min="1" max="8" step="1" value={hours()} onInput={(e) => setHours(parseInt(e.currentTarget.value))} class="range range-primary range-sm w-full cursor-pointer border-none p-0 bg-transparent" />
+          <input type="range" min="1" max="8" step="0.5" value={hours()} onInput={(e) => setHours(parseFloat(e.currentTarget.value))} class="range range-primary range-sm w-full cursor-pointer border-none p-0 bg-transparent" />
           <div class="flex justify-between text-[10px] text-base-content/40 font-bold px-0.5 mt-0.5">
             <span>1h</span><span>2h</span><span>3h</span><span>4h</span><span>5h</span><span>6h</span><span>7h</span><span>8h</span>
           </div>
         </div>
 
         <div>
-          <label class="label text-sm font-black p-0 mb-2 text-base-content">2. Location</label>
+          <label class="label text-sm font-black flex justify-between p-0 mb-1 text-base-content">
+            <span>2. Bild-Anzahl</span>
+            <span class="text-primary font-black">{images()} Bilder</span>
+          </label>
+          <input type="range" min="1" max="50" step="1" value={images()} onInput={(e) => setImages(parseInt(e.currentTarget.value))} class="range range-primary range-sm w-full cursor-pointer border-none p-0 bg-transparent" />
+        </div>
+
+        <div>
+          <label class="label text-sm font-black p-0 mb-2 text-base-content">3. Location</label>
           <div class="flex gap-2">
             <button type="button" class={"btn btn-sm flex-1 border-2 " + (location() === "indoor" ? "btn-primary text-white border-primary" : "btn-outline border-base-300 text-base-content")} onClick={() => setLocation("indoor")}>
               Studio Indoor
             </button>
             <button type="button" class={"btn btn-sm flex-1 border-2 " + (location() === "outdoor" ? "btn-primary text-white border-primary" : "btn-outline border-base-300 text-base-content")} onClick={() => setLocation("outdoor")}>
-              Outdoor (2x Bilder)
+              Outdoor
             </button>
           </div>
         </div>
