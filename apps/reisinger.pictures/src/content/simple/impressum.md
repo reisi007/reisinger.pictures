@@ -11,7 +11,7 @@ Robert-Stolz-Straße 8
 
 Kontaktdaten:  
 E-Mail: florian@reisinger.pictures  
-Web: [https://reisinger.pictures](https://reisinger.pictures/impressum#kontakt)
+Web: [https://story.reisinger.pictures](https://story.reisinger.pictures/impressum#kontakt)
 WhatsApp: https://wa.me/message/WCWIDNQAIYSGE1  
 Telefon: +43 670 201 77 10
 

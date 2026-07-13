@@ -1,11 +1,16 @@
-version: '3.8'
+version: '3'
 
 services:
-  web:
+  website:
     image: nginx:alpine
-    container_name: web_web_reisinger_pictures
+    container_name: reisinger-pictures
     restart: unless-stopped
-    ports:
-      - "8082:80"
     volumes:
-      - /var/www/reisinger.pictures:/usr/share/nginx/html:ro
+      - /home/webadmin/websites/reisinger.pictures:/usr/share/nginx/html:ro
+    networks:
+      webnet:
+        ipv4_address: 172.18.0.50
+
+networks:
+  webnet:
+    external: true

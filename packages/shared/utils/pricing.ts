@@ -1,12 +1,14 @@
 const config = {
   basePrice: 50,
-  hourlyRate: 100,
-  imagesPerHourPackage: 6 // Basis für Studio (Indoor)
+  hourlyRate: 80,
+  imagesPerHourPackage: 6
 };
 
 export const basePrice = config.basePrice;
-export const flatrateMultiplier = 1.2;
+export const reportageMultiplier = 1.2;
 export const outdoorDiscountMultiplier = 0.5;
+export const studentDiscountMultiplier = 0.7;
+export const friendDiscountMultiplier = 0.5;
 
 /**
  * Zentralisierte Preis-Berechnung für Shootings

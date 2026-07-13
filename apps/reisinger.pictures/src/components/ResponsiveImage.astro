@@ -1,0 +1,124 @@
+---
+import { getImage } from "astro:assets";
+import type { NumericBreakpoints } from "@reisinger/shared/utils/Breakpoints";
+import { computeSizes, DEFAULT_IMAGE_SIZES, mergeBreakpoints } from "@reisinger/shared/utils/Breakpoints";
+
+import { getImage as getSourceImage } from "../images/Images";
+import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
+import { getMetadataForImageSlug } from "./image.utils";
+import { ResponsiveImageLoading } from "./ResponsiveImageLoading";
+
+interface Props {
+  name: string,
+  alt?: string,
+  class?: string,
+  height?: string,
+  sizes?: string,
+  widths?: number[],
+  loading?: ResponsiveImageLoading,
+  sizeModifiers?: Partial<NumericBreakpoints>,
+  showInfo?: boolean
+}
+
+const {
+  name,
+  sizes,
+  sizeModifiers,
+  widths: widthsOverride,
+  alt,
+  loading = ResponsiveImageLoading.LAZY,
+  class: classNames,
+  showInfo = false
+} = Astro.props;
+
+const isDevMode = import.meta.env.MODE === "development";
+const image = (await getSourceImage(name)).default;
+const data = await getMetadataForImageSlug(name);
+const darkInvert = data?.darkInvert ?? false;
+const resolvedAlt = alt ?? data?.title ?? "";
+const computedSizes = sizes ?? computeSizes(mergeBreakpoints(GALLERY_BREAKPOINTS[GalleryLayout.Full], sizeModifiers));
+const widths: number[] = (widthsOverride ?? DEFAULT_IMAGE_SIZES).filter(s => s <= image.width);
+
+const maxOptimizedWidth = widths[widths.length - 1];
+const maxOptimizedHeight = maxOptimizedWidth * image.height / image.width;
+
+const metadata = data?.metadata;
+const exifCompact = metadata
+  ? [metadata.focalLength, metadata.aperture, metadata.shutter && `${metadata.shutter}s`, metadata.iso && `ISO ${metadata.iso}`]
+      .filter(Boolean).join(" \u00b7 ")
+  : undefined;
+
+const infoId = `img-info-${name.replaceAll("/", "-")}`;
+
+const imageVariants = await Promise.all(
+  widths.map(w => getImage({ src: image, format: "webp", width: w, quality: "mid" }))
+);
+
+const src = imageVariants[imageVariants.length - 1].src;
+const srcset = imageVariants
+  .map((v, i) => `${v.src} ${widths[i]}w`)
+  .join(", ");
+
+const darkClass = darkInvert ? "dark:invert" : "";
+const imgClass = [classNames, darkClass].filter(Boolean).join(" ") || undefined;
+---
+
+{showInfo ? (
+  <div class="group relative">
+    <input type="checkbox" id={infoId} class="peer sr-only" />
+    <img
+      src={src}
+      srcset={srcset}
+      sizes={computedSizes}
+      loading={loading}
+      class={imgClass}
+      alt={resolvedAlt}
+      data-pswp-width={maxOptimizedWidth}
+      data-pswp-height={maxOptimizedHeight}
+      data-name={isDevMode ? name : undefined}
+      data-exif-camera={metadata?.camera}
+      data-exif-lens={metadata?.lens}
+      data-exif-focal={metadata?.focalLength}
+      data-exif-aperture={metadata?.aperture}
+      data-exif-shutter={metadata?.shutter}
+      data-exif-iso={metadata?.iso}
+      data-exif-date={metadata?.captureDate?.toISOString()}
+      decoding="async"
+      width={maxOptimizedWidth}
+      height={maxOptimizedHeight}
+    />
+    <label
+      for={infoId}
+      class="absolute top-2 right-2 z-10 size-7 flex items-center justify-center rounded-full bg-base-300/80 text-base-100 opacity-40 group-hover:opacity-100 peer-checked:opacity-100 transition-opacity cursor-pointer"
+      aria-label="Bildinformationen ein-/ausblenden"
+    >
+      <span class="icon-[mdi--information-outline] size-4" />
+    </label>
+    <div class="absolute inset-x-0 bottom-0 bg-base-300/90 backdrop-blur p-3 text-xs opacity-0 peer-checked:opacity-100 group-hover:opacity-100 transition-opacity pointer-events-none peer-checked:pointer-events-auto group-hover:pointer-events-auto">
+      <p class="text-base-content leading-snug m-0">{resolvedAlt}</p>
+      {exifCompact && <p class="text-base-content/70 m-0 mt-1">{exifCompact}</p>}
+    </div>
+  </div>
+) : (
+  <img
+    src={src}
+    srcset={srcset}
+    sizes={computedSizes}
+    loading={loading}
+    class={imgClass}
+    alt={resolvedAlt}
+    data-pswp-width={maxOptimizedWidth}
+    data-pswp-height={maxOptimizedHeight}
+    data-name={isDevMode ? name : undefined}
+    data-exif-camera={metadata?.camera}
+    data-exif-lens={metadata?.lens}
+    data-exif-focal={metadata?.focalLength}
+    data-exif-aperture={metadata?.aperture}
+    data-exif-shutter={metadata?.shutter}
+    data-exif-iso={metadata?.iso}
+    data-exif-date={metadata?.captureDate?.toISOString()}
+    decoding="async"
+    width={maxOptimizedWidth}
+    height={maxOptimizedHeight}
+  />
+)}

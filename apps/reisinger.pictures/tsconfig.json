@@ -9,6 +9,8 @@
   ],
   "compilerOptions": {
     "strictNullChecks": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
     "moduleResolution": "bundler",
     "types": [
       "astro/client"

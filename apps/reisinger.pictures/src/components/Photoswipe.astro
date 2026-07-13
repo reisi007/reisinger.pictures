@@ -1,0 +1,155 @@
+---
+---
+
+<script>
+  import PhotoSwipeLightbox from "photoswipe/lightbox";
+
+  type ExifData = {
+    alt?: string;
+    camera?: string;
+    lens?: string;
+    focal?: string;
+    aperture?: string;
+    shutter?: string;
+    iso?: string;
+    date?: string;
+  };
+
+  // PhotoSwipe's item data extended with our custom exif payload.
+  type ItemDataWithExif = { exif?: ExifData } & Record<string, unknown>;
+
+  function readExif(el: HTMLElement): ExifData {
+    const ds = el.dataset;
+    return {
+      alt: el.getAttribute("alt") ?? undefined,
+      camera: ds.exifCamera,
+      lens: ds.exifLens,
+      focal: ds.exifFocal,
+      aperture: ds.exifAperture,
+      shutter: ds.exifShutter,
+      iso: ds.exifIso,
+      date: ds.exifDate
+    };
+  }
+
+  function formatExifLine(exif: ExifData): string {
+    const parts = [
+      [exif.camera, exif.lens].filter(Boolean).join(" \u00b7 "),
+      [exif.focal, exif.aperture, exif.shutter && `${exif.shutter}s`, exif.iso && `ISO ${exif.iso}`].filter(Boolean).join(" \u00b7 ")
+    ].filter(Boolean);
+    if (exif.date) {
+      try {
+        parts.push(new Date(exif.date).toLocaleDateString("de-AT", { year: "numeric", month: "long", day: "numeric" }));
+      } catch {
+        parts.push(exif.date);
+      }
+    }
+    return parts.join(" \u2014 ");
+  }
+
+  function buildCaptionHtml(exif: ExifData): string {
+    const lines: string[] = [];
+    if (exif.alt) lines.push(`<p class="pswp-caption-alt">${exif.alt}</p>`);
+    const exifLine = formatExifLine(exif);
+    if (exifLine) lines.push(`<p class="pswp-caption-exif">${exifLine}</p>`);
+    return lines.join("");
+  }
+
+  document.addEventListener("astro:page-load", () => {
+      const lightbox = new PhotoSwipeLightbox({
+        gallery: "section[data-gallery]:not([data-clickable])",
+        children: "img:not([data-bg])",
+        thumbSelector: "img[data-bg]",
+        pswpModule: () => import("photoswipe")
+        });
+
+      lightbox.addFilter("domItemData", (itemData, element) => {
+        const imgElement = element as HTMLImageElement;
+        itemData.src = imgElement.src;
+        itemData.msrc = imgElement.src;
+        itemData.srcset = imgElement.srcset;
+        itemData.width = parseInt(imgElement.dataset?.pswpWidth ?? "0", 10);
+        itemData.height = parseInt(imgElement.dataset?.pswpHeight ?? "0", 10);
+        // Attach EXIF + alt so the caption element can render them per slide.
+        (itemData as ItemDataWithExif).exif = readExif(imgElement as HTMLElement);
+        return itemData;
+        });
+
+      // Register a toggle button that shows/hides the caption.
+      lightbox.on("uiRegister", () => {
+        const pswp = (lightbox as any).pswp;
+        if (!pswp?.ui) return;
+
+        // Toggle button — displayed in the top bar, before the close button.
+        pswp.ui.registerElement({
+          name: "custom-caption-toggle",
+          ariaLabel: "Bildinformationen ein-/ausblenden",
+          order: 9,
+          isButton: true,
+          html: '<span class="icon-[mdi--information-outline]" style="font-size:20px;color:#fff"></span>',
+          onClick: (_event: unknown, el: HTMLElement) => {
+            const caption = pswp.template?.querySelector(".pswp-caption") as HTMLElement | null;
+            if (!caption) return;
+            const isVisible = caption.classList.toggle("pswp-caption--visible");
+            el.setAttribute("aria-pressed", String(isVisible));
+          }
+        });
+
+        // Caption container — hidden by default, filled on slide change.
+        pswp.ui.registerElement({
+          name: "custom-caption",
+          order: 10,
+          isButton: false,
+          onInit: (el: HTMLElement) => {
+            el.classList.add("pswp-caption");
+            pswp.on("change", () => {
+              const slide = pswp.currSlide?.data as ItemDataWithExif | undefined;
+              el.innerHTML = slide?.exif ? buildCaptionHtml(slide.exif) : "";
+            });
+          }
+        });
+      });
+
+      lightbox.init();
+      });
+</script>
+
+<style is:global>
+  /* Caption hidden by default; toggled via custom-caption-toggle button. */
+  .pswp-caption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+  }
+  .pswp-caption--visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .pswp-caption .pswp-caption-alt {
+    margin: 0;
+    font-weight: 500;
+  }
+  .pswp-caption .pswp-caption-exif {
+    margin: 0.25rem 0 0;
+    opacity: 0.8;
+    font-size: 0.8rem;
+  }
+  /* Hide the toggle button when the current slide has no EXIF/alt data. */
+  .pswp__button--custom-caption-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>

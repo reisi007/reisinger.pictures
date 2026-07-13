@@ -1,0 +1,23 @@
+---
+import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
+import Photoswipe from "./Photoswipe.astro";
+import ResponsiveImage from "./ResponsiveImage.astro";
+
+interface Props {
+  images: string[];
+  layout?: GalleryLayout;
+}
+
+const { images, layout = GalleryLayout.Presentation } = Astro.props;
+---
+<section data-gallery={layout}>
+  {images.map((image, idx) => {
+    const isLast = idx === images.length - 1;
+    return (
+      <ResponsiveImage name={image}
+                       showInfo
+                       sizeModifiers={GALLERY_BREAKPOINTS[isLast && idx % 2 === 0 && layout === GalleryLayout.Presentation ? GalleryLayout.Full : layout]}
+      />);
+  })}
+</section>
+<Photoswipe />

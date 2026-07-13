@@ -1,0 +1,64 @@
+---
+import { absoluteLink } from "@reisinger/shared/utils";
+import type { InferGetStaticPropsType, PaginateFunction } from "astro";
+import { getCollection, render } from "astro:content";
+
+import BaseHead from "../../../components/BaseHead.astro";
+import HeroBanner from "../../../components/HeroBanner.astro";
+import MinimalPage from "../../../components/pages/MinimalPage.astro";
+import Portfolio from "../../../components/Portfolio.astro";
+import { type SchemaCreationFunction } from "../../../components/SchemaOrg";
+import SchemaOrg from "../../../components/SchemaOrg.astro";
+import { createCollectionPageSchema } from "../../../components/SchemaOrg.factory";
+import SocialImage from "../../../components/SocialImage.astro";
+
+export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
+  const overviewPages = (await getCollection("portfolioOverviews"));
+
+  const posts = (await getCollection("portfolio")).sort(
+    (a, b) => {
+      const aData = a.data;
+      const bData = b.data;
+      return Math.max(bData.date.valueOf(), bData.updated?.valueOf() ?? Number.MIN_VALUE) - Math.max(aData.date.valueOf(), aData.updated?.valueOf() ?? Number.MIN_VALUE);
+    }
+  );
+
+  return overviewPages.flatMap((e) => {
+    const id = e.id;
+    const relevantPosts = posts.filter(p => id === "/" || p.id.startsWith(id));
+    if (relevantPosts.length === 0) return [];
+    return paginate(relevantPosts, {
+      pageSize: 12,
+      params: { overview: id },
+      props: { title: e.data.title, entry: e }
+    });
+  });
+}
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { page, title, entry } = Astro.props;
+const id = entry.id;
+const { description: overviewDescription } = entry.data;
+const { Content } = await render(entry);
+const { data: posts } = page;
+const { heroImage, date, updated } = posts[0].data;
+
+const description = overviewDescription ?? `Portfolio-Beiträge rund um „${title}" von Fotograf Florian Reisinger aus Linz.`;
+
+const createData: SchemaCreationFunction = (_, __, df) => createCollectionPageSchema({
+  name: title,
+  description,
+  dateModified: df(updated ?? date),
+  items: posts.map((e) => ({ url: absoluteLink(Astro.url, `/portfolio/${e.id}`), name: e.data.title, type: "BlogPosting" }))
+});
+---
+<MinimalPage>
+  <BaseHead title={title} description={description} noIndex={!(id === "/" && page.url.prev === undefined)} slot="head">
+    {heroImage && <SocialImage name={heroImage} />}
+    <SchemaOrg createData={createData} />
+  </BaseHead>
+  {heroImage && <HeroBanner slot="hero" name={heroImage} alt={title} />}
+  <h1>{title}</h1>
+  <Content />
+  <Portfolio page={page} />
+</MinimalPage>

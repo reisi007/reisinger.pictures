@@ -182,6 +182,9 @@ missingUrls = removeIf(missingUrls, link => link.protocol.includes("mailto") && 
 missingUrls = removeIf(missingUrls, link => link.protocol.includes("https") && !link.host.includes("reisinger.pictures"));
 missingUrls = removeIf(missingUrls, link => excludedHosts.includes(link.host) || (link.host.includes("reisinger.pictures") && link.host !== siteHost));
 missingUrls = removeIf(missingUrls, link => link.pathname.endsWith(".pdf") && (["agb", "dsb"].some(prefix => link.pathname.includes(prefix))));
+// 404 pages are output as flat 404.html (not /404/index.html) and are noindex,
+// so their self-referential internal links resolve to /404.html which is never in the sitemap.
+missingUrls = removeIf(missingUrls, link => link.pathname.endsWith("/404.html"));
 
 if (missingUrls.length > 0)
   throw new Error(`Found ${missingUrls.length} missing links:\n${missingUrls.join("\n")}`);

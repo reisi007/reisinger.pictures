@@ -1,0 +1,18 @@
+---
+import FormattedDate from "./FormattedDate.astro";
+interface Props {
+  date?: Date,
+  updated?: Date
+}
+
+const { date, updated } = Astro.props;
+---
+{ date !== undefined &&
+<div class="text-center">Veröffentlicht am
+  <FormattedDate date={date} />
+  {updated &&
+    <>- zuletzt aktualisiert am
+      <FormattedDate date={updated} />
+    </>
+  }</div>
+  }

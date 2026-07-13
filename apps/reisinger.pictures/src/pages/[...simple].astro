@@ -1,53 +1,68 @@
 ---
-import { getCollection, render } from "astro:content";
-import { Image } from "astro:assets";
+import { absoluteLink } from "@reisinger/shared/utils";
+import { LARGEST_IMAGE_SIZE } from "@reisinger/shared/utils/Breakpoints";
+import type { GetImageResult } from "astro";
+import { getImage } from "astro:assets";
+import { type CollectionEntry, getCollection, render } from "astro:content";
+
 import BaseHead from "../components/BaseHead.astro";
-import MinimalPage from "../layouts/MinimalPage.astro";
+import HeroBanner from "../components/HeroBanner.astro";
+import MinimalPage from "../components/pages/MinimalPage.astro";
+import Published from "../components/Published.astro";
+import type { SchemaCreationFunction } from "../components/SchemaOrg";
+import SchemaOrg from "../components/SchemaOrg.astro";
+import { createWebPageSchema } from "../components/SchemaOrg.factory";
+import SocialImage from "../components/SocialImage.astro";
+import { getImage as getImageByName } from "../images/Images";
 
 export async function getStaticPaths() {
   const posts = await getCollection("simple");
-  return posts
-    .filter(post => post.id !== "index")
-    .map((post) => ({
-      params: { simple: post.id },
-      props: { post },
-    }));
+  return posts.filter(post => post.id !== "index").map((post) => ({
+    params: { simple: post.id },
+    props: post
+  }));
 }
+type Props = CollectionEntry<"simple">;
 
-const { post } = Astro.props;
-const { title, description, heroImage, noIndex } = post.data;
+const post = Astro.props;
+const { data } = post;
+const { title, description, heroImage, showContact, showToc, index = true, ...dates } = data;
 const { Content } = await render(post);
 
-// Temporärer Workaround für das Hero-Bild, bis ResponsiveImage im Shared-Ordner liegt:
-const images = import.meta.glob<{ default: ImageMetadata }>('/src/images/*.{jpeg,jpg,png,gif,webp}');
-let heroImgSrc;
-if (heroImage) {
-  const imagePath = `/src/images/${heroImage}.jpg`;
-  if (images[imagePath]) {
-    heroImgSrc = (await images[imagePath]()).default;
-  }
-}
+let imageInfo: GetImageResult | undefined;
+if (heroImage !== undefined)
+  imageInfo = await getImage({
+    src: getImageByName(heroImage),
+    format: "webp",
+    width: LARGEST_IMAGE_SIZE,
+    fit: "scale-down"
+  });
+
+const src = imageInfo?.src;
+
+const createData: SchemaCreationFunction = (o, p, df, url) => createWebPageSchema({
+  name: title,
+  description,
+  url,
+  author: p,
+  publisher: o,
+  datePublished: df(dates.date),
+  dateModified: df(dates.updated),
+  image: src === undefined ? undefined : absoluteLink(Astro.url, src)
+});
 ---
-<MinimalPage>
-  <BaseHead slot="head" title={title} description={description} noIndex={noIndex} />
-  
-  {heroImgSrc && (
-    <section slot="hero" class="relative w-full h-[70vh] min-h-[500px] flex items-center justify-center bg-base-300 overflow-hidden">
-      <Image 
-        src={heroImgSrc} 
-        alt={title} 
-        class="absolute inset-0 w-full h-full object-cover object-center" 
-        widths={[720, 1280, 1920]} 
-        sizes="100vw" 
-      />
-      <div class="absolute inset-0 bg-base-300/10"></div>
-      
-      <div class="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-base-100 from-0% via-base-100/10 via-50% to-transparent"></div>
-    </section>
-  )}
-  
-  <article class="w-full flex flex-col items-center">
-    <h1>{title}</h1>
-    <Content />
-  </article>
+
+<MinimalPage showContact={showContact}>
+  <BaseHead title={title} description={description} noIndex={!index} slot="head">
+    <SocialImage name={heroImage} />
+    <SchemaOrg createData={createData} />
+  </BaseHead>
+  {heroImage && <HeroBanner slot="hero" name={heroImage} alt={title} />}
+  <h1>{title}</h1>
+  <Published {...dates} />
+
+  {showToc &&
+    <div data-toc />}
+
+  <Content />
 </MinimalPage>

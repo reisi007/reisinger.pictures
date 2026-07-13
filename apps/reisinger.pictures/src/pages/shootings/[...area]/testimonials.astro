@@ -1,0 +1,77 @@
+---
+import AiSummaryCard from "@reisinger/shared/components/AiSummaryCard.astro";
+import { groupBy, slugToName } from "@reisinger/shared/utils";
+import type { InferGetStaticPropsType } from "astro";
+import { getCollection, getEntry } from "astro:content";
+
+import BaseHead from "../../../components/BaseHead.astro";
+import MinimalPage from "../../../components/pages/MinimalPage.astro";
+import ReviewCards from "../../../components/ReviewCards.astro";
+import SocialImage from "../../../components/SocialImage.astro";
+import { tryGetImage } from "../../../images/Images";
+
+const typeLabels: Record<string, { title: string; description: string }> = {
+  beauty: {
+    title: "Beauty-Fotoshooting Bewertungen & Erfahrungen – Linz",
+    description: "Echte Kundenstimmen zu Beauty- & Portrait-Shootings bei Florian Reisinger in Linz. Authentische Erfahrungen, Ratings und Einblicke."
+  },
+  akt: {
+    title: "Akt- & Boudoir-Fotoshooting Bewertungen & Erfahrungen – Linz",
+    description: "Vertravolle Kundenbewertungen zu Akt- und Boudoir-Shootings bei Florian Reisinger in Linz. Diskretion, Wohlfühlatmosphäre und Ergebnisse, die begeistern."
+  },
+  couples: {
+    title: "Pärchen-Fotoshooting Bewertungen & Erfahrungen – Linz",
+    description: "Paare berichten über ihre Fotoshootings mit Florian Reisinger in Linz und Oberösterreich. Authentische Erlebnisse und zufriedene Kunden."
+  },
+  sport: {
+    title: "Sportfotografie Bewertungen & Erfahrungen – Linz",
+    description: "Vereine, Agenturen und Sportler bewerten die Sportfotografie von Florian Reisinger. Bundesliga-Erfahrung, schnelle Lieferung und PR-wirksame Bilder."
+  }
+};
+
+export async function getStaticPaths() {
+  const testimonials = await getCollection("testimonials");
+
+  const pageData = groupBy(testimonials, e => e.data.type);
+
+  return Object.keys(pageData).flatMap((type) => {
+    const sortedReviews = pageData[type].sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+    return { params: { area: type }, props: { reviews: sortedReviews, type } };
+  });
+}
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { type, reviews } = Astro.props;
+let heroImage: string | undefined = undefined;
+for (const review of reviews) {
+  const name = `${review.id}-large`;
+  if (tryGetImage(name) !== undefined) {
+    heroImage = name;
+    break;
+  }
+}
+
+const label = typeLabels[type];
+const title = label?.title ?? `${slugToName(type)} Bewertungen – Linz`;
+const description = label?.description;
+
+const aiSummary = (await getEntry("testimonialSummary", type))?.data;
+
+const slugs = reviews.map(r => r.id);
+---
+<MinimalPage>
+  <BaseHead title={title} description={description} slot="head">
+    <SocialImage name={heroImage} />
+  </BaseHead>
+  <h1 class="mb-8 text-center">{title}</h1>
+
+  {aiSummary !== undefined &&
+    <div class="mb-12">
+      <AiSummaryCard summary={aiSummary.summary} reviewCount={aiSummary.reviewCount} />
+    </div>
+  }
+
+  <ReviewCards slugs={slugs} displayLargeImage={true} />
+
+</MinimalPage>

@@ -1,0 +1,41 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import MinimalPage from "../components/pages/MinimalPage.astro";
+import SocialImage from "../components/SocialImage.astro";
+
+const title = "Seite nicht gefunden (404)";
+---
+<MinimalPage>
+  <BaseHead title={title} noIndex slot="head">
+    <SocialImage />
+  </BaseHead>
+
+  <div class="not-prose text-center max-w-xl mx-auto py-16">
+    <p class="text-7xl md:text-9xl font-black text-primary/20 leading-none">404</p>
+    <h1 class="text-3xl md:text-4xl font-black text-base-content mt-4 mb-4">
+      Seite nicht gefunden
+    </h1>
+    <p class="text-base-content/70 text-lg mb-10">
+      Die gewünschte Seite existiert nicht oder wurde verschoben.
+      Vielleicht findest du, was du suchst, über diese Links.
+    </p>
+
+    <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+      <a href="/" class="btn btn-primary btn-lg shadow-lg border-none">
+        <span class="icon-[mdi--home] size-5"></span>
+        Zur Startseite
+      </a>
+      <a href="/preise/" class="btn btn-outline btn-primary btn-lg border-2">
+        Preise ansehen
+      </a>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
+      <a href="/shootings/beauty/" class="link link-hover text-base-content/60">Beauty & Portrait</a>
+      <a href="/shootings/akt/" class="link link-hover text-base-content/60">Akt & Boudoir</a>
+      <a href="/shootings/couples/" class="link link-hover text-base-content/60">Pärchen</a>
+      <a href="/ueber-mich/" class="link link-hover text-base-content/60">Über mich</a>
+      <a href="/tfp/" class="link link-hover text-base-content/60">TFP Shootings</a>
+    </div>
+  </div>
+</MinimalPage>

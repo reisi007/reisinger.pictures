@@ -1,0 +1,13 @@
+---
+import { GalleryLayout } from "./GalleryLayout";
+import ImageGallery from "./ImageGallery.astro";
+
+interface Props {
+  sorted: string[],
+  layout?: GalleryLayout
+}
+
+const { sorted: images, layout } = Astro.props;
+---
+{images.length > 0 &&
+<ImageGallery images={images} layout={layout} />}
