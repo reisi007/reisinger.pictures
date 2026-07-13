@@ -79,7 +79,7 @@ export default function PricingCalculator() {
             </span>
             <span class="flex items-center justify-center gap-1.5">
               <span class="icon-[mdi--image-multiple-outline] text-primary text-base"></span>
-              {flexImagesIncluded} High-End-Bilder inklusive
+              {flexImagesIncluded} bearbeitete Bilder inklusive
             </span>
             <Show when={extraImages() > 0}>
               <span class="flex items-center justify-center gap-1.5 text-warning">

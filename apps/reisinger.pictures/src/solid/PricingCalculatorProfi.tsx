@@ -12,7 +12,7 @@ import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from
 export default function PricingCalculatorProfi() {
   const [hours, setHours] = createSignal(1);
   const [images, setImages] = createSignal(15);
-  const [location, setLocation] = createSignal<"indoor" | "outdoor">("indoor");
+  const [location, setLocation] = createSignal<"indoor" | "outdoor">("outdoor");
   const [isStudent, setIsStudent] = createSignal(false);
   const [isFriend, setIsFriend] = createSignal(false);
   const [showFriend, setShowFriend] = createSignal(false);
