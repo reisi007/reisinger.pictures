@@ -25,13 +25,13 @@ const footerProps = Astro.props;
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
   <link rel="manifest" href="/site.webmanifest" />
-  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#1E5631" />
   <slot name="head" />
 </head>
 <body class="min-h-screen flex flex-col">
 <Header />
 <slot name="hero" />
-<main class="container prose max-w-none mb-4 flex-grow">
+<main class="container prose max-w-none mb-4 grow">
   <Breadcrumbs></Breadcrumbs>
   <slot />
 </main>
