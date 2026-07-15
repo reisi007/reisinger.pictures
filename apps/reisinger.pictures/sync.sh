@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -e
 echo "Synchronisiere reisinger.pictures via rclone..."
-rclone sync dist reisinger.pictures:/reisinger.pictures --transfers=150 --track-renames --progress
+rclone sync dist reisinger.pictures:/reisinger.pictures --transfers=50 --track-renames --progress
+echo "Synchronisiere .imagedist (Bild-CDN) via rclone..."
+rclone sync .imagedist reisinger.pictures:/images.reisinger.pictures --transfers=50 --track-renames --progress
 echo "Upload fuer reisinger.pictures erfolgreich abgeschlossen!"

@@ -3,7 +3,6 @@ import type { ImageMetadata } from "astro";
 import type { NumericBreakpoints } from "@reisinger/shared/utils/Breakpoints";
 import { computeSizes, DEFAULT_IMAGE_SIZES, mergeBreakpoints } from "@reisinger/shared/utils/Breakpoints";
 import { getImage } from "astro:assets";
-
 import { getImage as getSourceImage } from "../images/slug-map";
 import { getMetadataForImageSlug } from "./image.utils";
 import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
@@ -37,10 +36,48 @@ const {
   image: directImage
 } = Astro.props;
 
-const isDevMode = import.meta.env.MODE === "development";
-const image = directImage ?? (await getSourceImage(name!)).default;
+const isDev = import.meta.env.MODE === "development";
+const isBuild = import.meta.env.PROD;
+
 const imageWithMeta = directImage as ImageWithMeta | undefined;
 
+// Resolve image metadata instance (dev mode + direct-import fallback)
+let image: ImageMetadata | undefined;
+if (!isBuild || directImage) {
+  if (directImage) {
+    image = directImage;
+  } else if (name) {
+    const resolved = await getSourceImage(name);
+    image = resolved.default;
+  }
+}
+
+// Resolve native dimensions and CDN manifest data
+let nativeWidth = 0;
+let nativeHeight = 0;
+let buildHash: string | undefined;
+let buildVariants: number[] | undefined;
+
+if (isBuild && name) {
+  const { getManifestImage } = await import("../images/image-manifest");
+  const mi = getManifestImage(name);
+  if (mi) {
+    nativeWidth = mi.width;
+    nativeHeight = mi.height;
+    buildHash = mi.hash;
+    buildVariants = mi.variants;
+  } else {
+    throw new Error(
+      `ResponsiveImage: "${name}" nicht in .imagedist/manifest.json gefunden. ` +
+        `existiert der Slug in src/images/ oder src/content/?`
+    );
+  }
+} else if (image) {
+  nativeWidth = image.width;
+  nativeHeight = image.height;
+}
+
+// --- Common metadata / EXIF ---
 const data = imageWithMeta?.title
   ? { title: imageWithMeta.title, darkInvert: imageWithMeta.darkInvert ?? false, metadata: imageWithMeta.metadata ?? null }
   : name ? await getMetadataForImageSlug(name) : undefined;
@@ -48,10 +85,10 @@ const data = imageWithMeta?.title
 const darkInvert = data?.darkInvert ?? false;
 const resolvedAlt = alt ?? data?.title ?? "";
 const computedSizes = sizes ?? computeSizes(mergeBreakpoints(GALLERY_BREAKPOINTS[GalleryLayout.Full], sizeModifiers));
-const widths: number[] = (widthsOverride ?? DEFAULT_IMAGE_SIZES).filter(s => s <= image.width);
+const widths: number[] = (widthsOverride ?? DEFAULT_IMAGE_SIZES).filter(s => s <= nativeWidth);
 
-const maxOptimizedWidth = widths[widths.length - 1];
-const maxOptimizedHeight = maxOptimizedWidth * image.height / image.width;
+const maxOptimizedWidth = widths[widths.length - 1] ?? nativeWidth;
+const maxOptimizedHeight = maxOptimizedWidth * nativeHeight / nativeWidth;
 
 const metadata = data?.metadata;
 const equipment = metadata
@@ -67,16 +104,27 @@ const exifCompact = metadata
 const infoId = name ? `img-info-${name.replaceAll("/", "-")}` : imageWithMeta?.slug ? `img-info-${imageWithMeta.slug}` : undefined;
 
 const captureDate = metadata?.captureDate ? new Date(metadata.captureDate).toISOString() : undefined;
-const aspectRatioValue = `${image.width}/${image.height}`;
+const aspectRatioValue = `${nativeWidth}/${nativeHeight}`;
 
-const imageVariants = await Promise.all(
-  widths.map(w => getImage({ src: image, format: "webp", width: w, quality: "mid" }))
-);
+// --- Build src / srcset ---
+let src: string;
+let srcset: string;
 
-const src = imageVariants[imageVariants.length - 1].src;
-const srcset = imageVariants
-  .map((v, i) => `${v.src} ${widths[i]}w`)
-  .join(", ");
+if (isBuild && name && buildHash) {
+  const { IMAGE_BASE_URL: cdnBase } = await import("../images/image-config");
+  const prefix = `${cdnBase}/${buildHash.slice(0, 2)}/${buildHash}`;
+  const cdnWidths = widths.filter(w => buildVariants!.includes(w));
+  src = `${prefix}_${cdnWidths[cdnWidths.length - 1]}.webp`;
+  srcset = cdnWidths.map(w => `${prefix}_${w}.webp ${w}w`).join(", ");
+} else if (isBuild && name && !buildHash) {
+  throw new Error(`ResponsiveImage: "${name}" nicht in .imagedist/manifest.json gefunden. existsiert der Slug in src/images/ oder src/content/portfolio/?`);
+} else {
+  const imageVariants = await Promise.all(
+    widths.map(w => getImage({ src: image!, format: "webp", width: w, quality: "mid" }))
+  );
+  src = imageVariants[imageVariants.length - 1].src;
+  srcset = imageVariants.map((v, i) => `${v.src} ${widths[i]}w`).join(", ");
+}
 
 const darkClass = darkInvert ? "dark:invert" : "";
 const imgClass = [classNames, darkClass].filter(Boolean).join(" ") || undefined;
@@ -93,7 +141,7 @@ const imgClass = [classNames, darkClass].filter(Boolean).join(" ") || undefined;
       alt={resolvedAlt}
       data-pswp-width={maxOptimizedWidth}
       data-pswp-height={maxOptimizedHeight}
-      data-name={isDevMode ? (name ?? imageWithMeta?.slug) : undefined}
+      data-name={isDev ? (name ?? imageWithMeta?.slug) : undefined}
       data-exif-camera={metadata?.camera}
       data-exif-lens={metadata?.lens}
       data-exif-focal={metadata?.focalLength}
@@ -133,7 +181,7 @@ const imgClass = [classNames, darkClass].filter(Boolean).join(" ") || undefined;
     alt={resolvedAlt}
     data-pswp-width={maxOptimizedWidth}
     data-pswp-height={maxOptimizedHeight}
-      data-name={isDevMode ? name : undefined}
+      data-name={isDev ? name : undefined}
       data-exif-camera={metadata?.camera}
       data-exif-lens={metadata?.lens}
       data-exif-focal={metadata?.focalLength}
@@ -146,4 +194,3 @@ const imgClass = [classNames, darkClass].filter(Boolean).join(" ") || undefined;
       height={maxOptimizedHeight}
   />
 )}
-
