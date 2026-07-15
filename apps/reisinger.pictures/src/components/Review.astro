@@ -1,7 +1,7 @@
 ---
 import { type CollectionEntry, render } from "astro:content";
 
-import { filterInvalidImageName } from "../images/Images";
+import { filterInvalidImageName } from "../images/slug-map";
 import ResponsiveImage from "./ResponsiveImage.astro";
 import ReviewSocialLink from "./ReviewSocialLink.astro";
 import { type ReviewProps } from "./Types";
@@ -27,13 +27,13 @@ const { Content } = await render(entry);
   {source !== undefined && <ReviewSocialLink source={source} class="right-6" />}
   {small !== undefined &&
     <div>
-      <ResponsiveImage sizes="128px" widths={[128]} name={smallName} />
+      <ResponsiveImage sizes="128px" widths={[128]} name={smallName} showInfo={true} />
     </div>}
   <h4>{name}</h4>
   <div />
   {displayLargeImage && large !== undefined &&
     <div>
-      <ResponsiveImage name={largeName} />
+      <ResponsiveImage name={largeName} showInfo={true} />
     </div>
   }
   <div />

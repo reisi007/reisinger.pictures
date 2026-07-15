@@ -20,22 +20,22 @@ const {
   imageName,
   title,
   date,
-  ctaLabel = "Jetzt lesen", // Standardwert für den Button
-  imageSizeModifiers = GALLERY_BREAKPOINTS[GalleryLayout.Overview], // Standardwert für die Bildgrößen
-  class: className // 'class' ist ein reserviertes Wort, wir benennen es um
+  ctaLabel = "Jetzt lesen",
+  imageSizeModifiers = GALLERY_BREAKPOINTS[GalleryLayout.Overview],
+  class: className
 } = Astro.props;
 ---
 <a href={href} class:list={[
   "card bg-base-200 shadow-sm hover:shadow-xl transition-shadow no-underline group h-full flex flex-col",
   className
 ]}>
-  {/* 1. Einheitliche Container-Größe erzwingen (hier z. B. Aspect Ratio 4:3) */}
-  <figure class="aspect-3/2 w-full flex items-center justify-center bg-base-200/50">
+  <figure class="relative aspect-3/2 max-h-60 bg-base-200/50 overflow-hidden flex items-center">
     <ResponsiveImage
-      class="w-full h-full object-contain p-2"
+      class="w-full h-full object-contain"
       sizeModifiers={imageSizeModifiers}
       alt={title}
       name={imageName}
+      showInfo={true}
     />
   </figure>
 
@@ -48,7 +48,6 @@ const {
       </p>
     )}
 
-    {/* 4. mt-auto schiebt den Button immer an den unteren Rand der Karte */}
     <div class="card-actions justify-center mt-auto pt-4">
       <span class="btn btn-primary">{ctaLabel}</span>
     </div>

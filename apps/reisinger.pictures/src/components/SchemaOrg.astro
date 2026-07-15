@@ -2,7 +2,7 @@
 import { absoluteLink } from "@reisinger/shared/utils";
 import { getImage } from "astro:assets";
 
-import { getImage as getImageByName } from "../images/Images";
+import logoSrc from "../images/logo.png";
 import type { Organization, Person, SchemaCreationFunction } from "./SchemaOrg";
 
 const url = Astro.url;
@@ -31,7 +31,7 @@ export interface Props {
 const { createData } = Astro.props;
 
 const logoInfo = await getImage({
-  src: getImageByName("logo"),
+  src: logoSrc,
   format: "webp"
 });
 

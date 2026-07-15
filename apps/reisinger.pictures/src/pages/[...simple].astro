@@ -13,7 +13,7 @@ import type { SchemaCreationFunction } from "../components/SchemaOrg";
 import SchemaOrg from "../components/SchemaOrg.astro";
 import { createWebPageSchema } from "../components/SchemaOrg.factory";
 import SocialImage from "../components/SocialImage.astro";
-import { getImage as getImageByName } from "../images/Images";
+import { getImage as getImageByName } from "../images/slug-map";
 
 export async function getStaticPaths() {
   const posts = await getCollection("simple");

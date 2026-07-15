@@ -2,7 +2,7 @@
 import { absoluteLink } from "@reisinger/shared/utils";
 import { getImage } from "astro:assets";
 
-import { getImage as getImageByName } from "../images/Images";
+import { getImage as getImageByName } from "../images/slug-map";
 import { getMetadataForImageSlug } from "./image.utils";
 
 interface Props {
@@ -15,8 +15,6 @@ const { name } = Astro.props;
 // Fall back to the photographer portrait so every page has a social preview image.
 const resolvedName = name ?? "me";
 
-const alt = (await getMetadataForImageSlug(resolvedName))?.title;
-
 const imageInfo = await getImage({
   src: getImageByName(resolvedName),
   format: "webp",
@@ -24,6 +22,8 @@ const imageInfo = await getImage({
   height: 630,
   fit: "cover"
 });
+
+const alt = (await getMetadataForImageSlug(resolvedName))?.title;
 
 const { src, options } = imageInfo;
 const fullSrc = absoluteLink(Astro.url, src);

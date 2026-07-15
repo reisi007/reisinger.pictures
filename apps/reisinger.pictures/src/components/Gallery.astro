@@ -1,9 +1,12 @@
 ---
+import type { ImageMetadata } from "astro";
 import { GalleryLayout } from "./GalleryLayout";
 import ImageGallery from "./ImageGallery.astro";
 
+type GalleryEntry = string | ImageMetadata;
+
 interface Props {
-  sorted: string[],
+  sorted: GalleryEntry[],
   layout?: GalleryLayout
 }
 

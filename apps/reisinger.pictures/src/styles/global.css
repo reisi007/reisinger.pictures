@@ -22,6 +22,11 @@
         @apply max-h-[80vh] object-contain;
     }
 
+    section[data-gallery] img {
+        @apply max-h-none max-w-full !my-0;
+        object-fit: contain;
+    }
+
     h1, h2, h3, h4 {
         @apply text-center break-words;
     }
@@ -54,7 +59,7 @@
         @apply xl:grid-cols-2 gap-x-4 gap-y-8
     }
 
-    section[data-gallery="11122"] img {
+    section[data-gallery="11122"] > * {
         @apply xl:last:odd:col-span-2;
     }
 
@@ -83,12 +88,25 @@
 }
 
 @layer utilities {
+    /* Info-Box (Bildinformationen) nur bei Hover über den Info-Button
+       bzw. wenn der Toggle (Checkbox) aktiv ist – nicht bei Hover über
+       das gesamte Bild. */
+    .info-overlay:has(> label:hover) .info-box,
+    .info-overlay:has(> label:focus-visible) .info-box {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
     .container {
         @apply w-full px-4 sm:px-0 sm:mx-auto sm:w-[540px] md:w-[720px] lg:w-[960px] xl:w-[1140px] 2xl:w-[1320px];
     }
 
     .prose {
         @apply max-w-none;
+    }
+
+    img:not(.pswp__img) {
+        @apply m-0;
     }
 
     .aspect-paper-vertical {

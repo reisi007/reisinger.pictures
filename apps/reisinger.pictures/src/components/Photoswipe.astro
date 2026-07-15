@@ -96,10 +96,12 @@
         });
 
         // Caption container — hidden by default, filled on slide change.
+        // Appended to the root template (not the top bar) so it sits as a
+        // bottom overlay and never overlaps the close button.
         pswp.ui.registerElement({
           name: "custom-caption",
-          order: 10,
           isButton: false,
+          appendTo: "root",
           onInit: (el: HTMLElement) => {
             el.classList.add("pswp-caption");
             pswp.on("change", () => {

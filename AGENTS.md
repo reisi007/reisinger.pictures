@@ -44,6 +44,12 @@ When tasks require subjective selection (e.g., curating images or testimonials),
 4. **Format:** The AI proposes a `favorites_hitl.json` (or similar). The human reviews it in the HTML tool and returns a response JSON. The AI strictly applies the `selected_ids` in the exact order returned.
 5. **Readiness Check:** Ensure the HTML tool uses Inline SVGs (no external fonts) and provides textareas for `comment`.
 
+## 8. Build Cache & Asset Hygiene
+* **Niemals Cache-Verzeichnisse löschen:** Die Ordner `.cache/`, `.astro/` und `dist/` werden von Astro verwaltet. Sie dürfen **nie eigenmächtig gelöscht werden** – weder teilweise noch ganz.
+* **Folgen:** Löschen führt zu korrupten Image-Hash-Referenzen, Build-Abbrüchen mit `ENOENT`-Fehlern und unnötigen Voll-Neuberechnungen.
+* **Stattdessen:** `astro sync` ausführen, um den Content-Index zu aktualisieren. Bei echten Cache-Problemen den User fragen.
+* **dist/ ist Build-Artefakt:** `dist/` wird bei `astro build` komplett neu geschrieben. Änderungen darin sind niemals zu committen oder zu referenzieren.
+
 ## 7. Deployment & Hosting Strategy
 * **Architecture:** SSG Astro site, hosted via Nginx in a Portainer Docker stack.
 * **Sync:** Deployment relies on local builds synced via `rclone`.

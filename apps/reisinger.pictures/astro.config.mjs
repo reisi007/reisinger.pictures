@@ -1,22 +1,39 @@
+import fs from "node:fs/promises";
+import path from "node:path";
 import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import solidJs from "@astrojs/solid-js";
+import imageMetaPlugin from "./vite-plugin-image-meta.mjs";
 
-function stripSourceImagesPlugin() {
+const ORIGINAL_IMAGE_FORMATS = new Set(["jpg", "jpeg", "png"]);
+const ORIGINAL_IMAGE_RE = /\.[a-zA-Z0-9_\-]{8}\.(jpg|jpeg|png)$/;
+
+function stripSourceImages() {
   return {
     name: "strip-source-images",
-    apply: "build",
-    generateBundle(_, bundle) {
-      for (const fileName in bundle) {
-        if (
-          (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) &&
-          bundle[fileName].type === "asset"
-        ) {
-          delete bundle[fileName];
+    hooks: {
+      "astro:build:done": async ({ dir }) => {
+        const assetsDir = path.join(dir.pathname, "_astro");
+        let files;
+        try {
+          files = await fs.readdir(assetsDir);
+        } catch {
+          return;
         }
-      }
+        let removed = 0;
+        for (const file of files) {
+          const ext = path.extname(file).toLowerCase();
+          if (!ORIGINAL_IMAGE_FORMATS.has(ext.slice(1))) continue;
+          if (!ORIGINAL_IMAGE_RE.test(file)) continue;
+          await fs.unlink(path.join(assetsDir, file));
+          removed++;
+        }
+        if (removed > 0) {
+          console.log(`🧹 Removed ${removed} original image(s) from dist/_astro/`);
+        }
+      },
     },
   };
 }
@@ -37,7 +54,7 @@ export default defineConfig({
   },
   vite: {
     cacheDir: ".cache/.vite",
-    plugins: [tailwindcss(), stripSourceImagesPlugin()],
+    plugins: [tailwindcss(), imageMetaPlugin()],
     optimizeDeps: {
       include: [
         "astro/virtual-modules/transitions-router.js",
@@ -49,7 +66,7 @@ export default defineConfig({
       ]
     }
   },
-  integrations: [mdx(), solidJs(), sitemap({
+  integrations: [mdx(), solidJs(), stripSourceImages(), sitemap({
     serialize(item) {
       // Prioritize key pages for crawlers.
       if (!item.url.endsWith("/")) return item;

@@ -14,7 +14,7 @@ import type { SchemaCreationFunction } from "../../../components/SchemaOrg";
 import SchemaOrg from "../../../components/SchemaOrg.astro";
 import { createWebPageSchema } from "../../../components/SchemaOrg.factory";
 import SocialImage from "../../../components/SocialImage.astro";
-import { getImage as getImageByName } from "../../../images/Images";
+import { getImage as getImageByName } from "../../../images/slug-map";
 
 interface Props {
   entry: CollectionEntry<"areas">,
@@ -104,9 +104,9 @@ const createData: SchemaCreationFunction = (o, me, _, url) => createWebPageSchem
 
   <FeaturedTestimonials slug={slug} categoryTestimonials={categoryReviews} featuredTestimonials={reviewSlugs} />
   {images.length > 0 &&
-    <Gallery sorted={images} />}
+    <div class="mt-16"><Gallery sorted={images} /></div>}
   {relatedPosts && relatedPosts.length > 0 && (
-    <div class="mt-16 border-t border-base-200 pt-10">
+    <div class="[&:not(:nth-child(3))]:mt-16 [&:not(:nth-child(3))]:pt-10 [&:not(:nth-child(3))]:border-t [&:not(:nth-child(3))]:border-base-200">
       <div class="flex items-center justify-between mb-8">
         <h2 class="text-3xl font-black m-0">Aktuelle Einblicke</h2>
         {portfolioPrefix && (

@@ -1,7 +1,7 @@
 ---
 import { type CollectionEntry, render } from "astro:content";
 
-import { tryGetImage } from "../images/Images";
+import { tryGetImage } from "../images/slug-map";
 import ResponsiveImage from "./ResponsiveImage.astro";
 import ReviewAvatar from "./ReviewAvatar.astro";
 import ReviewSocialLink from "./ReviewSocialLink.astro";
@@ -51,7 +51,7 @@ const { Content } = await render(entry);
       </div>}
     <h4 class="card-title">{name}</h4>
     {displayLargeImage && large !== undefined &&
-      <ResponsiveImage name={largeName} />
+      <ResponsiveImage name={largeName} showInfo={true} />
     }
     <div />
     <div class="card-body">

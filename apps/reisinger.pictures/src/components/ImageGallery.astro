@@ -1,22 +1,28 @@
 ---
+import type { ImageMetadata } from "astro";
 import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
 import Photoswipe from "./Photoswipe.astro";
 import ResponsiveImage from "./ResponsiveImage.astro";
 
+type GalleryEntry = string | ImageMetadata;
+
 interface Props {
-  images: string[];
+  images: GalleryEntry[];
   layout?: GalleryLayout;
 }
 
 const { images, layout = GalleryLayout.Presentation } = Astro.props;
 ---
 <section data-gallery={layout}>
-  {images.map((image, idx) => {
+  {images.map((entry, idx) => {
+    const isString = typeof entry === "string";
     const isLast = idx === images.length - 1;
     return (
-      <ResponsiveImage name={image}
-                       showInfo
-                       sizeModifiers={GALLERY_BREAKPOINTS[isLast && idx % 2 === 0 && layout === GalleryLayout.Presentation ? GalleryLayout.Full : layout]}
+      <ResponsiveImage
+        name={isString ? entry : undefined}
+        image={isString ? undefined : entry}
+        showInfo={isString}
+        sizeModifiers={GALLERY_BREAKPOINTS[isLast && idx % 2 === 0 && layout === GalleryLayout.Presentation ? GalleryLayout.Full : layout]}
       />);
   })}
 </section>

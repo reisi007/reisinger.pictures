@@ -1,9 +1,10 @@
 ---
 import ResponsiveImage from "./ResponsiveImage.astro";
+import meImg from "../images/me.jpg";
 ---
 <a href="/" class="flex items-center gap-3 no-underline group">
   <ResponsiveImage
-    name="me"
+    image={meImg}
     alt="Florian Reisinger"
     class="size-10 rounded-full object-cover group-hover:ring-2 ring-primary transition-all shadow"
     sizes="40px"

@@ -1,21 +1,58 @@
 ---
 import ResponsiveImage from "./ResponsiveImage.astro";
+import { getMetadataForImageSlug } from "./image.utils";
+import { getImage as getSourceImage } from "../images/slug-map";
 
 interface Props {
   name: string;
   alt?: string;
 }
 
-const { name, alt = "" } = Astro.props;
+const { name: imageName, alt } = Astro.props;
+const [imgModule, data] = await Promise.all([
+  getSourceImage(imageName),
+  getMetadataForImageSlug(imageName),
+]);
+const image = imgModule.default;
+const resolvedAlt = alt ?? data?.title ?? "";
+const metadata = data?.metadata;
+const aspectRatio = `${image.width}/${image.height}`;
+
+const infoId = `hero-info-${imageName.replaceAll("/", "-")}`;
+
+const equipment = metadata
+  ? [metadata.camera, metadata.lens].filter(Boolean).join(" \u00b7 ")
+  : undefined;
+
+const exifCompact = metadata
+  ? [metadata.focalLength, metadata.aperture, metadata.shutter && `${metadata.shutter}s`, metadata.iso && `ISO ${metadata.iso}`]
+      .filter(Boolean).join(" \u00b7 ")
+  : undefined;
 ---
-<div class="w-full bg-base-200 border-b border-base-200 mb-8 relative">
-  <div class="mx-auto w-full max-w-[1920px] aspect-video md:aspect-[21/9] overflow-hidden relative shadow-sm">
-    <ResponsiveImage 
-      name={name} 
-      alt={alt} 
-      class="w-full h-full object-cover object-center !max-h-none !m-0" 
-      sizes="100vw"
-    />
-    {/* Das optionale Gradient-Overlay wurde entfernt, um das Bild ohne Schleier zu zeigen. */}
+<div class="w-full bg-base-200 border-b border-base-200 mb-8 shadow-sm overflow-hidden">
+  <div class="relative mx-auto" style={`max-height: 80vh; aspect-ratio: ${aspectRatio};`}>
+      <ResponsiveImage 
+        name={imageName} 
+        alt={alt} 
+        class="w-full h-full object-contain object-center"
+        sizes="100vw"
+      />
+      <div class="info-overlay group absolute inset-0">
+        <input type="checkbox" id={infoId} class="peer sr-only" />
+        <label
+          for={infoId}
+          class="absolute top-3 right-3 z-10 size-9 flex items-center justify-center rounded-full bg-primary/70 text-primary-content ring-1 ring-primary-content/30 opacity-90 hover:opacity-100 peer-checked:opacity-100 peer-focus-visible:opacity-100 cursor-pointer transition-all"
+          aria-label="Bildinformationen ein-/ausblenden"
+          onclick="event.stopPropagation()"
+        >
+          <span class="icon-[mdi--information-outline] size-5" />
+        </label>
+        <div class="info-box absolute inset-x-0 bottom-0 bg-base-300/90 backdrop-blur p-4 text-sm opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none peer-checked:pointer-events-auto">
+          <p class="text-base-content leading-snug m-0">{resolvedAlt}</p>
+          {equipment && <p class="text-base-content/80 m-0 mt-1">{equipment}</p>}
+          {exifCompact && <p class="text-base-content/70 m-0 mt-0.5">{exifCompact}</p>}
+        </div>
+      </div>
+    </div>
   </div>
 </div>

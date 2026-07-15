@@ -101,26 +101,6 @@ const dsb = defineCollection({
   })
 });
 
-const imageMetadata = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.yaml", base: "./src" }),
-  schema: z.object({
-    title: z.string().nullish(),
-    darkInvert: z.boolean().default(false),
-    favorite: z.boolean().default(false),
-    metadata: z.object({
-      captureDate: z.coerce.date().optional(),
-      aperture: z.string().optional(),
-      focalLength: z.string().optional(),
-      shutter: z.string().optional(),
-      iso: z.coerce.number().optional(),
-      camera: z.string().optional(),
-      lens: z.string().optional(),
-      orientation: z.enum(["portrait", "landscape", "square"]).optional()
-    }).optional().nullable(),
-    categories: z.array(z.string()).optional().nullable()
-  })
-});
-
 const categories = defineCollection({
   loader: file("src/content/categories.json"),
   schema: z.object({
@@ -146,7 +126,6 @@ export const collections = {
   dsb,
   portfolio,
   portfolioOverviews,
-  imageMetadata,
   simple,
   testimonialSummary,
   testimonials,

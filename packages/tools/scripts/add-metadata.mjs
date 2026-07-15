@@ -4,6 +4,8 @@ import yaml from "js-yaml";
 import ExifReader from "exifreader";
 import sharp from "sharp";
 
+import { applyCameraMap, applyLensMap } from "./apply-camera-lens-map.mjs";
+
 // The root folder to start searching from
 const FOLDER_PATH = path.join(process.cwd(), "src");
 const CATEGORIES_PATH = path.join(FOLDER_PATH, "content", "categories.json");
@@ -100,18 +102,20 @@ async function processFiles() {
         const relativePath = path.relative(FOLDER_PATH, yamlFilePath);
         let slug = relativePath.replace(/\.(yml|yaml)$/, "").replace(/[\\/ ]/g, "-");
 
-        // List of prefixes to remove from the start of the slug
+        // Must match Images.ts computeKey prefix list (without src-/ -src- variants)
         const prefixesToRemove = [
           "images-testimonials-",
           "images-",
-          "content-einblicke-",
+          "content-portfolio-",
           "content-simple-"
         ];
         for (const prefix of prefixesToRemove) {
           if (slug.startsWith(prefix)) {
             slug = slug.substring(prefix.length);
+            break;
           }
         }
+        const oldSlug = data.slug;
         data.slug = slug;
 
         // Process only if metadata AND orientation are missing
@@ -120,6 +124,14 @@ async function processFiles() {
 
         if (hasMetadata && hasOrientation) {
           console.log(`✅ '${yamlFilePath}' wurde bereits verarbeitet. Überspringe.`);
+
+          // Write back if slug changed (e.g. after file restructuring)
+          if (oldSlug !== undefined && oldSlug !== slug) {
+            await fs.writeFile(yamlFilePath, yaml.dump(data), "utf8");
+            console.log(`  -> 💾 Slug aktualisiert: "${slug}" (war: "${oldSlug}")`);
+            filesUpdatedCount++;
+          }
+
           // Even if we skip, we need to read the date for categories
           if (data.metadata?.captureDate) {
             const date = new Date(data.metadata.captureDate);
@@ -169,6 +181,10 @@ async function processFiles() {
             lens: exifData.LensModel?.description || data.metadata?.lens,
             orientation: orientation
           };
+
+          // Apply camera/lens name mapping (short → full names)
+          newMetadata.camera = applyCameraMap(newMetadata.camera);
+          newMetadata.lens = applyLensMap(newMetadata.lens);
 
           Object.keys(newMetadata).forEach(key => newMetadata[key] === undefined && delete newMetadata[key]);
           data.metadata = newMetadata;

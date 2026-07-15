@@ -1,0 +1,31 @@
+{
+  "_comment": "Map short/incomplete EXIF camera/lens names to full display names. Keys are matched case-insensitively as substrings (partial match).",
+  "camera": {
+    "Canon EOS R6m2": "Canon EOS R6 Mark II",
+    "Canon EOS R1": "Canon EOS R1",
+    "EOS R1": "Canon EOS R1",
+    "Canon EOS R7": "Canon EOS R7",
+    "EOS R7": "Canon EOS R7",
+    "Canon EOS M50m2": "Canon EOS M50 Mark II",
+    "EOS M50": "Canon EOS M50"
+  },
+  "lens": {
+    "56mm F1.4 DC DN | Contemporary 018": "Sigma 56mm f/1.4 DC DN | Contemporary",
+    "105.0 mm": "Sigma 105mm f/2.8 OS HSM Macro",
+    "EF-M18-150mm f/3.5-6.3 IS STM": "Canon EF-M 18-150mm f/3.5-6.3 IS STM",
+    "EF-S10-18mm f/4.5-5.6 IS STM": "Canon EF-S 10-18mm f/4.5-5.6 IS STM",
+    "EF-S18-135mm f/3.5-5.6 IS STM": "Canon EF-S 18-135mm f/3.5-5.6 IS STM",
+    "EF-S35mm f/2.8 MACRO IS STM": "Canon EF-S 35mm f/2.8 Macro IS STM",
+    "EF-S55-250mm f/4-5.6 IS STM": "Canon EF-S 55-250mm f/4-5.6 IS STM",
+    "EF100mm f/2.8L Macro IS USM": "Canon EF 100mm f/2.8L Macro IS USM",
+    "EF135mm f/2L USM": "Canon EF 135mm f/2L USM",
+    "EF85mm f/1.8 USM": "Canon EF 85mm f/1.8 USM",
+    "RF-S18-150mm F3.5-6.3 IS STM": "Canon RF-S 18-150mm f/3.5-6.3 IS STM",
+    "RF16mm F2.8 STM": "Canon RF 16mm f/2.8 STM",
+    "RF24-105mm F2.8 L IS USM Z": "Canon RF 24-105mm f/2.8L IS USM Z",
+    "RF35mm F1.8 MACRO IS STM": "Canon RF 35mm f/1.8 Macro IS STM",
+    "RF50mm F1.8 STM": "Canon RF 50mm f/1.8 STM",
+    "RF70-200mm F2.8 L IS USM": "Canon RF 70-200mm f/2.8L IS USM",
+    "Viltrox AF 23/1.4M": "Viltrox AF 23mm f/1.4"
+  }
+}
