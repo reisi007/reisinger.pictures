@@ -23,12 +23,23 @@ const rawDescription = Astro.props.description;
 // This ensures every portfolio page has a meta description for search engines.
 const description = rawDescription ?? `Fotografie von Florian Reisinger aus Linz: ${title}. Eindrücke und Bilder im Portfolio.`;
 
-const imageInfo = await getImage({
-  src: getImageByName(heroImage),
-  format: "webp",
-  width: LARGEST_IMAGE_SIZE,
-  fit: "scale-down"
-});
+const heroImageSrc = getImageByName(heroImage);
+
+const [imageInfo, socialImageInfo] = await Promise.all([
+  getImage({
+    src: heroImageSrc,
+    format: "webp",
+    width: LARGEST_IMAGE_SIZE,
+    fit: "scale-down"
+  }),
+  getImage({
+    src: heroImageSrc,
+    format: "webp",
+    width: 1200,
+    height: 630,
+    fit: "cover"
+  }),
+]);
 
 const date = "date" in dates ? dates.date : undefined;
 const updated = "updated" in dates ? dates.updated : undefined;
@@ -49,7 +60,7 @@ const schemaOrg: SchemaCreationFunction = (o, me, df, url) => createBlogPostingS
   <BaseHead slot="head" title={title} description={description}>
     {date && <meta property="article:published_time" content={date.toISOString()} />}
     {updated && <meta property="article:modified_time" content={updated.toISOString()} />}
-    <SocialImage name={heroImage} />
+    <SocialImage image={socialImageInfo} />
     <SchemaOrg createData={schemaOrg} />
   </BaseHead>
   {heroImage &&

@@ -11,8 +11,8 @@
     "preview": "astro preview",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
-    "publish": "pnpm run build ",
-    "postpublish": "sync.bat",
+    "publish": "pnpm run build",
+    "postpublish": "./sync.sh",
     "merge:llm": "repomix",
     "editor": "concurrently \"tailwindcss -i ./editor/editor.tw.css -o ./editor/editor.css --watch\" \"http-server . -p 8080 -c-1 -o /editor/editor.html\"",
     "human-loop": "concurrently \"tailwindcss -i ./human-loop/human-loop.tw.css -o human-loop/human-loop.css --watch\" \"http-server . -p 8081 -c-1 -o /human-loop/human-loop.html\""

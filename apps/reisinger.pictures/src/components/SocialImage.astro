@@ -1,4 +1,5 @@
 ---
+import type { GetImageResult } from "astro";
 import { absoluteLink } from "@reisinger/shared/utils";
 import { getImage } from "astro:assets";
 
@@ -8,14 +9,15 @@ import { getMetadataForImageSlug } from "./image.utils";
 interface Props {
   /** Image slug to use as social preview. Falls back to "me" (portrait) when omitted. */
   name?: string;
+  /** Pre-computed image result. Skips internal getImage() call when provided. */
+  image?: GetImageResult;
 }
 
-const { name } = Astro.props;
+const { name, image: precomputed } = Astro.props;
 
-// Fall back to the photographer portrait so every page has a social preview image.
 const resolvedName = name ?? "me";
 
-const imageInfo = await getImage({
+const imageInfo = precomputed ?? await getImage({
   src: getImageByName(resolvedName),
   format: "webp",
   width: 1200,
@@ -23,7 +25,7 @@ const imageInfo = await getImage({
   fit: "cover"
 });
 
-const alt = (await getMetadataForImageSlug(resolvedName))?.title;
+const alt = precomputed ? undefined : (await getMetadataForImageSlug(resolvedName))?.title;
 
 const { src, options } = imageInfo;
 const fullSrc = absoluteLink(Astro.url, src);

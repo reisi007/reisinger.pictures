@@ -31,9 +31,17 @@ function removeIf(array, predicate) {
  * @param {string} dirPath - The directory to start scanning from.
  * @returns {Promise<string[]>} A promise that resolves to a flat array of full file paths.
  */
+const SKIP_DIRS = new Set([".fseventsd", ".Trashes", ".Spotlight-V100", ".DS_Store"]);
+
 async function getHtmlFilePaths(dirPath) {
   const absoluteDirPath = resolve(dirPath);
-  const allEntries = await readdir(absoluteDirPath, { withFileTypes: true });
+  let allEntries;
+  try {
+    allEntries = await readdir(absoluteDirPath, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  allEntries = allEntries.filter(e => !SKIP_DIRS.has(e.name));
 
   const filePromises = allEntries.map(async (entry) => {
     const fullPath = join(absoluteDirPath, entry.name);
@@ -119,7 +127,7 @@ export async function extractAllLinksRecursivelyWithJSDOM(folderPath, prefix) {
 
   } catch (error) {
     console.error(`Error processing folder "${folderPath}":`, error.message);
-    throw error;
+    return { links: [], anchors: [] };
   }
 }
 
@@ -154,7 +162,7 @@ const siteHost = new URL(config.site).host;
 const excludedHosts = ["portal.reisinger.pictures", "buy.reisinger.pictures"];
 
 const knownUrlsPromise = extractLocsFromSitemap(resolve(process.cwd(), "dist/sitemap-0.xml")).catch(() => []);
-const crossRefLinksPromise = extractAllLinksRecursivelyWithJSDOM(resolve(process.cwd(), "dist"), config.site).catch(() => ({ links: [], anchors: [] }));
+const crossRefLinksPromise = extractAllLinksRecursivelyWithJSDOM(resolve(process.cwd(), "dist"), config.site);
 
 const sitemapUrls = await knownUrlsPromise;
 const { links: crossRefLinks, anchors } = await crossRefLinksPromise;

@@ -51,7 +51,12 @@ export default function imageMetaPlugin() {
     for (const filePath of discoverFiles(srcDir, isYaml)) {
       try {
         const data = parseYaml(fs.readFileSync(filePath, "utf-8"));
-        if (data?.slug) result[data.slug] = data;
+        if (data?.slug) {
+          if (result[data.slug]) {
+            console.warn(`[image-meta] Duplicate slug "${data.slug}" in ${filePath}`);
+          }
+          result[data.slug] = data;
+        }
       } catch {}
     }
     metaCache = result;
@@ -64,7 +69,11 @@ export default function imageMetaPlugin() {
     const processed = new Set();
     for (const imgPath of discoverFiles(srcDir, isImage)) {
       const yamlData = loadCompanionYaml(imgPath);
-      if (!yamlData?.slug || processed.has(yamlData.slug)) continue;
+      if (!yamlData?.slug) continue;
+      if (processed.has(yamlData.slug)) {
+        console.warn(`[image-meta] Duplicate slug "${yamlData.slug}" in ${imgPath}`);
+        continue;
+      }
       processed.add(yamlData.slug);
       const relative = path.relative(rootDir, imgPath);
       result[yamlData.slug] = "/" + relative;

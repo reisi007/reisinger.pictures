@@ -30,13 +30,25 @@ const { title, description, heroImage, showContact, showToc, index = true, ...da
 const { Content } = await render(post);
 
 let imageInfo: GetImageResult | undefined;
-if (heroImage !== undefined)
-  imageInfo = await getImage({
-    src: getImageByName(heroImage),
-    format: "webp",
-    width: LARGEST_IMAGE_SIZE,
-    fit: "scale-down"
-  });
+let socialImageInfo: GetImageResult | undefined;
+if (heroImage !== undefined) {
+  const heroImageSrc = getImageByName(heroImage);
+  [imageInfo, socialImageInfo] = await Promise.all([
+    getImage({
+      src: heroImageSrc,
+      format: "webp",
+      width: LARGEST_IMAGE_SIZE,
+      fit: "scale-down"
+    }),
+    getImage({
+      src: heroImageSrc,
+      format: "webp",
+      width: 1200,
+      height: 630,
+      fit: "cover"
+    }),
+  ]);
+}
 
 const src = imageInfo?.src;
 
@@ -54,7 +66,7 @@ const createData: SchemaCreationFunction = (o, p, df, url) => createWebPageSchem
 
 <MinimalPage showContact={showContact}>
   <BaseHead title={title} description={description} noIndex={!index} slot="head">
-    <SocialImage name={heroImage} />
+    <SocialImage image={socialImageInfo} />
     <SchemaOrg createData={createData} />
   </BaseHead>
   {heroImage && <HeroBanner slot="hero" name={heroImage} alt={title} />}

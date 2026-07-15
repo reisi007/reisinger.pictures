@@ -73,13 +73,25 @@ const reviewSlugs: string[] | undefined = testimonials?.map(e => e.id);
 const { Content } = await render(entry);
 
 let schemaOrgImage = undefined;
+let socialImageInfo = undefined;
+let heroImageSrc = undefined;
 if(heroImage !== undefined) {
-  schemaOrgImage = await getImage({
-    src: getImageByName(heroImage),
-    format: "webp",
-    width: LARGEST_IMAGE_SIZE,
-    fit: "scale-down"
-  });
+  heroImageSrc = getImageByName(heroImage);
+  [schemaOrgImage, socialImageInfo] = await Promise.all([
+    getImage({
+      src: heroImageSrc,
+      format: "webp",
+      width: LARGEST_IMAGE_SIZE,
+      fit: "scale-down"
+    }),
+    getImage({
+      src: heroImageSrc,
+      format: "webp",
+      width: 1200,
+      height: 630,
+      fit: "cover"
+    }),
+  ]);
 }
 
 const createData: SchemaCreationFunction = (o, me, _, url) => createWebPageSchema({
@@ -93,7 +105,7 @@ const createData: SchemaCreationFunction = (o, me, _, url) => createWebPageSchem
 ---
 <MinimalPage>
   <BaseHead title={name} description={description} slot="head">
-    <SocialImage name={heroImage} />
+    <SocialImage image={socialImageInfo} />
     <SchemaOrg createData={createData} />
   </BaseHead>
   {heroImage && <HeroBanner slot="hero" name={heroImage} alt={name} />}
