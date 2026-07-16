@@ -1,6 +1,6 @@
 ---
 const actionUrl = "https://form.reisinger.pictures";
-const nextUrl = new URL('/thankyou', Astro.url).href;
+const nextUrl = new URL(Astro.url.pathname + '?sent=true', Astro.url.origin).href;
 ---
 <p class="text-base-content/60 text-sm text-center mb-4">Teile mir dein Projekt mit – ich melde mich zeitnah bei dir.</p>
 <form id="reisinger-contact-form" method="POST" action={actionUrl} class="flex flex-col w-full max-w-lg mx-auto gap-y-2 not-prose">
@@ -120,6 +120,29 @@ const nextUrl = new URL('/thankyou', Astro.url).href;
           }
         }
       });
+    });
+  </script>
+  <script>
+    document.addEventListener("astro:page-load", () => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("sent") !== "true") return;
+
+      history.replaceState(null, "", window.location.pathname);
+
+      const toast = document.createElement("div");
+      toast.className = "toast toast-end toast-bottom";
+      toast.innerHTML = `
+        <div role="alert" class="alert alert-success shadow-lg">
+          <span class="icon-[mdi--check-circle] text-xl"></span>
+          <span>Nachricht erfolgreich versandt!</span>
+        </div>`;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.transition = "opacity 0.4s";
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 400);
+      }, 4000);
     });
   </script>
 </form>
