@@ -6,8 +6,7 @@
     "EOS R1": "Canon EOS R1",
     "Canon EOS R7": "Canon EOS R7",
     "EOS R7": "Canon EOS R7",
-    "Canon EOS M50m2": "Canon EOS M50 Mark II",
-    "EOS M50": "Canon EOS M50"
+    "Canon EOS M50m2": "Canon EOS M50 Mark II"
   },
   "lens": {
     "56mm F1.4 DC DN | Contemporary 018": "Sigma 56mm f/1.4 DC DN | Contemporary",
@@ -25,7 +24,11 @@
     "RF24-105mm F2.8 L IS USM Z": "Canon RF 24-105mm f/2.8L IS USM Z",
     "RF35mm F1.8 MACRO IS STM": "Canon RF 35mm f/1.8 Macro IS STM",
     "RF50mm F1.8 STM": "Canon RF 50mm f/1.8 STM",
+    "RF45mm F1.2 STM": "Canon RF 45mm f/1.2 STM",
     "RF70-200mm F2.8 L IS USM": "Canon RF 70-200mm f/2.8L IS USM",
+    "RF100-500mm F4.5-7.1 L IS USM": "Canon RF 100-500mm f/4.5-7.1L IS USM",
+    "RF100mm F2.8 L MACRO IS USM": "Canon RF 100mm f/2.8L Macro IS USM",
+    "RF200-800mm F6.3-9 IS USM": "Canon RF 200-800mm f/6.3-9 IS USM",
     "Viltrox AF 23/1.4M": "Viltrox AF 23mm f/1.4"
   }
 }
