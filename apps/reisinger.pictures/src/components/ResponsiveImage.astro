@@ -114,8 +114,9 @@ if (isBuild && name && buildHash) {
   const { IMAGE_BASE_URL: cdnBase } = await import("../images/image-config");
   const prefix = `${cdnBase}/${buildHash.slice(0, 2)}/${buildHash}`;
   const cdnWidths = widths.filter(w => buildVariants!.includes(w));
-  src = `${prefix}_${cdnWidths[cdnWidths.length - 1]}.webp`;
-  srcset = cdnWidths.map(w => `${prefix}_${w}.webp ${w}w`).join(", ");
+  const effectiveWidths = cdnWidths.length > 0 ? cdnWidths : [buildVariants![0]];
+  src = `${prefix}_${effectiveWidths[effectiveWidths.length - 1]}.webp`;
+  srcset = effectiveWidths.map(w => `${prefix}_${w}.webp ${w}w`).join(", ");
 } else if (isBuild && name && !buildHash) {
   throw new Error(`ResponsiveImage: "${name}" nicht in .imagedist/manifest.json gefunden. existsiert der Slug in src/images/ oder src/content/portfolio/?`);
 } else {

@@ -44,6 +44,7 @@ export default function imageMetaPlugin() {
   let metaCache = null;
   let slugCache = null;
   let rootDir = "";
+  let isBuild = false;
 
   function buildMetaIndex(srcDir) {
     if (metaCache) return metaCache;
@@ -88,6 +89,7 @@ export default function imageMetaPlugin() {
 
     configResolved(config) {
       rootDir = config.root || process.cwd();
+      isBuild = config.command === "build";
     },
 
     resolveId(id) {
@@ -106,6 +108,15 @@ export default function imageMetaPlugin() {
       if (id === RESOLVED_SLUG_ID) {
         const srcDir = path.resolve(rootDir, "src");
         const map = buildSlugMap(srcDir);
+        if (isBuild) {
+          const entries = Object.keys(map)
+            .map((slug) => `${JSON.stringify(slug)}: true`)
+            .join(",\n");
+          return {
+            code: `export default {\n${entries}\n};`,
+            map: null,
+          };
+        }
         const entries = Object.entries(map)
           .map(([slug, imgPath]) => `${JSON.stringify(slug)}: () => import(${JSON.stringify(imgPath)})`)
           .join(",\n");

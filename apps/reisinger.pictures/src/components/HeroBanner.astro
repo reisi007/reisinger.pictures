@@ -1,7 +1,7 @@
 ---
 import ResponsiveImage from "./ResponsiveImage.astro";
 import { getMetadataForImageSlug } from "./image.utils";
-import { getImage as getSourceImage } from "../images/slug-map";
+import { loadImage } from "../images/image-service";
 
 interface Props {
   name: string;
@@ -9,14 +9,14 @@ interface Props {
 }
 
 const { name: imageName, alt } = Astro.props;
-const [imgModule, data] = await Promise.all([
-  getSourceImage(imageName),
+
+const [imgInfo, data] = await Promise.all([
+  loadImage(imageName),
   getMetadataForImageSlug(imageName),
 ]);
-const image = imgModule.default;
 const resolvedAlt = alt ?? data?.title ?? "";
 const metadata = data?.metadata;
-const aspectRatio = `${image.width}/${image.height}`;
+const aspectRatio = `${imgInfo.width}/${imgInfo.height}`;
 
 const infoId = `hero-info-${imageName.replaceAll("/", "-")}`;
 

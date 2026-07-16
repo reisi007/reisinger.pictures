@@ -1,8 +1,8 @@
 ---
 import { absoluteLink } from "@reisinger/shared/utils";
-import { getImage } from "astro:assets";
 
-import logoSrc from "../images/logo.png";
+import { IMAGE_BASE_URL } from "../images/image-config";
+import { getManifestImage } from "../images/image-manifest";
 import type { Organization, Person, SchemaCreationFunction } from "./SchemaOrg";
 
 const url = Astro.url;
@@ -30,10 +30,14 @@ export interface Props {
 
 const { createData } = Astro.props;
 
-const logoInfo = await getImage({
-  src: logoSrc,
-  format: "webp"
-});
+const logoManifest = getManifestImage("logo");
+if (!logoManifest) {
+  throw new Error("SchemaOrg: logo not found in manifest");
+}
+const logoHash = logoManifest.hash;
+const logoWidth = 256;
+const logoCdnPath = `${IMAGE_BASE_URL}/${logoHash.slice(0, 2)}/${logoHash}_${logoWidth}.webp`;
+const logoUrl = absoluteLink(url, logoCdnPath);
 
 const me: Person = {
   "@type": "Person",
@@ -44,7 +48,7 @@ const organisation: Organization = {
   "@type": "Organization",
   name: "Fotograf Florian Reisinger",
   url: Astro.site?.toString(),
-  logo: absoluteLink(Astro.url, logoInfo.src),
+  logo: logoUrl,
   address: {
     "@type": "PostalAddress",
     addressCountry: "AT",
@@ -67,7 +71,7 @@ const business = {
   description:
     "Professionelle Portrait-, Beauty-, Akt-, Boudoir- und Paar-Shootings in Linz. Business-Portraits und Personal Branding für Selbstständige und Führungskräfte. Event- und Sportfotografie mit eigenem Presse-Portal.",
   url: siteUrl,
-  image: absoluteLink(Astro.url, logoInfo.src),
+  image: logoUrl,
   telephone: "+43 670 201 77 10",
   priceRange: "\u20ac\u20ac",
   address: {

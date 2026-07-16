@@ -1,9 +1,8 @@
 ---
 import { groupBy } from "@reisinger/shared/utils";
-import { LARGEST_IMAGE_SIZE } from "@reisinger/shared/utils/Breakpoints";
-import { getImage } from "astro:assets";
 import { type CollectionEntry, getCollection, render } from "astro:content";
 
+import { loadImage } from "../../../images/image-service";
 import BaseHead from "../../../components/BaseHead.astro";
 import FeaturedTestimonials from "../../../components/FeaturedTestimonials.astro";
 import Gallery from "../../../components/Gallery.astro";
@@ -14,7 +13,6 @@ import type { SchemaCreationFunction } from "../../../components/SchemaOrg";
 import SchemaOrg from "../../../components/SchemaOrg.astro";
 import { createWebPageSchema } from "../../../components/SchemaOrg.factory";
 import SocialImage from "../../../components/SocialImage.astro";
-import { getImage as getImageByName } from "../../../images/slug-map";
 
 interface Props {
   entry: CollectionEntry<"areas">,
@@ -72,40 +70,20 @@ const { id: slug, data: { name, description, testimonials, images, heroImage } }
 const reviewSlugs: string[] | undefined = testimonials?.map(e => e.id);
 const { Content } = await render(entry);
 
-let schemaOrgImage = undefined;
-let socialImageInfo = undefined;
-let heroImageSrc = undefined;
-if(heroImage !== undefined) {
-  heroImageSrc = getImageByName(heroImage);
-  [schemaOrgImage, socialImageInfo] = await Promise.all([
-    getImage({
-      src: heroImageSrc,
-      format: "webp",
-      width: LARGEST_IMAGE_SIZE,
-      fit: "scale-down"
-    }),
-    getImage({
-      src: heroImageSrc,
-      format: "webp",
-      width: 1200,
-      height: 630,
-      fit: "cover"
-    }),
-  ]);
-}
+const imageInfo = heroImage ? await loadImage(heroImage) : undefined;
 
 const createData: SchemaCreationFunction = (o, me, _, url) => createWebPageSchema({
   url,
   name,
   description,
-  image: schemaOrgImage?.src,
+  image: imageInfo?.src,
   author: me,
   publisher: o
 });
 ---
 <MinimalPage>
   <BaseHead title={name} description={description} slot="head">
-    <SocialImage image={socialImageInfo} />
+    <SocialImage name={heroImage} />
     <SchemaOrg createData={createData} />
   </BaseHead>
   {heroImage && <HeroBanner slot="hero" name={heroImage} alt={name} />}

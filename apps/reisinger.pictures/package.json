@@ -5,7 +5,7 @@
   "scripts": {
     "astro": "astro",
     "dev": "astro dev",
-    "build": "astro check && astro build",
+    "build": "PUBLIC_IMAGE_CDN_URL=https://images.reisinger.pictures astro check && PUBLIC_IMAGE_CDN_URL=https://images.reisinger.pictures astro build",
     "prebuild": "node ../../packages/tools/scripts/add-metadata.mjs && node ../../packages/tools/scripts/process-images.mjs",
     "postbuild": "node ../../packages/tools/scripts/check_links.mjs",
     "preview": "astro preview",
