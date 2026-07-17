@@ -38,25 +38,25 @@ const reviewBody = (body ?? "")
 // Map percentage rating (0-100) to a 5-star scale for Schema.org.
 const starRating = rating !== undefined ? (rating / 20).toFixed(1) : undefined;
 
-const reviewSchema = {
+const businessSchema = {
   "@context": "https://schema.org",
-  "@type": "Review",
-  itemReviewed: {
-    "@type": "Service",
-    name: "Fotografie by Florian Reisinger",
-    serviceType: "Photography"
-  },
-  reviewBody,
-  name: title,
-  author: { "@type": "Person", name },
-  datePublished: date.toISOString().split("T")[0],
-  reviewRating: starRating ? {
-    "@type": "Rating",
-    ratingValue: starRating,
-    bestRating: "5"
-  } : undefined
+  "@type": "LocalBusiness",
+  name: "Fotografie by Florian Reisinger",
+  serviceType: "Photography",
+  review: {
+    "@type": "Review",
+    reviewBody,
+    name: title,
+    author: { "@type": "Person", name },
+    datePublished: date.toISOString().split("T")[0],
+    reviewRating: starRating ? {
+      "@type": "Rating",
+      ratingValue: starRating,
+      bestRating: "5"
+    } : undefined
+  }
 };
-const reviewJson = JSON.stringify(reviewSchema);
+const reviewJson = JSON.stringify(businessSchema);
 ---
 <MinimalPage>
   <BaseHead title={title} author={name} slot="head">
