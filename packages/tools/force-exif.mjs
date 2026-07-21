@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import yaml from "js-yaml";
+import * as yaml from "js-yaml";
 import ExifReader from "exifreader";
 import sharp from "sharp";
 import { applyCameraMap, applyLensMap } from "./scripts/apply-camera-lens-map.mjs";

@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import yaml from "js-yaml";
+import * as yaml from "js-yaml";
 
 import { applyCameraMap, applyLensMap } from "./apply-camera-lens-map.mjs";
 

@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import yaml from "js-yaml";
+import * as yaml from "js-yaml";
 import { readFileSync, existsSync } from "fs";
 
 const SRC_PATH = path.join(process.cwd(), "src");

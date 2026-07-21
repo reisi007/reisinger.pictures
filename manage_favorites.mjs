@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
-import yaml from "js-yaml";
+import * as yaml from "js-yaml";
 
 const command = process.argv[2];
 // Optionales Filter-Jahr als drittes Argument (z.B. "2026")

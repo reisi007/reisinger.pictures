@@ -15,6 +15,7 @@
     "build:reisinger.pictures": "pnpm --filter reisinger.pictures exec astro check && pnpm --filter reisinger.pictures build"
   },
   "devDependencies": {
-    "repomix": "^1.13.1"
+    "repomix": "^1.16.1",
+    "typescript": "5.9.3"
   }
 }
