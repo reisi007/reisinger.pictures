@@ -9,13 +9,12 @@ interface Props {
 const { infoId, title, equipment, exifCompact } = Astro.props;
 ---
 
-<div class="info-overlay group absolute inset-0" onclick="event.stopPropagation()">
+<div class="info-overlay group absolute inset-0">
   <input type="checkbox" id={infoId} class="peer sr-only" />
   <label
     for={infoId}
     class="absolute top-3 right-3 z-10 size-9 flex items-center justify-center rounded-full bg-primary/70 text-primary-content ring-1 ring-primary-content/30 opacity-90 hover:opacity-100 peer-checked:opacity-100 peer-focus-visible:opacity-100 cursor-pointer transition-all"
     aria-label="Bildinformationen ein-/ausblenden"
-    onclick="event.stopPropagation()"
   >
     <span class="icon-[mdi--information-outline] size-5" />
   </label>
@@ -25,3 +24,9 @@ const { infoId, title, equipment, exifCompact } = Astro.props;
     {exifCompact && <p class="text-base-content/70 m-0 mt-0.5">{exifCompact}</p>}
   </div>
 </div>
+
+<script>
+  document.querySelectorAll(".info-overlay").forEach((el) => {
+    el.addEventListener("click", (e) => e.stopPropagation());
+  });
+</script>

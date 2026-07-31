@@ -154,8 +154,7 @@ const commonImgAttrs: Record<string, unknown> = {
   <div class="relative mx-auto overflow-hidden max-w-full max-h-full" style={`aspect-ratio: ${aspectRatioValue};`}>
     <img
       {...commonImgAttrs}
-      class={[imgClass, "w-full h-full object-contain"].filter(Boolean).join(" ")}
-      style="display:block"
+      class={[imgClass, "w-full h-full object-contain block"].filter(Boolean).join(" ")}
     />
     <ExifInfoOverlay infoId={infoId} title={resolvedAlt} equipment={equipment} exifCompact={exifCompact} />
   </div>

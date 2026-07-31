@@ -26,8 +26,7 @@
         <img
           id="referenceImage"
           alt="Referenzbild"
-          class="max-w-full h-auto rounded my-4 mx-auto object-contain"
-          style="display: none; max-height: 400px"
+          class="max-w-full h-auto rounded my-4 mx-auto object-contain hidden max-h-[400px]"
         >
         <div id="autoDescribeProgress" class="flex items-center gap-2 my-2 hidden">
           <span class="loading loading-spinner text-primary"></span>
@@ -402,7 +401,7 @@ Antworte NUR mit dem JSON. Keine Erklärungen, kein Markdown-Block um das JSON.`
   // --- UI APP FLOW ---
 
   function updateProgress() {
-    const remaining = filesToProcess.length + (editorDiv.style.display === "block" ? 1 : 0);
+    const remaining = filesToProcess.length + (!editorDiv.classList.contains("hidden") ? 1 : 0);
     if (remaining > 0) {
       progressIndicator.textContent = `Noch ${remaining} Bild${remaining !== 1 ? "er" : ""} zu bearbeiten`;
     } else {
@@ -431,12 +430,12 @@ Antworte NUR mit dem JSON. Keine Erklärungen, kein Markdown-Block um das JSON.`
       const imageFile = await imageHandle.getFile();
       currentImageUrl = URL.createObjectURL(imageFile);
       referenceImage.src = currentImageUrl;
-      referenceImage.style.display = "block";
+      referenceImage.classList.remove("hidden");
     } catch (e) {
-      referenceImage.style.display = "none";
+      referenceImage.classList.add("hidden");
     }
 
-    editorDiv.style.display = "block";
+    editorDiv.classList.remove("hidden");
 
     const cacheKey = `seo_alt_${fileObj.relativePath}`;
     const cachedStr = localStorage.getItem(cacheKey);
@@ -464,8 +463,8 @@ Antworte NUR mit dem JSON. Keine Erklärungen, kein Markdown-Block um das JSON.`
 
   async function processNextFile() {
     if (filesToProcess.length === 0) {
-      editorDiv.style.display = "none";
-      successMessageDiv.style.display = "block";
+      editorDiv.classList.add("hidden");
+      successMessageDiv.classList.remove("hidden");
       progressIndicator.textContent = "";
       return;
     }
@@ -481,7 +480,7 @@ Antworte NUR mit dem JSON. Keine Erklärungen, kein Markdown-Block um das JSON.`
     try {
       directoryHandle = await window.showDirectoryPicker();
       filesToProcess = await collectYamlFilesInFolder(directoryHandle);
-      selectFolderBtn.style.display = "none";
+      selectFolderBtn.classList.add("hidden");
 
       activeModelId = await fetchCurrentModelId();
       processNextFile();

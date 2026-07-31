@@ -14,8 +14,7 @@ const {
 } = Astro.props;
 ---
 <div
-  class="flex bg-primary text-primary-content rounded-xl overflow-hidden relative filter drop-shadow-xl"
-  style="mask-image: radial-gradient(circle at 0 50%, transparent 20px, black 21px), radial-gradient(circle at 100% 50%, transparent 20px, black 21px); -webkit-mask-image: radial-gradient(circle at 0 50%, transparent 20px, black 21px), radial-gradient(circle at 100% 50%, transparent 20px, black 21px);"
+  class="flex bg-primary text-primary-content rounded-xl overflow-hidden relative filter drop-shadow-xl [mask-image:radial-gradient(circle_at_0_50%,transparent_20px,black_21px),radial-gradient(circle_at_100%_50%,transparent_20px,black_21px)] [-webkit-mask-image:radial-gradient(circle_at_0_50%,transparent_20px,black_21px),radial-gradient(circle_at_100%_50%,transparent_20px,black_21px)]"
 >
 
   <div class="flex-1 p-8 py-10 flex flex-col justify-center border-r-2 border-dashed border-primary-content/30 relative">
@@ -43,7 +42,7 @@ const {
   </div>
 
   <div class="w-24 flex items-center justify-center relative bg-black/5">
-      <span class="text-xs font-bold uppercase tracking-[0.2em] opacity-70 whitespace-nowrap" style="writing-mode: vertical-rl; transform: rotate(180deg);">
+      <span class="text-xs font-bold uppercase tracking-[0.2em] opacity-70 whitespace-nowrap [writing-mode:vertical-rl] -rotate-180">
         Jetzt teilen
       </span>
   </div>

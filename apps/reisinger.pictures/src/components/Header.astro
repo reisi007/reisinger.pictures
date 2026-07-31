@@ -134,13 +134,13 @@ function isActive(href: string) {
         void overlay.offsetWidth;
         overlay.classList.remove("opacity-0");
         overlay.classList.add("opacity-100");
-        document.body.style.overflow = "hidden";
+        document.body.classList.add("overflow-hidden");
       };
 
       const closeMenu = () => {
         overlay.classList.remove("opacity-100");
         overlay.classList.add("opacity-0");
-        document.body.style.overflow = "";
+        document.body.classList.remove("overflow-hidden");
         setTimeout(() => {
           overlay.classList.remove("flex", "flex-col");
           overlay.classList.add("hidden");

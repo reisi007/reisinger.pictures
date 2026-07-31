@@ -130,8 +130,7 @@ const nextUrl = new URL(Astro.url.pathname + '?sent=true', Astro.url.origin).hre
       history.replaceState(null, "", window.location.pathname);
 
       const toast = document.createElement("div");
-      toast.className = "toast toast-top toast-center";
-      toast.style.zIndex = "9999";
+      toast.className = "toast toast-top toast-center z-[9999]";
       toast.innerHTML = `
         <div role="alert" class="alert alert-success shadow-lg">
           <span class="icon-[mdi--check-circle] text-xl"></span>
@@ -140,8 +139,7 @@ const nextUrl = new URL(Astro.url.pathname + '?sent=true', Astro.url.origin).hre
       document.body.appendChild(toast);
 
       setTimeout(() => {
-        toast.style.transition = "opacity 0.4s";
-        toast.style.opacity = "0";
+        toast.classList.add("opacity-0", "transition-opacity", "duration-[400ms]");
         setTimeout(() => toast.remove(), 400);
       }, 4000);
     });
