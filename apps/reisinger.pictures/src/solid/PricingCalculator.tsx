@@ -1,6 +1,6 @@
-import { createEffect, createMemo, createSignal, onMount, Show } from "solid-js";
-import { flexBasePrice, flexImagesIncluded, flexImagePrice, flexSetupSurcharge, flexPrivacyBase, flexPrivacyPerImage } from "@reisinger/shared/utils/pricing";
 import { roundToPsychologicalValue } from "@reisinger/shared/utils";
+import { flexBasePrice, flexImagePrice, flexImagesIncluded, flexPrivacyBase, flexPrivacyPerImage, flexSetupSurcharge } from "@reisinger/shared/utils/pricing";
+import { createEffect, createMemo, createSignal, onMount, Show } from "solid-js";
 
 export default function PricingCalculator() {
   const [shootingType, setShootingType] = createSignal("portrait");

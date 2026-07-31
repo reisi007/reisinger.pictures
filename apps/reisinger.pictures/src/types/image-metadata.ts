@@ -1,4 +1,4 @@
-export interface ExifData {
+export type ExifData = {
   captureDate?: string;
   aperture?: string;
   focalLength?: string;
@@ -9,7 +9,7 @@ export interface ExifData {
   orientation?: "portrait" | "landscape" | "square";
 }
 
-export interface YamlMetaData {
+export type YamlMetaData = {
   title?: string | null;
   darkInvert?: boolean;
   favorite?: boolean;
@@ -18,7 +18,7 @@ export interface YamlMetaData {
   categories?: string[] | null;
 }
 
-export interface ImageWithExifMeta {
+export type ImageWithExifMeta = {
   metadata: ExifData | null;
   slug: string;
   title: string;

@@ -1,21 +1,22 @@
 import fs from "node:fs";
 import path from "node:path";
+
 import { IMAGE_BASE_URL } from "./image-config";
 
-export interface ManifestImage {
+export type ManifestImage = {
   hash: string;
   width: number;
   height: number;
   variants: number[];
 }
 
-export interface ImageManifest {
+export type ImageManifest = {
   version: number;
   generated: string;
   images: Record<string, ManifestImage>;
 }
 
-export interface CdnImageInfo {
+export type CdnImageInfo = {
   src: string;
   width: number;
   height: number;

@@ -53,7 +53,7 @@ When tasks require subjective selection (e.g., curating images or testimonials),
 ## 7. Deployment & Hosting Strategy
 * **Architecture:** SSG Astro site, hosted via Nginx in a Portainer Docker stack.
 * **Sync:** Deployment relies on local builds synced via `rclone`.
-* **Publishing:** The complete build and sync cycle is orchestrated via `npm run publish`. Do not introduce GitHub Actions CI/CD unless explicitly requested.
+* **Publishing:** The complete build and sync cycle is orchestrated via `pnpm run publish` (this project uses **pnpm**, not npm; `prebuild`, `postbuild` and `postpublish` hooks run automatically). Do not introduce GitHub Actions CI/CD unless explicitly requested.
 
 ## Regelwerk & Grenzfälle (Rules)
 - **Konsultationspflicht:** Prüfe bei Unklarheiten, Strukturfragen, Daten-Mappings oder Namenskonventionen immer zuerst die Markdown-Dateien im Ordner `rules/`.

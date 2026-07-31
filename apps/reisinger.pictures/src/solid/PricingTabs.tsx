@@ -1,6 +1,7 @@
 import { createSignal, Show } from "solid-js";
-import PricingCalculatorProfi from "./PricingCalculatorProfi";
+
 import PricingCalculator from "./PricingCalculator";
+import PricingCalculatorProfi from "./PricingCalculatorProfi";
 
 type Tab = "standard" | "flex";
 

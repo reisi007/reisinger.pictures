@@ -1,11 +1,11 @@
-export interface ManifestImage {
+export type ManifestImage = {
   hash: string;
   width: number;
   height: number;
   variants: number[];
 }
 
-export interface ImageManifest {
+export type ImageManifest = {
   version: number;
   generated: string;
   images: Record<string, ManifestImage>;

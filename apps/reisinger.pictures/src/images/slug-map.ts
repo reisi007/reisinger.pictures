@@ -7,7 +7,7 @@ const isBuild = import.meta.env.PROD;
 export function tryGetImage(name: string | undefined) {
   if (name === undefined) return undefined;
   const entry = slugMap[name];
-  if (isBuild) return entry !== undefined ? entry : undefined;
+  if (isBuild) return entry;
   return entry;
 }
 

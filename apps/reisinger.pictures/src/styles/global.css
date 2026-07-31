@@ -88,13 +88,19 @@
 }
 
 @layer utilities {
-    /* Info-Box (Bildinformationen) nur bei Hover über den Info-Button
-       bzw. wenn der Toggle (Checkbox) aktiv ist – nicht bei Hover über
-       das gesamte Bild. */
-    .info-overlay:has(> label:hover) .info-box,
+    /* Info-Box (Bildinformationen) bei Hover über den Info-Button
+       nur auf Hover-fähigen Geräten zeigen bzw. wenn der Toggle
+       (Checkbox) aktiv ist – nicht bei Hover über das gesamte Bild. */
     .info-overlay:has(> label:focus-visible) .info-box {
         opacity: 1;
         pointer-events: auto;
+    }
+
+    @media (hover: hover) {
+        .info-overlay:has(> label:hover) .info-box {
+            opacity: 1;
+            pointer-events: auto;
+        }
     }
 
     .container {

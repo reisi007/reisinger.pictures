@@ -3,6 +3,7 @@
 
 declare module "*.jpg" {
   import type { ImageMetadata } from "astro";
+
   import type { ImageWithExifMeta } from "./types/image-metadata";
   const value: ImageMetadata & ImageWithExifMeta;
   export default value;
@@ -10,6 +11,7 @@ declare module "*.jpg" {
 
 declare module "*.jpeg" {
   import type { ImageMetadata } from "astro";
+
   import type { ImageWithExifMeta } from "./types/image-metadata";
   const value: ImageMetadata & ImageWithExifMeta;
   export default value;
@@ -17,6 +19,7 @@ declare module "*.jpeg" {
 
 declare module "*.png" {
   import type { ImageMetadata } from "astro";
+
   import type { ImageWithExifMeta } from "./types/image-metadata";
   const value: ImageMetadata & ImageWithExifMeta;
   export default value;
@@ -24,6 +27,7 @@ declare module "*.png" {
 
 declare module "*.webp" {
   import type { ImageMetadata } from "astro";
+
   import type { ImageWithExifMeta } from "./types/image-metadata";
   const value: ImageMetadata & ImageWithExifMeta;
   export default value;
@@ -31,6 +35,7 @@ declare module "*.webp" {
 
 declare module "*.gif" {
   import type { ImageMetadata } from "astro";
+
   import type { ImageWithExifMeta } from "./types/image-metadata";
   const value: ImageMetadata & ImageWithExifMeta;
   export default value;
@@ -43,7 +48,7 @@ declare module "virtual:image-slug-map" {
 }
 
 declare module "virtual:image-meta-index" {
-  interface Exif {
+  type Exif = {
     captureDate?: string;
     aperture?: string;
     focalLength?: string;
@@ -53,7 +58,7 @@ declare module "virtual:image-meta-index" {
     lens?: string;
     orientation?: "portrait" | "landscape" | "square";
   }
-  interface MetaEntry {
+  type MetaEntry = {
     title?: string | null;
     darkInvert?: boolean;
     favorite?: boolean;

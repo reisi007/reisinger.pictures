@@ -1,3 +1,4 @@
+import { roundToPsychologicalValue } from "@reisinger/shared/utils";
 import {
   basePrice,
   friendDiscountMultiplier,
@@ -6,7 +7,6 @@ import {
   standardImagePriceOutdoor,
   studentDiscountMultiplier
 } from "@reisinger/shared/utils/pricing";
-import { roundToPsychologicalValue } from "@reisinger/shared/utils";
 import { createEffect, createMemo, createSignal, onCleanup, onMount, Show } from "solid-js";
 
 export default function PricingCalculatorProfi() {

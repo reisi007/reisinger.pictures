@@ -2,7 +2,6 @@
 import { groupBy } from "@reisinger/shared/utils";
 import { type CollectionEntry, getCollection, render } from "astro:content";
 
-import { loadImage } from "../../../images/image-service";
 import BaseHead from "../../../components/BaseHead.astro";
 import FeaturedTestimonials from "../../../components/FeaturedTestimonials.astro";
 import Gallery from "../../../components/Gallery.astro";
@@ -13,6 +12,7 @@ import type { SchemaCreationFunction } from "../../../components/SchemaOrg";
 import SchemaOrg from "../../../components/SchemaOrg.astro";
 import { createWebPageSchema } from "../../../components/SchemaOrg.factory";
 import SocialImage from "../../../components/SocialImage.astro";
+import { loadImage } from "../../../images/image-service";
 
 interface Props {
   entry: CollectionEntry<"areas">,

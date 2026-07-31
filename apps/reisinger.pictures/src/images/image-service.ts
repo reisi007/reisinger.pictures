@@ -1,6 +1,7 @@
 import type { ImageMetadata } from "astro";
-import { resolveCdnImage } from "./image-manifest";
+
 import type { CdnImageInfo } from "./image-manifest";
+import { resolveCdnImage } from "./image-manifest";
 import { getImage as getSlugMapImage } from "./slug-map";
 
 export type ImageInfo = CdnImageInfo;

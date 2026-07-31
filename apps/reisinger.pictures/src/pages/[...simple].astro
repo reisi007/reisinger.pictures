@@ -2,7 +2,6 @@
 import { absoluteLink } from "@reisinger/shared/utils";
 import { type CollectionEntry, getCollection, render } from "astro:content";
 
-import { loadImage } from "../images/image-service";
 import BaseHead from "../components/BaseHead.astro";
 import HeroBanner from "../components/HeroBanner.astro";
 import MinimalPage from "../components/pages/MinimalPage.astro";
@@ -11,6 +10,7 @@ import type { SchemaCreationFunction } from "../components/SchemaOrg";
 import SchemaOrg from "../components/SchemaOrg.astro";
 import { createWebPageSchema } from "../components/SchemaOrg.factory";
 import SocialImage from "../components/SocialImage.astro";
+import { loadImage } from "../images/image-service";
 
 export async function getStaticPaths() {
   const posts = await getCollection("simple");
