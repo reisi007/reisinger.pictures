@@ -1,5 +1,6 @@
 import { createSignal, Show } from "solid-js";
 
+import { trackEvent } from "../tracking";
 import PricingCalculator from "./PricingCalculator";
 import PricingCalculatorProfi from "./PricingCalculatorProfi";
 
@@ -19,7 +20,10 @@ export default function PricingTabs() {
             (activeTab() === "standard"
               ? "bg-primary text-primary-content shadow-inner"
               : "bg-base-200 text-base-content/60 hover:text-base-content/90 hover:bg-base-300")}
-          onClick={() => setActiveTab("standard")}
+          onClick={() => {
+            setActiveTab("standard");
+            trackEvent("pricing_tab", { tab: "standard" });
+          }}
         >
           Standard
         </button>
@@ -30,7 +34,10 @@ export default function PricingTabs() {
             (activeTab() === "flex"
               ? "bg-primary text-primary-content shadow-inner"
               : "bg-base-200 text-base-content/60 hover:text-base-content/90 hover:bg-base-300")}
-          onClick={() => setActiveTab("flex")}
+          onClick={() => {
+            setActiveTab("flex");
+            trackEvent("pricing_tab", { tab: "flex" });
+          }}
         >
           Flex
         </button>

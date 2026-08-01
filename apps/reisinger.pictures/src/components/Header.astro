@@ -53,7 +53,7 @@ function isActive(href: string) {
     </div>
 
     <div class="navbar-end gap-2">
-      <button onclick="document.getElementById('contact_modal').showModal();" class="btn btn-primary btn-sm md:btn-md shadow-md flex border-none">
+      <button data-contact-open="header" onclick="document.getElementById('contact_modal').showModal();" class="btn btn-primary btn-sm md:btn-md shadow-md flex border-none">
         <span class="icon-[mdi--message-text] text-lg"></span> Jetzt kontaktieren
       </button>
       <button id="mobile-menu-btn" aria-label="open menu" class="btn btn-ghost btn-circle lg:hidden">
@@ -113,7 +113,7 @@ function isActive(href: string) {
         })}
       </ul>
       <div class="mt-6 text-center px-4">
-        <button onclick="document.getElementById('contact_modal').showModal(); document.getElementById('mobile-menu-close').click();" class="btn btn-primary btn-block shadow-md">
+        <button data-contact-open="mobile_menu" onclick="document.getElementById('contact_modal').showModal(); document.getElementById('mobile-menu-close').click();" class="btn btn-primary btn-block shadow-md">
           <span class="icon-[mdi--message-text] text-xl"></span> Jetzt anfragen
         </button>
       </div>

@@ -63,6 +63,13 @@ const nextUrl = new URL(Astro.url.pathname + '?sent=true', Astro.url.origin).hre
       const nameInput = document.getElementById("form__name") as HTMLInputElement;
       const subjectInput = document.getElementById("form-subject") as HTMLInputElement;
 
+      form.addEventListener("submit", () => {
+        const prefixInput = document.getElementById("form__subject_prefix") as HTMLInputElement | null;
+        const payload: Record<string, string> = { subject: subjectInput.value.trim() || "Allgemeine Anfrage" };
+        if (prefixInput?.value) payload.subject_prefix = prefixInput.value;
+        window.trackEvent?.("contact_form_submit", payload);
+      });
+
       // Zentrale Funktion für das Subject
       const updateSubject = () => {
         if (!nameInput || !subjectInput) return;
@@ -97,6 +104,7 @@ const nextUrl = new URL(Astro.url.pathname + '?sent=true', Astro.url.origin).hre
 
       if (modal) {
         modal.addEventListener("close", () => {
+          window.trackEvent?.("contact_abort");
           if (window.location.hash === "#kontakt" || window.location.search !== "") {
             history.replaceState(null, "", window.location.pathname);
           }
@@ -126,6 +134,8 @@ const nextUrl = new URL(Astro.url.pathname + '?sent=true', Astro.url.origin).hre
     document.addEventListener("astro:page-load", () => {
       const params = new URLSearchParams(window.location.search);
       if (params.get("sent") !== "true") return;
+
+      window.trackEvent?.("contact_form_success");
 
       history.replaceState(null, "", window.location.pathname);
 

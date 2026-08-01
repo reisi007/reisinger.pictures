@@ -150,3 +150,6 @@ import-gemini.mjs
 repomix-website.md
 .imagecache
 .imagedist
+test-results
+playwright-report
+playwright/.cache
