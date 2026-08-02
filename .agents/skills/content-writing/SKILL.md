@@ -5,6 +5,16 @@ description: Schreibt und pflegt Astro-Content für reisinger.pictures (portfoli
 
 # Content Writing für reisinger.pictures
 
+## Meta-Ablauf (Orchestrierung, Portfolio-Artikel)
+
+Dieser Skill ist der Einstiegspunkt/Orchestrator für alle Portfolio-Artikel. Der Ablauf ist verbindlich in dieser Reihenfolge: **Kontext verstehen → Bilder mit Kontext benennen & kategorisieren → Bilder umbenennen → Artikel schreiben → fertig.**
+
+1. **Kontext verstehen**: Interaktiv abfragen (Abschnitt 6): Content-Typ, Titel, Slug/Ziel-URL, Datum, Kontext (Event/Teams/Ort/Liga/Ergebnis), Bildordner, Gallery-Wunsch.
+2. **Bilder mit Kontext benennen & kategorisieren**: Vision-Subagent (Abschnitt 4) beschreibt jedes Bild semantisch (Deutsch) und schlägt SEO-Dateinamen vor; `heroImage` wird nach Relevanz gewählt (Abschnitt `image-renaming`). Verstehen der Bildinhalte ERST hier, nicht raten.
+3. **Bilder umbenennen → YAML-Sidecars (nur `description`) anlegen** (Abschnitt 5). `slug`/`metadata`/`categories` übernimmt `add-metadata.mjs` im Build.
+4. **Artikel schreiben**: Galerie-Arrays + `heroImage` über `image-renaming`, Text über `journalist`, Einleitung/Description/Überschriften interaktiv abstimmen (Abschnitt 6 Runde 2).
+5. **Fertig**: `astro sync`/`astro check` validieren; Review-Modus per `review.html` oder Chat.
+
 ## 1. Kontext: Astro Content Collections
 
 Alle Schemas stehen in `apps/reisinger.pictures/src/content.config.ts`. Neue Inhalte MÜSSEN dem jeweiligen Schema entsprechen, sonst bricht der Build.
@@ -84,7 +94,7 @@ description: >-
 
 ## 4. Captions erzeugen
 
-Deutsche Bildbeschreibungen (Captions) und SEO-Dateinamen je Bild erzeugt der Harness (vision-fähige Bildanalyse). Pro Bild gilt:
+Deutsche Bildbeschreibungen (Captions) und SEO-Dateinamen je Bild erzeugt ein **vision-fähiger Subagent** (Agent-Typ `vision`, über das Task-Tool). Das Hauptmodell kann Bilder ggf. NICHT direkt ansehen – Bildbeschreibungen daher IMMER über den Vision-Subagenten erzeugen lassen. Pro Bild gilt:
 
 - **Bildbeschreibung:** 1 bis maximal 2 kurze deutsche Sätze, präzise für SEO-Zwecke (Alt-Text).
 - **SEO-Dateiname (kebab-case):** alles klein, nur `a-z0-9-`, keine Umlaute/Sonderzeichen, max. 6 Wörter, Wörter aus dem übergeordneten Ordnerpfad nicht wiederholen, keine Dateiendung.
@@ -102,16 +112,21 @@ Deutsche Bildbeschreibungen (Captions) und SEO-Dateinamen je Bild erzeugt der Ha
 
 ## 6. Interaktive Fragen (Checkliste vor dem Start)
 
+Ist ein passender Agent vorhanden, befrage ihn **interaktiv** (Question-Tool) und warte auf Antworten, bevor du schreibst. Dies ist PFLICHT – nicht nur ein Vorschlag. In einer Session wurden Titel, Ordner/Slug (URL) sowie Einleitung und Description jeweils getrennt interaktiv abgestimmt.
+
 Stelle diese Fragen (oder passende Äquivalente) und warte auf Antworten:
 
-1. Welcher Content-Typ? (portfolio / simple / portfolioOverviews / testimonials / areas / tfp)
+1. Content-Typ? (portfolio / simple / portfolioOverviews / testimonials / areas / tfp)
 2. Titel, Thema und Datum des Beitrags?
-3. Kontext: Event, Teams, Ort, Liga, Ergebnis (bei Sport); Story/Stimmung (sonst)?
-4. In welchem Ordner liegen die Bilder? (relativ zu `src/content/`)
-5. Wie viele Galerien und mit welchen Namen? (z.B. `IMAGES_HIGHLIGHTS`, `IMAGES_ACTION`, `IMAGES_IMPRESSIONS`)
-6. Sollen Bilder umbenannt und Captions erzeugt werden? (Standard: ja)
-7. Review-Modus: `review.html` im Browser oder nur Chat?
-8. Tonfall / Zielgruppe?
+3. Slug / Ziel-URL des Beitrags (z.B. `/portfolio/sport/fussball/<jahr>/g3`) – der Ordnerpfad bestimmt die URL!
+4. Kontext: Event, Teams, Ort, Liga, Ergebnis (bei Sport); Story/Stimmung (sonst)?
+5. In welchem Ordner liegen die Bilder? (relativ zu `src/content/`)
+6. Wie viele Galerien und mit welchen Namen? (z.B. `IMAGES_HIGHLIGHTS`, `IMAGES_ACTION`, `IMAGES_IMPRESSIONS`)
+7. Sollen Bilder umbenannt und Captions erzeugt werden? (Standard: ja)
+8. Review-Modus: `review.html` im Browser oder nur Chat?
+9. Tonfall / Zielgruppe?
+
+Nach dem Schreiben folgt die zweite interaktive Runde zu den redaktionellen Texten: **Einleitung (erster Absatz)**, **Description (Meta-Description)** sowie alternative Überschriften – jede einzeln zur Auswahl stellen und die getroffene Wahl erst übernehmen.
 
 ## 7. Toolchain-Regeln
 

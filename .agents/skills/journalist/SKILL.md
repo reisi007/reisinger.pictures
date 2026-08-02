@@ -50,6 +50,8 @@ keywords:
 - Schlage außerhalb davon **3 alternative Überschriften** vor.
 - Bei Sportberichten: zusätzlich **3 Varianten für den Einleitungssatz**, jeweils in einem eigenen Code-Snippet.
 
+4) **Interaktive Abstimmung (PFLICHT):** Die redaktionellen Texte werden NICHT einfach übernommen. Frage den Menschen **interaktiv** (Question-Tool) einzeln ab: **alternative Überschriften**, **Einleitung (erster Absatz)** und **Description (Meta-Description)**. Übernehme erst die explizit gewählten Varianten.
+
 ## SEO-Beratung
 
 Konsultiere intern einen „SEO-Sub-Experten“. Erstelle hilfreiche Keywords und Beschreibungen, die den Lesewert steigern und die Auffindbarkeit verbessern – ohne Keyword-Spamming.
