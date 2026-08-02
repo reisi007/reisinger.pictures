@@ -16,10 +16,7 @@
     "test:e2e": "pnpm run build && playwright test",
     "test:e2e:install": "playwright install chromium",
     "publish": "pnpm run test:e2e",
-    "postpublish": "./sync.sh",
-    "merge:llm": "repomix",
-    "editor": "concurrently \"tailwindcss -i ./editor/editor.tw.css -o ./editor/editor.css --watch\" \"http-server . -p 8080 -c-1 -o /editor/editor.html\"",
-    "human-loop": "concurrently \"tailwindcss -i ./human-loop/human-loop.tw.css -o human-loop/human-loop.css --watch\" \"http-server . -p 8081 -c-1 -o /human-loop/human-loop.html\""
+    "postpublish": "./sync.sh"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.9",
@@ -58,7 +55,6 @@
     "jsdom": "^29.1.1",
     "prettier": "^3.9.5",
     "prettier-plugin-tailwindcss": "^0.8.1",
-    "repomix": "^1.16.1",
     "tailwindcss": "^4.3.3",
     "typescript": "5.9.3",
     "typescript-eslint": "^8.64.0",

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caption Review</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f5f5f7; color: #1d1d1f; margin: 0; padding: 32px; }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  .sub { color: #6e6e73; margin: 0 0 24px; font-size: 14px; }
+  .card { background: #fff; border: 1px solid #d2d2d7; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+  .btn { background: #0071e3; color: #fff; border: none; border-radius: 8px; padding: 10px 18px; font-size: 14px; cursor: pointer; }
+  .btn:hover { opacity: .9; }
+  .btn.secondary { background: #e8e8ed; color: #1d1d1f; }
+  .row { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+  .row img { width: 240px; height: 160px; object-fit: cover; border-radius: 8px; background: #f0f0f5; display: block; }
+  label { display: block; font-size: 12px; font-weight: 600; color: #6e6e73; margin: 8px 0 4px; text-transform: uppercase; letter-spacing: .03em; }
+  input[type=text], textarea { width: 100%; border: 1px solid #d2d2d7; border-radius: 8px; padding: 8px 10px; font-size: 14px; font-family: inherit; }
+  textarea { min-height: 64px; resize: vertical; }
+  .id { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: #86868b; margin-top: 6px; word-break: break-all; }
+  .toolbar { display: flex; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .counter { font-size: 13px; color: #6e6e73; }
+  .approved { accent-color: #0071e3; }
+  textarea#out { width: 100%; height: 160px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Caption Review</h1>
+  <p class="sub">Bilder + vorgeschlagene Captions prüfen, direkt editieren und das Ergebnis in den Chat kopieren.</p>
+
+  <div class="card">
+    <div class="toolbar">
+      <input type="file" id="fileInput" accept=".json" class="secondary">
+      <button id="copyBtn" class="btn secondary">Ergebnis als JSON kopieren</button>
+    </div>
+    <p class="counter" id="counter"></p>
+  </div>
+
+  <div id="cards"></div>
+
+  <div class="card">
+    <h2 style="font-size:16px;margin:0 0 8px">Ausgabe (in Chat einfügen)</h2>
+    <textarea id="out" readonly></textarea>
+  </div>
+</div>
+
+<script>
+  let data = { folder: "", captions: [] };
+
+  const svgCheck = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+
+  function render() {
+    const container = document.getElementById('cards');
+    container.innerHTML = '';
+    data.captions.forEach((c, i) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="row">
+          <div>
+            <img src="${c.image}" alt="" loading="lazy" onerror="this.style.opacity=.25">
+            <div class="id" title="${c.id}">${i + 1}. ${c.id}</div>
+          </div>
+          <div>
+            <label>Neuer Dateiname (ohne Endung)</label>
+            <input type="text" class="fn" value="${esc(c.filename || '')}">
+            <label>Beschreibung (deutscher Alt-Text)</label>
+            <textarea class="tl">${esc(c.description || '')}</textarea>
+            <label>Notiz / Änderungswunsch</label>
+            <textarea class="nt">${esc(c.note || '')}</textarea>
+            <label style="margin-top:10px"><input type="checkbox" class="ok" ${c.approved === false ? '' : 'checked'}> Freigegeben ${svgCheck}</label>
+          </div>
+        </div>`;
+      card.querySelectorAll('input.fn').forEach(el => el.addEventListener('input', () => data.captions[i].filename = el.value));
+      card.querySelectorAll('textarea.tl').forEach(el => el.addEventListener('input', () => data.captions[i].description = el.value));
+      card.querySelectorAll('textarea.nt').forEach(el => el.addEventListener('input', () => data.captions[i].note = el.value));
+      card.querySelector('input.ok').addEventListener('change', el => data.captions[i].approved = el.target.checked);
+      container.appendChild(card);
+    });
+    document.getElementById('counter').textContent = data.captions.length + ' Bild(er) geladen';
+    updateOutput();
+  }
+
+  function updateOutput() {
+    const out = {
+      folder: data.folder,
+      responses: data.captions.map(c => ({
+        id: c.id,
+        filename: (c.filename || '').trim(),
+        description: (c.description || '').trim(),
+        note: (c.note || '').trim(),
+        approved: c.approved !== false
+      }))
+    };
+    document.getElementById('out').value = JSON.stringify(out, null, 2);
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  document.getElementById('fileInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const json = JSON.parse(await file.text());
+      if (Array.isArray(json.captions)) {
+        data = { folder: json.folder || '', captions: json.captions.map(c => ({
+          id: c.id || c.image || '',
+          image: c.image || '',
+          filename: c.filename || '',
+          description: c.description || '',
+          note: c.note || '',
+          approved: c.approved !== false
+        })) };
+        render();
+      } else {
+        alert('Ungültiges Format: erwartet { "captions": [...] }');
+      }
+    } catch (err) {
+      alert('JSON-Fehler: ' + err.message);
+    }
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', async () => {
+    updateOutput();
+    const el = document.getElementById('out');
+    el.select();
+    try { await navigator.clipboard.writeText(el.value); } catch { document.execCommand('copy'); }
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Kopiert!';
+    setTimeout(() => { btn.textContent = 'Ergebnis als JSON kopieren'; }, 1500);
+  });
+
+  render();
+</script>
+</body>
+</html>

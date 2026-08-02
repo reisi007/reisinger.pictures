@@ -14,7 +14,7 @@ const { name } = Astro.props;
 const resolvedName = name ?? "me";
 
 const imageInfo = await loadImage(resolvedName);
-const alt = name !== undefined ? (await getMetadataForImageSlug(resolvedName))?.title : undefined;
+const alt = name !== undefined ? (await getMetadataForImageSlug(resolvedName))?.description : undefined;
 
 const fullSrc = absoluteLink(Astro.url, imageInfo.src);
 const { width, height, format } = imageInfo;

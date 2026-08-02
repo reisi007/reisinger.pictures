@@ -15,7 +15,7 @@ const [imgInfo, data] = await Promise.all([
   loadImage(imageName),
   getMetadataForImageSlug(imageName),
 ]);
-const resolvedAlt = alt ?? data?.title ?? "";
+const resolvedAlt = alt ?? data?.description ?? "";
 const metadata = data?.metadata;
 const aspectRatio = `${imgInfo.width}/${imgInfo.height}`;
 

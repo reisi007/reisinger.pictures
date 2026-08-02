@@ -10,7 +10,7 @@ export type ExifData = {
 }
 
 export type YamlMetaData = {
-  title?: string | null;
+  description?: string | null;
   darkInvert?: boolean;
   favorite?: boolean;
   metadata?: ExifData | null;
@@ -21,7 +21,7 @@ export type YamlMetaData = {
 export type ImageWithExifMeta = {
   metadata: ExifData | null;
   slug: string;
-  title: string;
+  description: string;
   darkInvert: boolean;
   favorite: boolean;
 }

@@ -138,7 +138,7 @@ export default function imageMetaPlugin() {
       const meta = {
         metadata: yamlData.metadata ?? null,
         slug: yamlData.slug ?? "",
-        title: yamlData.title ?? "",
+        description: yamlData.description ?? "",
         darkInvert: yamlData.darkInvert ?? false,
         favorite: yamlData.favorite ?? false,
       };
