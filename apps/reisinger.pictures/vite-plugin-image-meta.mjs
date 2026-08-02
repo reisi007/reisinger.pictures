@@ -40,6 +40,10 @@ function discoverFiles(dir, predicate) {
 const isYaml = (name) => name.endsWith(".yaml");
 const isImage = (name) => IMAGE_RE.test(name);
 
+function isRelevantFile(filePath) {
+  return isYaml(filePath) || isImage(filePath);
+}
+
 export default function imageMetaPlugin() {
   let metaCache = null;
   let slugCache = null;
@@ -98,6 +102,10 @@ export default function imageMetaPlugin() {
     },
 
     load(id) {
+      if (id === RESOLVED_META_ID || id === RESOLVED_SLUG_ID) {
+        const srcDir = path.resolve(rootDir, "src");
+        this.addWatchFile(path.join(srcDir, "content"));
+      }
       if (id === RESOLVED_META_ID) {
         const srcDir = path.resolve(rootDir, "src");
         return {
@@ -125,6 +133,22 @@ export default function imageMetaPlugin() {
           map: null,
         };
       }
+    },
+
+    handleHotUpdate(ctx) {
+      const file = ctx.file;
+      if (!isRelevantFile(file)) return [];
+      metaCache = null;
+      slugCache = null;
+      const updated = [];
+      for (const id of [RESOLVED_META_ID, RESOLVED_SLUG_ID]) {
+        const mod = ctx.server.moduleGraph.getModuleById(id);
+        if (mod) {
+          ctx.server.moduleGraph.invalidateModule(mod);
+          updated.push(mod);
+        }
+      }
+      return updated;
     },
 
     transform(code, id) {
