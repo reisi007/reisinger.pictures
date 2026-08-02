@@ -83,12 +83,13 @@ description: >-
 
 1. **Interaktive Fragen stellen** (siehe Abschnitt 6) – nicht mit der Arbeit beginnen, bevor nicht geantwortet wurde.
 2. **Bilder vorbereiten**: Liegen in `apps/reisinger.pictures/src/content/…`. Rohe Dateinamen nach Abschnitt 5 umbenennen.
-3. **Captions erzeugen** (Titel + SEO-Dateiname je Bild) über den Harness (Abschnitt 4).
-4. **Review (Human-in-the-Loop)**: `packages/tools/caption-review/review.html` in den Bildordner kopieren, im Browser öffnen (zeigt jede Bild-Datei + vorgeschlagenen Dateinamen + deutschen Titel), Änderungen per Chat vorgeben lassen. Erst nach Freigabe weitermachen.
+3. **Captions erzeugen** (Titel + SEO-Dateiname je Bild) über den Harness (Abschnitt 4) – Bilder in **Blöcken von max. 10** an den Vision-Subagenten geben.
+4. **Review (Human-in-the-Loop)**: Vorschläge **sortiert nach Original-Dateinamen** anzeigen (siehe Abschnitt 4, Review-Tabelle), Änderungen per Chat vorgeben lassen. Erst nach Freigabe weitermachen.
 5. **YAML-Sidecars schreiben**: pro Bild `<name>.yaml` mit **nur** `description` anlegen (Abschnitt 5).
 6. **Galerie-Arrays + `heroImage`** über den Skill **image-renaming** erzeugen, `index.mdx`-Frontmatter vorbereiten.
 7. **Artikel schreiben** über den Skill **journalist** → `index.mdx` (inkl. `<Gallery>`-Platzierungen).
 8. **Technische Metadaten**: `slug`, `metadata` (EXIF) und `categories` füllt automatisch `packages/tools/scripts/add-metadata.mjs` (läuft als `prebuild`-Hook). NIE manuell schreiben.
+9. **Slug-Verifikation (Pflicht, NACH `add-metadata`)**: Die Slug-Map (`virtual:image-slug-map`) liest die `slug`-Felder aus den YAML-Sidecars. Solange `add-metadata.mjs` nicht gelaufen ist, fehlen diese Felder und `getImage()` wirft `Image "…" does not exist!`. Deshalb NACH dem Anlegen von Bildern/Sidecars: `node ../../packages/tools/scripts/add-metadata.mjs` + `pnpm astro sync` ausführen und DANN alle im `index.mdx` referenzierten Slugs (Frontmatter-`heroImage` + Galerie-Arrays) mit den `slug`-Werten der YAML-Dateien abgleichen (Menge muss identisch sein). Erst nach dieser Verifikation gilt der Beitrag als abgeschlossen.
 
 **Datum (verbindlich):** Bei Ereignis-Beiträgen (Sport, Events, Shootings) NIE das aktuelle Datum verwenden. Immer das **Ereignis-Datum** als `date` setzen: das Datum der EXIF-`captureDate` der Bilder (bzw. das bekannte Event-Datum, falls es davon abweicht).
 
@@ -96,10 +97,15 @@ description: >-
 
 Deutsche Bildbeschreibungen (Captions) und SEO-Dateinamen je Bild erzeugt ein **vision-fähiger Subagent** (Agent-Typ `vision`, über das Task-Tool). Das Hauptmodell kann Bilder ggf. NICHT direkt ansehen – Bildbeschreibungen daher IMMER über den Vision-Subagenten erzeugen lassen. Pro Bild gilt:
 
-- **Bildbeschreibung:** 1 bis maximal 2 kurze deutsche Sätze, präzise für SEO-Zwecke (Alt-Text).
+- **Bildbeschreibung (verbindlich):** Immer **1 bis maximal 2 vollständige deutsche Sätze** (Subjekt + Prädikat), präzise für SEO-Zwecke (Alt-Text/Label). KEINE Satzfragmente, Stichworte oder Aufzählungen – die Beschreibung muss als Label/Alt-Text alleinstehend lesbar sein.
 - **SEO-Dateiname (kebab-case):** alles klein, nur `a-z0-9-`, keine Umlaute/Sonderzeichen, max. 6 Wörter, Wörter aus dem übergeordneten Ordnerpfad nicht wiederholen, keine Dateiendung.
 - **Eindeutigkeit (Pflicht):** Alle Dateinamen eines Beitrags MÜSSEN untereinander verschieden sein. Doppelte Namen auflösen (z.B. mit Suffix `-2`, `-3`), damit keine Slug-Kollisionen entstehen.
-- **Ergebnis:** Pro Bild `<aktueller-dateiname>` → `{ filename, description }`. Die Ergebnisse werden zu `captions.json` zusammengeführt (Format siehe review.html) und dem Menschen zur Freigabe vorgelegt.
+- **Review in 10er-Blöcken (verbindlich):** Die Bilder werden NICHT in einem Rutsch an den Vision-Subagenten übergeben, sondern in Blöcken von höchstens **10 Bildern**. Pro Block startet das Task-Tool einen eigenen Vision-Subagenten. Bei Fortsetzungs-Blöcken die bereits vergebenen Dateinamen der vorherigen Blöcke im Prompt mitgeben, damit keine Duplikate entstehen.
+- **Ergebnis:** Pro Bild `<aktueller-dateiname>` → `{ filename, description }`. Die Ergebnisse aller Blöcke werden dem Menschen zur Freigabe vorgelegt.
+
+### Review-Tabelle (zur Freigabe)
+
+Die Ergebnis-Tabelle zur menschlichen Freigabe wird **sortiert nach den Original-Dateinamen** (z.B. `12_Hanna_02.jpg` → …) angezeigt, NICHT nach den neuen SEO-Dateinamen. So kann der Mensch die Vorschläge direkt an seinen Ausgangsdateien abgleichen. Das gilt sowohl für die Anzeige im Chat als auch für jede tabellarische Darstellung (review.html).
 
 ## 5. Benennungs- & Sidecar-Regeln
 
@@ -107,6 +113,7 @@ Deutsche Bildbeschreibungen (Captions) und SEO-Dateinamen je Bild erzeugt ein **
 - **WICHTIG – Dateiname ≠ Slug**: Physische Dateinamen (`.jpg` + `.yaml`) enthalten NUR den beschreibenden Teil, **ohne** Slug-Präfix. Der Präfix (`sport-football-afl-2026-…-`) kommt automatisch aus dem Ordnerpfad (`add-metadata.mjs`); ihn in den Dateinamen zu schreiben würde doppelte Slugs erzeugen. Den Präfix erst im Galerie-Array/Slug anwenden (Skill `image-renaming`).
 - **Eindeutigkeit (Pflicht)**: Alle Dateinamen eines Beitrags MÜSSEN untereinander verschieden sein. Doppelte Namen auflösen (z.B. mit Suffix `-2`, `-3`), damit keine Slug-Kollisionen entstehen.
 - **YAML-Sidecar**: schreibe ausschließlich `description` (deutscher SEO-Alt-Text, 1–2 Sätze). `slug`, `metadata` und `categories` werden von `add-metadata.mjs` generiert.
+- **Slug-Verifikation (Pflicht)**: Der `slug` im YAML wird von `add-metadata.mjs` erzeugt (Ordnerpfad ab `src/` mit `/`→`-`, Prefixe entfernt). Er existiert erst NACH dem Lauf des Skripts. Vorher referenzierte Slugs (z.B. im `heroImage`) führen zu `Image "…" does not exist!`. Daher nach jedem neuen Bild/Beitrag `add-metadata.mjs` + `astro sync` ausführen und referenzierte Slugs gegen die YAML-Slugs abgleichen (siehe Workflow Schritt 9).
 - **Sprache**: Texte/Bilderstellung = Deutsch, Code/Technik = Englisch (AGENTS.md §3).
 - **Nichts löschen**: `.cache/`, `.astro/`, `dist/` nie anfassen (AGENTS.md §8). Stattdessen `astro sync`.
 
