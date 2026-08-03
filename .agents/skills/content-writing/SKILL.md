@@ -1,6 +1,6 @@
 ---
 name: content-writing
-description: Schreibt und pflegt Astro-Content für reisinger.pictures (portfolio, simple, portfolioOverviews, testimonials). Fragt interaktiv nach Kontext, benennt Bilder um, erzeugt YAML-Sidecars (nur description), generiert Bildbeschreibungen/Captions, reviewt Captions via review.html + Chat und delegiert Galerie-Arrays/heroImage an image-renaming sowie Artikel an journalist. TRIGGER when Content für die Content Collections geschrieben, Bilder umbenannt oder Bildbeschreibungen/Captions erstellt werden sollen.
+description: Schreibt und pflegt Astro-Content für reisinger.pictures (portfolio, simple, portfolioOverviews, testimonials). Fragt interaktiv nach Kontext, benennt Bilder um, erzeugt YAML-Sidecars (nur description), generiert Bildbeschreibungen/Captions (Bilder direkt einlesen, kein Vision-Subagent), reviewt Captions im Chat und nutzt die Skills image-renaming (Galerie-Arrays/heroImage) sowie journalist (Artikel, kein Subagent). TRIGGER when Content für die Content Collections geschrieben, Bilder umbenannt oder Bildbeschreibungen/Captions erstellt werden sollen.
 ---
 
 # Content Writing für reisinger.pictures
@@ -10,10 +10,10 @@ description: Schreibt und pflegt Astro-Content für reisinger.pictures (portfoli
 Dieser Skill ist der Einstiegspunkt/Orchestrator für alle Portfolio-Artikel. Der Ablauf ist verbindlich in dieser Reihenfolge: **Kontext verstehen → Bilder mit Kontext benennen & kategorisieren → Bilder umbenennen → Artikel schreiben → fertig.**
 
 1. **Kontext verstehen**: Interaktiv abfragen (Abschnitt 6): Content-Typ, Titel, Slug/Ziel-URL, Datum, Kontext (Event/Teams/Ort/Liga/Ergebnis), Bildordner, Gallery-Wunsch.
-2. **Bilder mit Kontext benennen & kategorisieren**: Vision-Subagent (Abschnitt 4) beschreibt jedes Bild semantisch (Deutsch) und schlägt SEO-Dateinamen vor; `heroImage` wird nach Relevanz gewählt (Abschnitt `image-renaming`). Verstehen der Bildinhalte ERST hier, nicht raten.
+2. **Bilder mit Kontext benennen & kategorisieren**: Bilder werden direkt eingelesen (Read-Tool, Abschnitt 4) und jedes Bild semantisch (Deutsch) beschrieben; SEO-Dateinamen werden vorgeschlagen; `heroImage` wird nach Relevanz gewählt (Abschnitt `image-renaming`). Verstehen der Bildinhalte ERST hier, nicht raten.
 3. **Bilder umbenennen → YAML-Sidecars (nur `description`) anlegen** (Abschnitt 5). `slug`/`metadata`/`categories` übernimmt `add-metadata.mjs` im Build.
-4. **Artikel schreiben**: Galerie-Arrays + `heroImage` über `image-renaming`, Text über `journalist`, Einleitung/Description/Überschriften interaktiv abstimmen (Abschnitt 6 Runde 2).
-5. **Fertig**: `astro sync`/`astro check` validieren; Review-Modus per `review.html` oder Chat.
+4. **Artikel schreiben**: Galerie-Arrays + `heroImage` über den Skill `image-renaming`, Text über den Skill `journalist` (ein Skill, kein Subagent – wird in denselben Agenten geladen), Einleitung/Description/Überschriften interaktiv abstimmen (Abschnitt 6 Runde 2).
+5. **Fertig**: `astro sync`/`astro check` validieren; Review der Captions ausschließlich im Chat (siehe Abschnitt 4).
 
 ## 1. Kontext: Astro Content Collections
 
@@ -83,7 +83,7 @@ description: >-
 
 1. **Interaktive Fragen stellen** (siehe Abschnitt 6) – nicht mit der Arbeit beginnen, bevor nicht geantwortet wurde.
 2. **Bilder vorbereiten**: Liegen in `apps/reisinger.pictures/src/content/…`. Rohe Dateinamen nach Abschnitt 5 umbenennen.
-3. **Captions erzeugen** (Titel + SEO-Dateiname je Bild) über den Harness (Abschnitt 4) – Bilder in **Blöcken von max. 10** an den Vision-Subagenten geben.
+3. **Captions erzeugen** (Titel + SEO-Dateiname je Bild) durch direktes Einlesen der Bilder (Abschnitt 4) – Bilder in **Blöcken von max. 10** verarbeiten.
 4. **Review (Human-in-the-Loop)**: Vorschläge **sortiert nach Original-Dateinamen** anzeigen (siehe Abschnitt 4, Review-Tabelle), Änderungen per Chat vorgeben lassen. Erst nach Freigabe weitermachen.
 5. **YAML-Sidecars schreiben**: pro Bild `<name>.yaml` mit **nur** `description` anlegen (Abschnitt 5).
 6. **Galerie-Arrays + `heroImage`** über den Skill **image-renaming** erzeugen, `index.mdx`-Frontmatter vorbereiten.
@@ -95,17 +95,22 @@ description: >-
 
 ## 4. Captions erzeugen
 
-Deutsche Bildbeschreibungen (Captions) und SEO-Dateinamen je Bild erzeugt ein **vision-fähiger Subagent** (Agent-Typ `vision`, über das Task-Tool). Das Hauptmodell kann Bilder ggf. NICHT direkt ansehen – Bildbeschreibungen daher IMMER über den Vision-Subagenten erzeugen lassen. Pro Bild gilt:
+Deutsche Bildbeschreibungen (Captions) und SEO-Dateinamen je Bild entstehen durch **direktes Einlesen der Bilder** über das Read-Tool. Das Hauptmodell ist vision-fähig und sieht die Bilder selbst – **kein** Vision-Subagent, kein Task-Tool. Pro Bild gilt:
 
+- **Kontext mitgeben (verbindlich):** Beim Einlesen MUSS der gesamte verfügbare Kontext einbezogen werden: Event, Teams, Liga, Ort, Datum, Ergebnis, Trikot-Farben sowie die **Aufstellungen beider Teams** (inkl. Rückennummern). Das Modell soll Spieler über ihre Rückennummer dem richtigen Team/Kontext zuordnen und die Aktion präzise beschreiben. Ohne diesen Kontext sinkt die Caption-Qualität deutlich.
 - **Bildbeschreibung (verbindlich):** Immer **1 bis maximal 2 vollständige deutsche Sätze** (Subjekt + Prädikat), präzise für SEO-Zwecke (Alt-Text/Label). KEINE Satzfragmente, Stichworte oder Aufzählungen – die Beschreibung muss als Label/Alt-Text alleinstehend lesbar sein.
+- **Keine Regieanweisungen:** Beschreibe ausschließlich, was auf dem Bild zu sehen ist. Formulierungen wie „blickt sich um", „sucht den TORERFOLG", „positioniert sich für den nächsten Pass" sind keine visuellen Beschreibungen, sondern Regieanweisungen. Stattdessen: Was ist konkret sichtbar? (z.B. „Zweikampf zwischen zwei Spielern", „Torhüter schlägt den Ball", „Spieler läuft mit Ball über das Feld").
+- **Situation detailiert beschreiben:** Neben der Hauptaktion auch die Spielsituation erfassen: Wo befindet sich der Spieler auf dem Feld (Strafraum, Mittelfeld, Flügel)? Welche Aktion steht im Mittelpunkt (Zweikampf, Schuss, Abwehr, Torjubel)? Gibt es weitere relevante Details wie Gegenwehr, Torwart-Positionierung oder Publikum im Hintergrund? Die Beschreibung soll dem Leser ein vollständiges Bild der Spielsituation vermitteln.
 - **SEO-Dateiname (kebab-case):** alles klein, nur `a-z0-9-`, keine Umlaute/Sonderzeichen, max. 6 Wörter, Wörter aus dem übergeordneten Ordnerpfad nicht wiederholen, keine Dateiendung.
 - **Eindeutigkeit (Pflicht):** Alle Dateinamen eines Beitrags MÜSSEN untereinander verschieden sein. Doppelte Namen auflösen (z.B. mit Suffix `-2`, `-3`), damit keine Slug-Kollisionen entstehen.
-- **Review in 10er-Blöcken (verbindlich):** Die Bilder werden NICHT in einem Rutsch an den Vision-Subagenten übergeben, sondern in Blöcken von höchstens **10 Bildern**. Pro Block startet das Task-Tool einen eigenen Vision-Subagenten. Bei Fortsetzungs-Blöcken die bereits vergebenen Dateinamen der vorherigen Blöcke im Prompt mitgeben, damit keine Duplikate entstehen.
-- **Ergebnis:** Pro Bild `<aktueller-dateiname>` → `{ filename, description }`. Die Ergebnisse aller Blöcke werden dem Menschen zur Freigabe vorgelegt.
+- **Verarbeitung in 10er-Blöcken (verbindlich):** Die Bilder werden NICHT in einem Rutsch verarbeitet, sondern in Blöcken von höchstens **10 Bildern**. Pro Block wird jedes Bild direkt mit dem Read-Tool eingelesen und beschrieben. Bei Fortsetzungs-Blöcken die bereits vergebenen Dateinamen der vorherigen Blöcke mitgeben, damit keine Duplikate entstehen.
+- **Rückgabe als Markdown (nicht JSON):** Das Ergebnis wird als **Markdown-Tabelle** (`| Original | Dateiname | Beschreibung |`) erstellt, NICHT als JSON – spart Tokens.
+- **Bild-Lesefehler:** Schlägt das direkte Einlesen eines Bildes fehl, den User informieren (ggf. Fehler beheben oder Modellwechsel erforderlich).
+- **Ergebnis:** Pro Bild `<aktueller-dateiname>` → Markdown-Zeile mit `filename` + `description`. Die Ergebnisse aller Blöcke werden dem Menschen zur Freigabe vorgelegt.
 
 ### Review-Tabelle (zur Freigabe)
 
-Die Ergebnis-Tabelle zur menschlichen Freigabe wird **sortiert nach den Original-Dateinamen** (z.B. `12_Hanna_02.jpg` → …) angezeigt, NICHT nach den neuen SEO-Dateinamen. So kann der Mensch die Vorschläge direkt an seinen Ausgangsdateien abgleichen. Das gilt sowohl für die Anzeige im Chat als auch für jede tabellarische Darstellung (review.html).
+Die Ergebnis-Tabelle zur menschlichen Freigabe wird **sortiert nach den Original-Dateinamen** (z.B. `12_Hanna_02.jpg` → …) angezeigt, NICHT nach den neuen SEO-Dateinamen. So kann der Mensch die Vorschläge direkt an seinen Ausgangsdateien abgleichen. Der Review erfolgt **ausschließlich im Chat** (Console): die Tabelle wird als Markdown angezeigt, der Mensch gibt Änderungen per Text vor und bestätigt am Ende ausdrücklich, bevor YAML-Sidecars geschrieben werden.
 
 ## 5. Benennungs- & Sidecar-Regeln
 
@@ -130,8 +135,7 @@ Stelle diese Fragen (oder passende Äquivalente) und warte auf Antworten:
 5. In welchem Ordner liegen die Bilder? (relativ zu `src/content/`)
 6. Wie viele Galerien und mit welchen Namen? (z.B. `IMAGES_HIGHLIGHTS`, `IMAGES_ACTION`, `IMAGES_IMPRESSIONS`)
 7. Sollen Bilder umbenannt und Captions erzeugt werden? (Standard: ja)
-8. Review-Modus: `review.html` im Browser oder nur Chat?
-9. Tonfall / Zielgruppe?
+8. Tonfall / Zielgruppe?
 
 Nach dem Schreiben folgt die zweite interaktive Runde zu den redaktionellen Texten: **Einleitung (erster Absatz)**, **Description (Meta-Description)** sowie alternative Überschriften – jede einzeln zur Auswahl stellen und die getroffene Wahl erst übernehmen.
 
