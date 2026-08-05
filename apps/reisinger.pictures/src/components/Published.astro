@@ -8,10 +8,10 @@ interface Props {
 const { date, updated } = Astro.props;
 ---
 { date !== undefined &&
-<div class="text-center">Veröffentlicht am
+<div class="text-center">Veröffentlicht am{" "}
   <FormattedDate date={date} />
   {updated &&
-    <>- zuletzt aktualisiert am
+    <>{" "}- zuletzt aktualisiert am{" "}
       <FormattedDate date={updated} />
     </>
   }</div>

@@ -2,6 +2,7 @@
 
 ## Aktuelle Tasks
 
+- [ ] **Skills neu organisieren** – Neuen unified `event-content` Skill erstellt (Bild-Analyse, SEO-Umbenennung, Alt-Tags, Ticker-Matching, Artikel), Single-Agent-Workflow, sport-spezifische Prompts mit Interaktions-Fragen & Konfidenz-%. Alte Skills (content-writing, image-renaming, journalist) gelöscht. Symlink in globalen Skill-Ordner erstellt. AGENTS.md bereinigt. Interaktiv verfeinern.
 - [x] **Journalist: AFL Playoff 2026 Dragons vs. Vikings** – Sportbericht zu `2026-playoff-dragons-vikings/index.mdx` geschrieben. Basierend auf Score summary: 35:17 Sieg der Dragons, Kuhlenkamp mit 3 TDs (2 Pass, 2 Lauf), Stefanek mit 7/7 PATs. Gallery-Arrays und Frontmatter intakt.
 
 ## Abgeschlossene Refactorings
