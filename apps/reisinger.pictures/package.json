@@ -7,7 +7,7 @@
     "dev": "astro dev",
     "build": "PUBLIC_IMAGE_CDN_URL=https://images.reisinger.pictures astro check && PUBLIC_IMAGE_CDN_URL=https://images.reisinger.pictures astro build",
     "prebuild": "node ../../packages/tools/scripts/add-metadata.mjs && node ../../packages/tools/scripts/process-images.mjs",
-    "postbuild": "node ../../packages/tools/scripts/check_links.mjs",
+    "postbuild": "node ../../packages/tools/scripts/check_links.mjs && node ../../packages/tools/scripts/prune-imagedist.mjs",
     "preview": "astro preview",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
