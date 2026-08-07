@@ -1,6 +1,7 @@
 ---
 import type { Page, PaginateFunction } from "astro";
 import { type CollectionEntry, getCollection, getEntry, render } from "astro:content";
+import type { NumericBreakpoints } from "@reisinger/shared/utils/Breakpoints";
 
 import BaseHead from "../components/BaseHead.astro";
 import ContentCard from "../components/ContentCard.astro";
@@ -28,6 +29,14 @@ let indexTitle = "Florian Reisinger Fotografie";
 
 const pageDescription =
   "Fotograf Florian Reisinger aus Linz – authentische Portrait-, Beauty-, Akt-, Boudoir- und Pärchen-Shootings. Professionelle Sportfotografie aus der österreichischen Bundesliga.";
+
+const CATEGORY_CARD_SIZES: NumericBreakpoints = {
+  sm: 1,
+  md: 2,
+  lg: 2,
+  xl: 2,
+  "2xl": 2
+};
 
 const createData: SchemaCreationFunction = (o, p, _df, url) => createWebPageSchema({
   name: indexTitle,
@@ -79,30 +88,34 @@ const websiteSchema = page.currentPage === 1
       )}
 
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-12 not-prose">
+      <div class="grid grid-cols-1 md:grid-cols-2 my-12 not-prose">
         <ContentCard
           title="Beauty & Portrait"
           imageName="beauty-sarah-home2025-portrait-rothaarig-intensiver-blick"
           href="/shootings/beauty/"
-          ctaLabel="Zu den Portraits"
+          overlay={true}
+          imageSizeModifiers={CATEGORY_CARD_SIZES}
         />
         <ContentCard
           title="Akt & Boudoir"
           imageName="akt-boudoir-fine-art-b-03"
           href="/shootings/akt/"
-          ctaLabel="Zu den Aktbildern"
+          overlay={true}
+          imageSizeModifiers={CATEGORY_CARD_SIZES}
         />
         <ContentCard
           title="Pärchen & Liebe"
           imageName="couples-schule1"
           href="/shootings/couples/"
-          ctaLabel="Pärchen-Bilder ansehen"
+          overlay={true}
+          imageSizeModifiers={CATEGORY_CARD_SIZES}
         />
         <ContentCard
           title="Personal Branding"
           imageName="beauty-anna-studio2025-gallery-anna-business-portrait"
           href="/personal-branding/"
-          ctaLabel="Business-Portraits"
+          overlay={true}
+          imageSizeModifiers={CATEGORY_CARD_SIZES}
         />
       </div>
     </>

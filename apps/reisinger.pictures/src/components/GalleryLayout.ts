@@ -27,7 +27,7 @@ export const GALLERY_BREAKPOINTS: Record<GalleryLayout, Omit<BreakPoints<number>
     "md": 2,
     "lg": 2,
     "xl": 2,
-    "2xl": 3
+    "2xl": 2
   },
   [GalleryLayout.Thumbnails]: {
     "sm": 4,

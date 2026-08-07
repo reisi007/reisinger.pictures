@@ -1,7 +1,6 @@
 ---
 import type { NumericBreakpoints } from "@reisinger/shared/utils/Breakpoints";
 
-import FormattedDate from "./FormattedDate.astro";
 import { GALLERY_BREAKPOINTS, GalleryLayout } from "./GalleryLayout";
 import ResponsiveImage from "./ResponsiveImage.astro";
 
@@ -9,47 +8,75 @@ export interface Props {
   href: string;
   imageName: string;
   title: string;
-  date?: Date;
-  ctaLabel?: string;
+  overlay: boolean;
   imageSizeModifiers?: Partial<NumericBreakpoints>;
   class?: string;
+  aspectRatio?: string;
+  fit?: "contain" | "cover";
 }
 
 const {
   href,
   imageName,
   title,
-  date,
-  ctaLabel = "Jetzt lesen",
+  overlay,
   imageSizeModifiers = GALLERY_BREAKPOINTS[GalleryLayout.Overview],
-  class: className
+  class: className,
+  aspectRatio = "3/2",
+  fit = "contain"
 } = Astro.props;
 ---
-<a href={href} class:list={[
-  "card bg-base-200 shadow-sm hover:shadow-xl transition-shadow no-underline group h-full flex flex-col",
-  className
-]}>
-  <figure class="relative aspect-3/2 w-full max-h-60 bg-base-200/50 overflow-hidden flex items-center justify-center">
-    <ResponsiveImage
-      class="w-full h-full object-contain"
-      sizeModifiers={imageSizeModifiers}
-      alt={title}
-      name={imageName}
-      showInfo={true}
-    />
-  </figure>
 
-  <div class="card-body flex flex-col grow">
-    <h3 class="card-title group-hover:text-primary transition-colors">{title}</h3>
+{overlay ? (
+  <a
+    href={href}
+    class:list={[
+      "card bg-base-300 shadow-md overflow-hidden no-underline rounded-none block w-full group flex flex-col",
+      className
+    ]}
+  >
+    <figure
+      class="relative w-full max-h-128 overflow-hidden bg-base-300"
+      style={aspectRatio ? `aspect-ratio: ${aspectRatio};` : undefined}
+    >
+      <ResponsiveImage
+        class="w-full h-full transition-transform duration-300 group-hover:scale-105"
+        sizeModifiers={imageSizeModifiers}
+        alt={title}
+        name={imageName}
+        showInfo={true}
+        fit={fit}
+      />
 
-    {date && (
-      <p class="text-center text-sm text-base-content/70">
-        <FormattedDate date={date} />
-      </p>
-    )}
+      <div class="absolute bottom-0 inset-x-0 z-10 bg-base-100/90 backdrop-blur-sm px-4 py-3">
+        <h3 class="card-title text-base-content text-lg m-0 group-hover:text-primary transition-colors">{title}</h3>
+      </div>
+    </figure>
+  </a>
+) : (
+  <a
+    href={href}
+    class:list={[
+      "card bg-base-300 shadow-md overflow-hidden no-underline rounded-none block w-full group flex flex-col",
+      className
+    ]}
+  >
+    <figure
+      class="w-full max-h-128 overflow-hidden bg-base-300"
+      style={aspectRatio ? `aspect-ratio: ${aspectRatio};` : undefined}
+    >
+      <ResponsiveImage
+        class="w-full h-full transition-transform duration-300 group-hover:scale-105"
+        sizeModifiers={imageSizeModifiers}
+        alt={title}
+        name={imageName}
+        showInfo={true}
+        fit={fit}
+      />
+    </figure>
 
-    <div class="card-actions justify-center mt-auto pt-4">
-      <span class="btn btn-primary">{ctaLabel}</span>
+    <div class="bg-base-100/90 backdrop-blur-sm px-4 py-3">
+      <h3 class="card-title text-base-content text-lg m-0 group-hover:text-primary transition-colors">{title}</h3>
     </div>
-  </div>
-</a>
+  </a>
+)}
