@@ -175,6 +175,8 @@ Erstelle für **JEDES** Bild:
 
 4. Der `slug` in der YAML wird automatisch von `add-metadata.mjs` aus dem Dateipfad generiert – er muss nicht manuell gesetzt werden.
 
+5. **Slug-Prefix & Ordnername (verbindlich):** Der generierte Slug enthält den Ordnerpfad als Präfix (z.B. `events-2026-pflasterspektakel-…`). Den Namen des Event-Ordners daher **niemals** im Dateinamen wiederholen – sonst entstehen Dopplungen wie `…-pflasterspektakel-pflasterspektakel-…`. Datei `linz-pole-jungle-auftakt.jpg` im Ordner `pflasterspektakel/` → Slug `events-2026-pflasterspektakel-linz-pole-jungle-auftakt`. Event-spezifische, suchbare Begriffe (Ort, Sportart, Studio, Motiv) im Dateinamen sind erwünscht.
+
 ### Schritt 6: YAML-Sidecars erstellen (nach Freigabe)
 
 Nach Freigabe durch den User:
@@ -202,6 +204,7 @@ Nach Freigabe durch den User:
 
 1. **Hero-Bild auswählen (INTERAKTIV):**
    - Schlage 2-3 Bilder als Hero-Kandidaten vor (Atmosphäre, Schlüsselmoment, Portrait)
+   - **Orientierung beachten:** Nenne bei jedem Kandidaten die Orientierung (square, horizontal, vertikal – aus den EXIF-Abmessungen oder der YAML `metadata.orientation`). **Horizontale (landscape) Bilder für das Hero bevorzugen**, da sie als Banner eingesetzt werden.
    - Frage den User nach seiner Wahl
    - **Erst nach Entscheidung** die Title/Description-Varianten formulieren
 
@@ -222,6 +225,7 @@ Nach Freigabe durch den User:
    - Wird vom `add-metadata.mjs` generiert aus dem Dateipfad
    - Format: `sport-fussball-nero2026-g4-bildname` ( Beispiel)
    - Immer kleingeschrieben, ohne Umlaute, Bindestriche statt Leerzeichen
+   - Der Ordnerpfad (inkl. Event-Ordner) ist automatisch Teil des Slug-Prefixes – Event-/Ordnernamen nicht im Dateinamen wiederholen (siehe Schritt 5.5)
 
 3. **YAML-Frontmatter-Typen (strikt einhalten):**
    - `title`: String
