@@ -1,6 +1,6 @@
 ---
 name: blog-beitrag
-description: Verarbeitet Event-Bilder (Sport, Lifestyle) zu strukturierten Blog-Artikeln: EXIF-Daten sammeln, Bilder analysieren & kategorisieren (A/B/C), SEO-Beschreibungen erstellen, mit Liveticker matchen, Artikel schreiben. YAML-Sidecars NUR nach expliziter Freigabe erstellen, dann `add-metadata.mjs` für slug/metadata/categories laufen lassen. Enthält sport-spezifische Zeitlogik (Fußball Brutto, Eishockey/AmFoot Netto). Single-Agent-Workflow, vision-capable, ohne Subagent. TRIGGER when Event-Bilder verarbeitet, Blog-Artikel geschrieben oder Bilder zu einem Event mit Liveticker strukturiert werden sollen.
+description: Verarbeitet Event-Bilder (Sport, Lifestyle) zu strukturierten Blog-Artikeln: EXIF-Daten sammeln, Bilder analysieren & kategorisieren (A/B/C), SEO-Beschreibungen erstellen, bei Sport-Events mit Liveticker matchen, Artikel schreiben. YAML-Sidecars NUR nach expliziter Freigabe erstellen, dann `add-metadata.mjs` für slug/metadata/categories laufen lassen. Enthält sport-spezifische Zeitlogik (Fußball Brutto, Eishockey/AmFoot Netto) und Parallel-Verarbeitung der vision-Batches bei Nicht-Sport-Events. Bildanalyse über den `vision`-Subagent (max. 10 Bilder gleichzeitig, parallel bei Nicht-Sport / sequenziell bei Sport), kreative Artikeltexte über den `author`-Subagent. TRIGGER when Event-Bilder verarbeitet, Blog-Artikel geschrieben oder Bilder zu einem Event mit Liveticker strukturiert werden sollen.
 ---
 
 # Blog-Beitrag: Bilder & Artikel verarbeiten
@@ -12,7 +12,9 @@ Deine Aufgabe ist es, einen unsortierten Satz von Bildern (Sport-Action, Zweikä
 Du analysierst die Bilder, erstellst Beschreibungen und verfasst einen packenden Artikel.
 
 **Wer macht was:**
-- **Dieser Agent (du):** Ist vision-capable. Sieht die Bilder direkt ein (Read-Tool), liefert visuelle Beschreibungen, strukturiert in Kategorien, matched Bilder mit dem Ticker, verfasst den Artikel. Kein Subagent wird verwendet.
+- **Dieser Agent (du):** Koordiniert den Workflow. Sammelt EXIF-Daten, bereitet die Bild-Batches für die Analyse vor, matched Bilder mit dem Ticker (nur bei Sport-Events), erstellt Beschreibungen, strukturiert Kategorien, schreibt YAML/`index.mdx`. Faktische Inhalte (Spielverlauf, Zuordnungen, technische Details) kommen von dir.
+- **`vision`-Subagent:** Analysiert die Bilder (Kategorisierung + visuelle Beschreibungen). Bekommt **maximal 10 Bilder pro Aufruf** – bei mehr Bildern werden mehrere Batches ausgeführt. Pro Batch dieselben Analyseregeln (Kategorien A/B/C, Sport-Interaktions-Prompting) übergeben. **Ausführungsmodus:** Bei **Nicht-Sport-Events parallel** (alle Batches gleichzeitig), bei **Sport-Events strikt nacheinander** (siehe Schritt 1).
+- **`author`-Subagent:** Verfasst den kreativen Artikeltext (Titel, Untertitel, Einleitung, Hauptteil, Fazit) aus den von dir vorbereiteten Fakten. Best for structured, highly logical, or creative writing tasks requiring strict adherence to prompts. Der Subagent bekommt als Prompt die Fakten, Bild-Zuordnungstabelle und Artikelregeln aus Schritt 3/3b – seine Textausgabe wird von dir anschließend geprüft und dem User vorgelegt.
 - **Mensch (Review):** Prüft die Vorschläge im Chat, korrigiert Fehler, gibt Freigabe. Keine Bilderkennung ohne menschliche Validierung.
 
 ## Inputs vom User
@@ -20,9 +22,26 @@ Du analysierst die Bilder, erstellst Beschreibungen und verfasst einen packenden
 1. **Event-Kontext:** Liveticker, Notizen oder grober Spielverlauf (Text).
 2. **Bildordner:** Pfad zum Ordner mit den Bildern (relativ zum Workspace oder absolut). Max. 25 Bilder.
 
-> **Global Linking:** Der Skill funktioniert von jedem beliebigen Ordner aus. Er sucht automatisch nach Bilddateien (`.jpg`, `.jpeg`, `.png`, `.webp`) im angegebenen oder aktuellen Ordner und nach Kontext-Dateien (`liveticker.txt`, `ticker.md`, `notes.md`, `event.md`) im selben oder übergeordneten Ordner. Keine Kontextangabe vom User nötig, wenn die Bilder in einem eigenen Ordner liegen.
+> **Global Linking:** Der Skill funktioniert von jedem beliebigen Ordner aus. Er sucht automatisch nach Bilddateien (`.jpg`, `.jpeg`, `.png`, `.webp`) im angegebenen oder aktuellen Ordner und nach Kontext-Dateien (`liveticker.txt`, `ticker.md`, `notes.md`, `event.md`, `context.txt`) im selben oder übergeordneten Ordner. Keine Kontextangabe vom User nötig, wenn die Bilder in einem eigenen Ordner liegen.
 
-### Context-Checkliste
+> **Kontext-Datei löschen (verbindlich):** Wird der Event-Kontext als Datei übergeben (z. B. `context.txt`, `liveticker.txt`, `ticker.md`, `notes.md`, `event.md`), wird diese Datei nach **Fertigstellung des Blog-Beitrags** (nach Freigabe und Schreiben aller Dateien) gelöscht. Sie ist nur ein Arbeitsmittel und soll nicht im Repository verbleiben.
+
+### Event-Typ bestimmen (vor dem Workflow)
+
+Bestimme zu Beginn, ob es sich um ein **Sport-Event** oder ein **Nicht-Sport-Event** handelt:
+
+- **Sport-Event:** Es liegt ein Liveticker/Spielverlauf vor oder die Bilder zeigen Sport-Action (Fußball, Eishockey, American Football ...). Ticker-Kontext und Zeitlogik werden aktiviert.
+- **Nicht-Sport-Event:** Kein Liveticker, z. B. Festivals, Konzerte, Lifestyle, Pflasterspektakel. Kein Ticker-Matching, die Bildanalyse läuft parallel.
+
+| | Sport-Event | Nicht-Sport-Event |
+|---|---|---|
+| vision-Batches (Schritt 1) | **sequenziell** (strikt nacheinander) | **parallel** (alle gleichzeitig) |
+| Ticker-Zeitkontext, Ticker-Matching, Zeitlogik | **aktiv** | **entfällt** |
+| Context-Checkliste | gilt | gilt nicht |
+
+**Sport-spezifische Regeln** (Context-Checkliste, Zeitlogik, Ticker-Matching, Interaktions-Prompting) gelten **nur bei Sport-Events** – bei Nicht-Sport-Events werden sie übersprungen.
+
+### Context-Checkliste (nur für Sport-Events)
 
 Um die Intention hinter Sportbildern korrekt zu deuten, braucht es mehr als nur EXIF und Bild. Folgende Kontextinformationen helfen enorm – idealerweise aus dem Liveticker oder Notizen des Users:
 
@@ -55,15 +74,29 @@ Bevor irgendein Bild analysiert, benannt oder vorgeschlagen wird, müssen die EX
 | IMG_001.jpg | 2026-06-13T14:32:00 |
 | IMG_002.jpg | 2026-06-13T14:35:12 |
 
-3. Diese Tabelle ist die Grundlage für Schritt 3 (Ticker-Matching). Ohne EXIF-Daten kann kein zeitliches Matching stattfinden.
+3. Diese Tabelle ist die Grundlage für das Ticker-Matching (Sport-Events); bei Nicht-Sport-Events dient sie der chronologischen Sortierung und Szenen-Erkennung.
+4. **Ticker-Zeitkontext aufbauen (nur bei Sport-Events, vor der Bildanalyse):** Ordne jedem Bild anhand seines `captureDate` bereits eine grobe Ticker-Spielminute zu (siehe Zeitlogik unten). Prüfe, welche Ticker-Ereignisse jeweils **±5 Minuten vor und nach** dem `captureDate` liegen, und notiere sie als temporären Kontext. Diese Annahmen werden dem `vision`-Subagent in Schritt 1 mitgegeben – er darf sie korrigieren.
 
 **Regeln:**
 - EXIF-Daten werden NIE verändert oder gelöscht.
-- Fehlt das EXIF-Datum eines Bildes, wird es mit `unknown` markiert und beim Ticker-Matching per inhaltlicher Passung zugeordnet.
+- Fehlt das EXIF-Datum eines Bildes, wird es mit `unknown` markiert und beim Ticker-Matching per inhaltlicher Passung zugeordnet (nur bei Sport-Events).
 
-### Schritt 1: Bild-Analyse & Kategorisierung
+### Schritt 1: Bild-Analyse & Kategorisierung (via `vision`-Subagent)
 
-Jetzt, da die Zeitstempel aller Bilder vorliegen, betrachte jedes Bild genau und klassifiziere es in eine von drei Kategorien:
+Jetzt, da die Zeitstempel aller Bilder vorliegen, wird die Bildanalyse an den `vision`-Subagent delegiert. **Maximal 10 Bilder pro Aufruf.**
+
+1. **Batches bilden:** Teile die Bilder in Gruppen von max. 10 (bei 25 Bildern → 3 Aufrufe: 10/10/5). Reihenfolge chronologisch nach EXIF-`captureDate`.
+   - **Ausführungsmodus je Event-Typ** (siehe „Event-Typ bestimmen"): **Nicht-Sport → parallel** – alle `vision`-Aufrufe gleichzeitig starten, Ergebnisse anschließend konsolidieren (keine Ticker-Abhängigkeiten). **Sport → strikt nacheinander** – jeder `vision`-Aufruf sequenziell, erst abschließen bevor der nächste beginnt; keine parallelen `task`-Aufrufe, da die Zeitkorrektur eines Batches die Ticker-Zuordnung späterer Batches verschieben kann.
+2. **Prompt je Batch:** Übergib dem `vision`-Subagent pro Batch:
+   - Die Batch-Bilddateien (absolute Pfade)
+   - Die Kategorien [A]/[B]/[C] inkl. Regeln (siehe unten)
+   - Das Sport-spezifische Prompting (siehe unten)
+   - Die EXIF-`captureDate`-Zeitstempel jedes Batch-Bildes
+   - **Serien-/Szenen-Erkennung:** Bilder mit dicht aufeinanderfolgenden `captureDate`s (kurz hintereinander) gehören meist zur **gleichen Szene** mit **gleichen Personen** → bitte als Serie markieren und Personen konsistent benennen
+   - **Nur bei Sport-Events zusätzlich:** Den **Ticker-Zeitkontext** (für jedes Batch-Bild die Ticker-Ereignisse ±5 Minuten um den Capture-Zeitpunkt aus Schritt 0.4) als Zuordnungshilfe für die Szene, sowie **Zeitkorrektur erlaubt** – der `vision`-Subagent darf die angenommene Ticker-Zuordnung korrigieren, wenn Bildinhalt und Ticker-Ereignis nicht zusammenpassen (Korrektur begründen)
+   - Fordere als Rückgabe je Bild: Original-Name, Kategorie [A]/[B]/[C], visuelle Beschreibung, erkennbare Personen/Nummern. **Nur bei Sport-Events zusätzlich:** bestätigte oder korrigierte Ticker-Zuordnung (inkl. Begründung)
+
+**Kategorien (an den `vision`-Subagent weitergeben):**
 
 - **[A] Action/Sport:** Zweikämpfe, Fouls, Tore, Spielszenen. Analysiere hart: Wer foult wen? Wo ist der Ball? Welche Körperteile sind beteiligt? Bei Sport **immer** die Interaktion beschreiben: Wer macht was? Wer grätscht, wer weicht aus, wer blockt? Was ist die genaue Körperhaltung? Wo auf dem Feld findet die Aktion statt?
 - **[B] Beauty/Porträt:** Fokussierte Gesichter, Athleten in Ruhe, Fans, Emotionen, Lifestyle-Shots.
@@ -78,7 +111,7 @@ Jetzt, da die Zeitstempel aller Bilder vorliegen, betrachte jedes Bild genau und
 **Sport-spezifisches Prompting (verbindlich):**
 Bei Sport-Bildern muss die Analyse die Interaktion zwischen den Personen beschreiben. Nicht nur „zwei Spieler stehen nebeneinander" sondern „Spieler 7 grätscht von links gegen Spieler 12, Ball liegt 2 Meter neben dem Fuß des Verteidigers". Die Frage ist immer: **Wer macht was, an wem, wie, wo auf dem Bild?** Was ist sichtbar, nicht was könnte passieren.
 
-### Schritt 2: Beschreibungen & Ticker-Matching
+### Schritt 2: Beschreibungen (Ticker-Matching nur bei Sport-Events)
 
 Erstelle für **JEDES** Bild:
 
@@ -88,14 +121,16 @@ Erstelle für **JEDES** Bild:
    - **Zeichensatz-Kontrolle (verbindlich):** Beschreibungen dürfen NUR deutsche Buchstaben (a-z, A-Z), Umlaute (äöüÄÖÜ), ß, Zahlen und Satzzeichen enthalten. Keine chinesischen, japanischen, arabischen oder anderen fremden Zeichen. Vor dem Schreiben IMMER explizit prüfen!
    - Keine Umlaute im Slug (ä → ae, ö → oe, ü → ue, ß → ss).
 
-2. **Bild-Matching mit dem Ticker:**
+2. **Bild-Matching mit dem Ticker (nur bei Sport-Events):**
    - Ordne jedes Bild dem nächsten passenden Ticker-Ereignis zu (basierend auf EXIF-`captureDate` oder inhaltlicher Passung).
    - **Halbzeit-Pause berücksichtigen:** Bei 2x 45 min Spielen und Standard-Pause (15 min) verschiebt sich die reale Uhrzeit für jedes Bild der zweiten Halbzeit um die Pause nach hinten.
    - Porträts ([B]) können als emotionale Auflockerung im Text platziert werden – sie müssen nicht zwingend einem Ticker-Ereignis zugeordnet werden.
    - Atmosphärbilder ([C]) passen zu Einleitungs- oder Fazit-Abschnitten.
    - Action-Bilder ([A]) sollten den Ticker-Ereignissen entsprechen, die sie illustrieren.
 
-#### Sport-spezifische Zeitlogik (essenziell für korrektes Matching)
+   **Bei Nicht-Sport-Events:** kein Ticker-Matching. Die Bilder werden rein nach Bildinhalt beschrieben.
+
+#### Sport-spezifische Zeitlogik (essenziell für korrektes Matching – nur bei Sport-Events)
 
 **Fußball (Brutto-Spielzeit):**
 - 2 × 45 Minuten = 90 Minuten effektive Spielzeit.
@@ -114,20 +149,32 @@ Erstelle für **JEDES** Bild:
 
 **Generelle Regel:** Bei Unklarheit über die Pausenlänge → nachfragen, bevor die Minute zugeordnet wird.
 
-**Zuordnungstabelle führen:**
+**Zuordnungstabelle führen (Spalten wie die Verarbeitungsliste, Kategorie NIE ausgeben):**
 
-| Original-Name | Beschreibung | Kategorie | EXIF-captureDate | Ticker-Minute/Ereignis |
+| Original-Name | Neuer Dateiname (SEO-Slug) | Beschreibung | EXIF-captureDate | Ticker-Zuordnung (nur Sport) |
 |---|---|---|---|---|
 
-### Schritt 3: Artikel-Schreiben
+### Schritt 3: Artikel-Schreiben (via `author`-Subagent)
 
-- Verfasse einen zusammenhängenden, dramaturgisch starken Artikel (Titel, Untertitel, Einleitung, Hauptteil, Fazit).
+- **Du:** Sammelst alle Fakten (bei Sport: Spielverlauf laut Ticker; Bild-Zuordnungen aus Schritt 2, Kategorien, ggf. Zuschauerzahl/Stimmung) und die Artikelregeln (siehe unten) und übergibst sie als detaillierten Prompt an den `author`-Subagent.
+- **`author`-Subagent:** Verfasst den zusammenhängenden, dramaturgisch starken Artikel (Titel, Untertitel, Einleitung, Hauptteil, Fazit).
+- **Du:** Prüfst das Ergebnis auf Faktentreue, übernimmst es und stellst es dem User zur Freigabe vor (Schritt 4).
+
+**Vorgaben an den `author`-Subagent (in den Prompt aufnehmen):**
 - Setze sinnvolle Zwischenüberschriften.
 - Binde die Bilder strategisch perfekt in den Text ein:
   - Action-Bilder für Spielbeschreibungen
   - Beauty-Porträts für emotionale Momente nach entscheidenden Spielzügen
   - Atmosphärbilder für Einleitung und Fazit
 - Syntax im Text: `![Alt-Tag](dateiname.jpg)`
+- **Keine Aufstellungen/Einwechslungslisten im Artikel** – die interessieren die Leser nicht. Die Mannschaftsnamen und ggf. Torschützen werden im Fließtext erwähnt.
+- **Wenige, längere Absätze statt vieler kurzer:** Je Abschnitt einen zusammenhängenden Fließtext schreiben, keine Ein-Satz-Absätze.
+- Sprache: Deutsch.
+
+### Schritt 3b: Gallerie-Platzierung (verbindlich)
+
+- Gilt, wenn **eine einzige Gallerie** verwendet wird: Sie steht **am Ende** des Artikels – **Text vorher, kein Text mehr nachher.** Auch Einleitungs-/Fazit-Teile gehören **vor** die Gallerie. Struktur: Einleitung → Hauptteil → Fazit → `<Gallery sorted={IMAGES}></Gallery>` (als letztes Element).
+- Wird dagegen entschieden, dass **mehrere Gallerien** den Artikel besser strukturieren (z. B. je ein Block pro Spielabschnitt), gilt diese Regel **nicht** – dann werden die Gallerien sinvoll in den Text eingebettet und Text steht davor und danach.
 
 ### Schritt 4: Freigabe einholen
 
@@ -135,25 +182,30 @@ Erstelle für **JEDES** Bild:
 
 1. Zeige die **Bild-Verarbeitungsliste** und den **Artikel** dem User.
 2. Frage gezielt nach:
-   - Sind die Beschreibungen korrekt?
-   - Fehlen Bilder? Falsche Kategorisierung?
-   - Ticker-Matching inkorrekt?
+   - Sind die Beschreibungen korrekt? **(Wichtigster Punkt:** eine falsche Beschriftung ist essentiell zu korrigieren**)
+   - Fehlen Bilder?
+   - Ticker-Matching inkorrekt? (nur Sport)
    - Artikel-Inhalt ok?
 3. Wende Änderungen an und zeige die aktualisierte Version.
 4. **Erst nach expliziter Freigabe** durch den User werden Dateien geschrieben.
 
+### Schritt 4a: Interne User-Kommentare ≠ freigegebene Beschreibungen (verbindlich)
+
+User-Kommentare und Korrekturen während des Reviews (z. B. „das ist ein Torschuss", „kein Luftduell", „gleiche Szene wie 93", „Horvath Daumen nach oben") sind **interne Hinweise** zur Bildinterpretation. Sie dürfen **niemals 1:1** in die YAML-Beschreibung übernommen werden, sondern helfen nur, die Szene korrekt zu verstehen und die Beschreibung entsprechend umzuformulieren.
+
+Regeln:
+- **Interne Zusammenhänge** („gleiche Szene wie 90", „gleiche Personen wie 93") gehören **nicht** in die Beschreibung.
+- **Wertende/technische Meta-Info** („kein Ballkontakt", „Ball auf Kniehöhe", „nach meiner Anweisung") wird nicht wörtlich übernommen.
+- Die **Beschreibung** wird erst durch die **explizite Freigabe** des Users verbindlich – bis dahin immer als Vorschlag kennzeichnen.
+- **Dateinamen (SEO-Slugs)** richten sich nach dem tatsächlichen Bildinhalt und werden unabhängig von internen Kommentaren vergeben.
+- **Bei Bedarf einzeln nachanalysieren:** Wenn die Bildinterpretation nach einem internen Hinweis unsicher ist (z. B. falsche Personen-/Szenen-Einschätzung), kann der betroffene **einzelne Bild(er)** erneut an den `vision`-Subagent zur Analyse gegeben werden – mit dem korrigierten Verständnis als Zusatzkontext. Das Ergebnis wird wieder als Vorschlag präsentiert.
+
 ### Schritt 4b: Zeichensatz-Check (vor dem Schreiben)
 
-**Vor dem Erstellen der YAML-Dateien MUSS jede Beschreibung auf fremde Zeichen geprüft werden:**
+**Vor dem Erstellen der YAML-Dateien MUSS jede Beschreibung erneut auf den erlaubten Zeichensatz geprüft werden** (siehe Regeln in Schritt 2.1):
 
 1. Lies jede Beschreibung nochmals durch.
-2. Stelle sicher, dass NUR folgende Zeichen verwendet werden:
-   - Deutsche Buchstaben: a-z, A-Z
-   - Umlaute: ä, ö, ü, Ä, Ö, Ü
-   - ß
-   - Zahlen: 0-9
-   - Satzzeichen: ., ,:;!?-()
-   - Leerzeichen
+2. Erlaubt sind NUR: deutsche Buchstaben (a-z, A-Z), Umlaute (äöüÄÖÜ), ß, Zahlen (0-9), Satzzeichen (., ,:;!?-()) und Leerzeichen.
 3. Bei gefundenen fremden Zeichen (z.B. Chinesisch, Japanisch, Arabisch): **Sofort korrigieren und erneut prüfen.**
 4. Erst wenn alle Beschreibungen geprüft sind, mit dem Schreiben fortfahren.
 
@@ -219,22 +271,23 @@ Nach Freigabe durch den User:
    - Frontmatter: `title`, `description`, `keywords`, `date` (als String!), `heroImage`
    - Galerie-Array mit allen Slugs
    - Import des Gallery-Components
-   - Artikeltext mit eingebetteter Galerie
+   - Artikeltext, Gallerie ans Ende (siehe Schritt 3b)
+   - `heroImage` = Slug des gewählten Hero-Bildes (im Dev-Build als `data-name`-Attribut am `<img>` sichtbar)
 
-2. **Slug-Format für heroImage und Galerie:**
+   **Slug-Format für heroImage und Galerie:**
    - Wird vom `add-metadata.mjs` generiert aus dem Dateipfad
    - Format: `sport-fussball-nero2026-g4-bildname` ( Beispiel)
    - Immer kleingeschrieben, ohne Umlaute, Bindestriche statt Leerzeichen
    - Der Ordnerpfad (inkl. Event-Ordner) ist automatisch Teil des Slug-Prefixes – Event-/Ordnernamen nicht im Dateinamen wiederholen (siehe Schritt 5.5)
 
-3. **YAML-Frontmatter-Typen (strikt einhalten):**
+   **YAML-Frontmatter-Typen (strikt einhalten):**
    - `title`: String
    - `description`: String
    - `keywords`: Array von Strings
    - `date`: **String** (in Anführungszeichen, z.B. `"2026-07-24"` – NICHT ohne Anführungszeichen!)
    - `heroImage`: String (Slug)
 
-4. **SEO-Keywords (verbindlich):**
+   **SEO-Keywords (verbindlich):**
    - Keywords müssen suchbar sein – was geben User in Google ein?
    - **Gut:** Teamspieler (`Galatasaray SK`, `AC Monza`), Wettbewerb (`Summer Series Upper Austria`), Stadion (`Raiffeisen Arena`), Suchbegriffe (`Freundschaftsspiel`, `Testspiel Fußball`)
    - **Schlecht:** Generische Begriffe wie `Sommer 2026`, `2026`, `Linz` (zu breit, kein Suchvolumen)
@@ -244,13 +297,15 @@ Nach Freigabe durch den User:
 
 ### Bild-Verarbeitungsliste (zur Freigabe durch User)
 
-Die Kategorie `[A]`/`[B]`/`[C]` ist eine interne Klassifikation – sie gehört **nicht** in die öffentliche Tabelle.
+Die Kategorie `[A]`/`[B]`/`[C]` ist eine interne Klassifikation – sie wird **niemals** in der Verarbeitungsliste ausgegeben. Stattdessen wird der **vorgeschlagene neue Dateiname** (SEO-Slug) angezeigt.
 
 ```
-| Original-Name | Beschreibung (für YAML) | Kategorie | EXIF-Zeit | Ticker-Zuordnung |
+| Original-Name | Neuer Dateiname (SEO-Slug) | Beschreibung (für YAML) | EXIF-Zeit | Ticker-Zuordnung (nur Sport) |
 | :--- | :--- | :--- | :--- | :--- |
-| IMG_1234.jpg | Spieler XYZ grätscht gegen Spieler ABC | [A] | 20:15 | ~15. Minute |
+| IMG_1234.jpg | lask-jungwirth-faengt-ball.jpg | Spieler XYZ grätscht gegen Spieler ABC | 20:15 | ~15. Minute |
 ```
+
+**Bei Nicht-Sport-Events:** Die Spalte „Ticker-Zuordnung" entfällt in der Verarbeitungsliste.
 
 ### Artikel (Vorschau)
 
@@ -269,7 +324,7 @@ Die Kategorie `[A]`/`[B]`/`[C]` ist eine interne Klassifikation – sie gehört 
 
 ## Technische Hinweise
 
-- **Kein Subagent:** Alles in einem Durchgang, kein Task-Tool, kein Subagent. Der Agent selbst ist vision-capable und liest Bilder direkt ein.
+- **Subagents für Bild & Text:** Die Bildanalyse (Schritt 1) läuft über den `vision`-Subagent in Batches von **max. 10 Bildern** – **parallel bei Nicht-Sport-Events, sequenziell bei Sport-Events**; der Artikeltext (Schritt 3) über den `author`-Subagent. Alles andere (EXIF, Matching, Beschreibungen, YAML, index.mdx) macht der Hauptagent selbst. Kein zusätzlicher Subagent, kein Task-Tool für die restlichen Schritte.
 - **EXIF zuerst:** Bevor irgendwelche Vorschläge, Kategorisierungen oder Alt-Tags erstellt werden, müssen die EXIF-`captureDate`-Werte aller Bilder erfasst sein (Schritt 0).
 - **Kein `<img>`-Tag:** Bilder werden als Markdown-Syntax referenziert. Die spätere Einbindung in Astro-Templates (ResponsiveImage, Gallery) erfolgt beim Build.
 - **YAML-Frontmatter:** Nur `description` wird vom Agent geschrieben. `slug`, `metadata` und `categories` kommen von `add-metadata.mjs` (Prebuild-Hook). **Niemals manuell EXIF-Daten in YAML kopieren!**
