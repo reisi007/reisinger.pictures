@@ -14,49 +14,93 @@ const {
   id: slug,
   data: { name, source, role, layout: frontmatterLayout, large: optLargeImage, small: optSmallImage, imageFit },
   displayLargeImage = true,
-  layout = frontmatterLayout
+  layout = frontmatterLayout,
+  clickable = false
 } = entry;
 const smallName = optSmallImage ?? `${slug}-small`;
 const largeName = optLargeImage ?? `${slug}-large`;
 const small = tryGetImage(smallName);
 const large = tryGetImage(largeName);
 const { Content } = await render(entry);
+const hoverClasses = "hover:shadow-md hover:border-primary hover:-translate-y-0.5 transition-all duration-300 cursor-pointer";
+const arrowClasses = "absolute bottom-6 right-6 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-primary icon-[mdi--arrow-right]";
 ---
 
-{layout === "quote" ? (
-  <div data-slug={import.meta.env.DEV ? slug : undefined} class="card sm:card-side bg-base-200 shadow-sm border border-base-300">
-    {small !== undefined &&
-      <figure class="sm:w-1/3 sm:min-w-48 p-6 sm:p-8 aspect-square self-center flex items-center justify-center shrink-0">
-        <ReviewAvatar name={smallName} imageFit={imageFit} containerClass="size-32 sm:size-48 shadow-md" paddingClass="p-4 sm:p-6" sizes="(max-width: 640px) 128px, 192px" widths={[128, 192]} />
-      </figure>
-    }
-    <div class="card-body justify-center">
-      <div class="text-5xl text-primary opacity-40 -mb-6 font-serif leading-none">❝</div>
-      <div class="prose prose-lg italic">
-        <Content />
+<div data-slug={import.meta.env.DEV ? slug : undefined} class="relative group">
+  {layout === "quote" ? (
+    clickable ? (
+      <a href={`/testimonials/${slug}`} aria-label={`Bewertung von ${name} lesen`} class:list={["card sm:card-side bg-base-200 shadow-sm border border-base-300 no-underline text-inherit h-full", hoverClasses]}>
+        {small !== undefined &&
+          <figure class="sm:w-1/3 sm:min-w-48 p-6 sm:p-8 aspect-square self-center flex items-center justify-center shrink-0">
+            <ReviewAvatar name={smallName} imageFit={imageFit} containerClass="size-32 sm:size-48 shadow-md" paddingClass="p-4 sm:p-6" sizes="(max-width: 640px) 128px, 192px" widths={[128, 192]} />
+          </figure>
+        }
+        <div class="card-body justify-center">
+          <div class="text-5xl text-primary opacity-40 -mb-6 font-serif leading-none">❝</div>
+          <div class="prose prose-lg italic">
+            <Content />
+          </div>
+          <div class="text-5xl text-primary opacity-40 -mb-6 text-right font-serif leading-none">❞</div>
+          <div>
+            <p class="font-bold text-lg m-0!">{name}</p>
+            {role && <p class="text-sm opacity-70 m-0!">{role}</p>}
+          </div>
+        </div>
+        <span class={arrowClasses} aria-hidden="true" />
+      </a>
+    ) : (
+      <div class="card sm:card-side bg-base-200 shadow-sm border border-base-300 h-full">
+        {small !== undefined &&
+          <figure class="sm:w-1/3 sm:min-w-48 p-6 sm:p-8 aspect-square self-center flex items-center justify-center shrink-0">
+            <ReviewAvatar name={smallName} imageFit={imageFit} containerClass="size-32 sm:size-48 shadow-md" paddingClass="p-4 sm:p-6" sizes="(max-width: 640px) 128px, 192px" widths={[128, 192]} />
+          </figure>
+        }
+        <div class="card-body justify-center">
+          <div class="text-5xl text-primary opacity-40 -mb-6 font-serif leading-none">❝</div>
+          <div class="prose prose-lg italic">
+            <Content />
+          </div>
+          <div class="text-5xl text-primary opacity-40 -mb-6 text-right font-serif leading-none">❞</div>
+          <div>
+            <p class="font-bold text-lg m-0!">{name}</p>
+            {role && <p class="text-sm opacity-70 m-0!">{role}</p>}
+          </div>
+        </div>
       </div>
-      <div class="text-5xl text-primary opacity-40 -mb-6 text-right font-serif leading-none">❞</div>
-      <div>
-        <p class="font-bold text-lg m-0!">{name}</p>
-        {role && <p class="text-sm opacity-70 m-0!">{role}</p>}
+    )
+  ) : (
+    clickable ? (
+      <a href={`/testimonials/${slug}`} aria-label={`Bewertung von ${name} lesen`} class:list={["card bg-base-300 shadow-sm border border-transparent no-underline text-inherit h-full", hoverClasses]}>
+        {small !== undefined &&
+          <div class="pt-8 flex justify-center">
+            <ReviewAvatar name={smallName} imageFit={imageFit} containerClass="size-32 shadow-sm" paddingClass="p-3" sizes="128px" widths={[128]} />
+          </div>}
+        <h4 class="card-title">{name}</h4>
+        {displayLargeImage && large !== undefined &&
+          <ResponsiveImage name={largeName} showInfo={true} />
+        }
+        <div />
+        <div class="card-body">
+          <Content />
+        </div>
+        <span class={arrowClasses} aria-hidden="true" />
+      </a>
+    ) : (
+      <div class="card bg-base-300 shadow-sm h-full">
+        {small !== undefined &&
+          <div class="pt-8 flex justify-center">
+            <ReviewAvatar name={smallName} imageFit={imageFit} containerClass="size-32 shadow-sm" paddingClass="p-3" sizes="128px" widths={[128]} />
+          </div>}
+        <h4 class="card-title">{name}</h4>
+        {displayLargeImage && large !== undefined &&
+          <ResponsiveImage name={largeName} showInfo={true} />
+        }
+        <div />
+        <div class="card-body">
+          <Content />
+        </div>
       </div>
-    </div>
-    {source !== undefined && <ReviewSocialLink source={source} class="right-6 top-6" />}
-  </div>
-) : (
-  <div data-slug={import.meta.env.DEV ? slug : undefined} class="card bg-base-300 shadow-sm">
-    {small !== undefined &&
-      <div class="pt-8 flex justify-center">
-        <ReviewAvatar name={smallName} imageFit={imageFit} containerClass="size-32 shadow-sm" paddingClass="p-3" sizes="128px" widths={[128]} />
-      </div>}
-    <h4 class="card-title">{name}</h4>
-    {displayLargeImage && large !== undefined &&
-      <ResponsiveImage name={largeName} showInfo={true} />
-    }
-    <div />
-    <div class="card-body">
-      <Content />
-    </div>
-    {source !== undefined && <ReviewSocialLink source={source} class="right-6" />}
-  </div>
-)}
+    )
+  )}
+  {source !== undefined && <ReviewSocialLink source={source} class={layout === "quote" ? "right-6 top-6" : "right-6"} />}
+</div>

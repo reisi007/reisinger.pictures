@@ -1,0 +1,13 @@
+---
+import ReviewCards from "./ReviewCards.astro";
+import { type ReviewProps } from "./Types";
+
+type Props = {
+  slug?: string,
+  slugs?: string[],
+} & ReviewProps
+
+const { slug, slugs = slug !== undefined ? [slug] : [], displayLargeImage = false, clickable = true, ...reviewProps } = Astro.props;
+---
+
+<ReviewCards slugs={slugs} displayLargeImage={displayLargeImage} clickable={clickable} {...reviewProps} class="mb-8" />
