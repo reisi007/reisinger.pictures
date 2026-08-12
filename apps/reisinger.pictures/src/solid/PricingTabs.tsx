@@ -1,3 +1,4 @@
+import { flexImagesIncluded } from "@reisinger/shared/utils/pricing";
 import { createSignal, Show } from "solid-js";
 
 import { trackEvent } from "../tracking";
@@ -8,6 +9,23 @@ type Tab = "standard" | "flex";
 
 export default function PricingTabs() {
   const [activeTab, setActiveTab] = createSignal<Tab>("standard");
+
+  const switchTab = (tab: Tab) => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (tab === "flex") {
+        const img = parseInt(params.get("img") ?? String(flexImagesIncluded), 10);
+        params.set("extra", String(Math.max(0, img - flexImagesIncluded)));
+      } else {
+        const extra = parseInt(params.get("extra") ?? "0", 10);
+        params.set("img", String(extra + flexImagesIncluded));
+      }
+      const query = params.toString();
+      window.history.replaceState({}, "", window.location.pathname + (query ? "?" + query : "") + window.location.hash);
+    }
+    setActiveTab(tab);
+    trackEvent("pricing_tab", { tab });
+  };
 
   return (
     <div class="card bg-base-100 border-2 border-primary/30 shadow-xl rounded-2xl overflow-hidden">
@@ -20,10 +38,7 @@ export default function PricingTabs() {
             (activeTab() === "standard"
               ? "bg-primary text-primary-content shadow-inner"
               : "bg-base-200 text-base-content/60 hover:text-base-content/90 hover:bg-base-300")}
-          onClick={() => {
-            setActiveTab("standard");
-            trackEvent("pricing_tab", { tab: "standard" });
-          }}
+          onClick={() => switchTab("standard")}
         >
           Standard
         </button>
@@ -34,10 +49,7 @@ export default function PricingTabs() {
             (activeTab() === "flex"
               ? "bg-primary text-primary-content shadow-inner"
               : "bg-base-200 text-base-content/60 hover:text-base-content/90 hover:bg-base-300")}
-          onClick={() => {
-            setActiveTab("flex");
-            trackEvent("pricing_tab", { tab: "flex" });
-          }}
+          onClick={() => switchTab("flex")}
         >
           Flex
         </button>

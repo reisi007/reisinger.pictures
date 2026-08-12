@@ -18,6 +18,7 @@ export default function PricingCalculatorProfi() {
   const [isStudent, setIsStudent] = createSignal(false);
   const [isFriend, setIsFriend] = createSignal(false);
   const [showFriend, setShowFriend] = createSignal(false);
+  const [friendCode, setFriendCode] = createSignal(false);
   let historyTimeout: number;
 
   onMount(() => {
@@ -25,6 +26,7 @@ export default function PricingCalculatorProfi() {
       const params = new URLSearchParams(window.location.search);
       if (params.has("code") && params.get("code") === "friend") {
         setShowFriend(true);
+        setFriendCode(true);
       }
       if (params.has("h")) setHours(parseFloat(params.get("h") ?? "1"));
       if (params.has("img")) setImages(parseInt(params.get("img") ?? "15", 10));
@@ -36,12 +38,19 @@ export default function PricingCalculatorProfi() {
 
   createEffect(() => {
     if (typeof window !== "undefined") {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams(window.location.search);
+      if (friendCode()) params.set("code", "friend");
+      else params.delete("code");
       if (hours() !== 1) params.set("h", hours().toString());
+      else params.delete("h");
       if (images() !== 15) params.set("img", images().toString());
+      else params.delete("img");
       if (location() !== "indoor") params.set("location", location());
+      else params.delete("location");
       if (isStudent()) params.set("student", "true");
+      else params.delete("student");
       if (isFriend() && showFriend()) params.set("friend", "true");
+      else params.delete("friend");
       const query = params.toString();
       const newUrl = window.location.pathname + (query ? "?" + query : "") + window.location.hash;
       clearTimeout(historyTimeout);

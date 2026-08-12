@@ -22,11 +22,15 @@ export default function PricingCalculator() {
 
   createEffect(() => {
     if (typeof window !== "undefined") {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams(window.location.search);
       if (shootingType() !== "portrait") params.set("type", shootingType());
+      else params.delete("type");
       if (setupType() !== "outdoor") params.set("setup", setupType());
+      else params.delete("setup");
       if (extraImages() > 0) params.set("extra", extraImages().toString());
+      else params.delete("extra");
       if (shootingType() === "akt" && isFullyPrivate()) params.set("private", "true");
+      else params.delete("private");
       
       const queryString = params.toString();
       const newUrl = window.location.pathname + (queryString ? "?" + queryString : "") + window.location.hash;
