@@ -7,7 +7,7 @@ type Props = {
   slugs?: string[],
 } & ReviewProps
 
-const { slug, slugs = slug !== undefined ? [slug] : [], displayLargeImage = false, clickable = true, ...reviewProps } = Astro.props;
+const { slug, slugs = slug !== undefined ? [slug] : [], displayLargeImage = false, showDetailLink = true, ...reviewProps } = Astro.props;
 ---
 
-<ReviewCards slugs={slugs} displayLargeImage={displayLargeImage} clickable={clickable} {...reviewProps} class="mb-8" />
+<ReviewCards slugs={slugs} displayLargeImage={displayLargeImage} showDetailLink={showDetailLink} {...reviewProps} class="mb-8" />

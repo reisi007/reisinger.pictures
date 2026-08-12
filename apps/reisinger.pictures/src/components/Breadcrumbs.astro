@@ -1,5 +1,7 @@
 ---
-import { type DataCollectionKey, getCollection } from "astro:content";
+import { type DataCollectionKey, getCollection, getEntry } from "astro:content";
+
+import { buildBreadcrumbs, extractTestimonialId } from "./Breadcrumbs.config";
 
 const astroUrl = Astro.url;
 const { pathname } = astroUrl;
@@ -63,9 +65,16 @@ const matchingContent = (await Promise.all(
   )
 );
 
-const matchingUrls = matchingContent.flatMap(k => k)
+const urlAncestors = matchingContent.flatMap(k => k)
   .filter(({ path }) => path !== "" && path !== url && url.startsWith(`${path}/`))
   .sort(({ path: a }, { path: b }) => a.length - b.length);
+
+const testimonialId = extractTestimonialId(url);
+const detailType = testimonialId !== undefined
+  ? (await getEntry("testimonials", testimonialId))?.data.type
+  : undefined;
+
+const matchingUrls = buildBreadcrumbs(url, urlAncestors, detailType);
 ---
 
 {url !== "" &&

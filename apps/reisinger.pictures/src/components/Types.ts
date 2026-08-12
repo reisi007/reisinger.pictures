@@ -1,5 +1,6 @@
 export type ReviewProps = {
-  clickable?: boolean,
+  showDetailLink?: boolean,
+  showCategory?: boolean,
   displayLargeImage?: boolean,
   largeImageStyles?: string,
   layout?: "default" | "quote",
