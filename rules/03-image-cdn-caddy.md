@@ -17,6 +17,12 @@ Caddy (Subdomain `images.reisinger.pictures`) – kein nginx-Container mehr.
 - **Struktur:** Die Caddy-Konfiguration nutzt einen wiederverwendbaren `(cdn)`-Snippet.
   Inline-Duplikate des Caching-Blocks sind verboten.
 
+## SVG-Unterstützung (Vereins-Logos)
+Die Bild-Pipeline unterstützt seit 2026-08 auch SVG-Quellen (z. B. Vereins-Logos):
+- **Slug-Map:** `apps/reisinger.pictures/vite-plugin-image-meta.mjs` (`IMAGE_RE`) enthält `.svg` → SVG-Dateien mit Companion-YAML-Slug werden wie Rasterbilder in `virtual:image-slug-map` registriert.
+- **Dev:** Astro rasiert SVG via Sharp-Dienst (`image.dangerouslyProcessSVG: true` in `astro.config.mjs`) zu WebP.
+- **Build/CDN:** `packages/tools/scripts/process-images.mjs` (`IMAGE_EXTENSIONS`) rasiert SVG zu WebP-Varianten im `.imagedist`-Manifest; `ResponsiveImage` baut daraus die CDN-URL. Der Slug liegt unter `src/images/vereine/` (Beispiel: `bwl.svg` → Slug `vereine-bwl`).
+
 ## Deployment / Validierung
 - Validierung der Caddyfile vor jedem Reload mit einem temporären Container:
   ```bash

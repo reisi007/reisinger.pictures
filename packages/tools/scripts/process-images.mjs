@@ -15,7 +15,7 @@ const IMAGE_DIST = path.join(ROOT, ".imagedist");
 const MANIFEST_PATH = path.join(IMAGE_DIST, "manifest.json");
 const TARGET_WIDTHS = [256, 640, 828, 1080, 1200, 1920, 2048];
 const WEBP_QUALITY = 75;
-const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png"]);
+const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".svg"]);
 const CONCURRENCY = 32;
 
 async function getAllFiles(dirPath) {

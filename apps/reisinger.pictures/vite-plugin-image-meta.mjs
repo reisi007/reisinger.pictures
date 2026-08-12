@@ -3,7 +3,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { load as parseYaml } from "js-yaml";
 
-const IMAGE_RE = /\.(jpe?g|png|gif|webp)$/i;
+const IMAGE_RE = /\.(jpe?g|png|gif|webp|svg)$/i;
 const ALREADY_WRAPPED = "__imgMeta_";
 
 const VIRTUAL_META_ID = "virtual:image-meta-index";
