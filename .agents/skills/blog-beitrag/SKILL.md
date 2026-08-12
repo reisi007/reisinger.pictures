@@ -111,6 +111,16 @@ Jetzt, da die Zeitstempel aller Bilder vorliegen, wird die Bildanalyse an den `v
 **Sport-spezifisches Prompting (verbindlich):**
 Bei Sport-Bildern muss die Analyse die Interaktion zwischen den Personen beschreiben. Nicht nur „zwei Spieler stehen nebeneinander" sondern „Spieler 7 grätscht von links gegen Spieler 12, Ball liegt 2 Meter neben dem Fuß des Verteidigers". Die Frage ist immer: **Wer macht was, an wem, wie, wo auf dem Bild?** Was ist sichtbar, nicht was könnte passieren.
 
+### Schritt 1a: Plausibilitäts-/Sanity-Check (verbindlich, nach der Vision-Analyse)
+
+Nach der Bildanalyse die Aussagen des `vision`-Subagents auf Plausibilität prüfen, BEVOR Beschreibungen geschrieben werden:
+
+- **Zeitliche Konsistenz:** Prüfen, ob die EXIF-Reihenfolge und der beschriebene Szenenverlauf zusammenpassen. Beispiel: Ein Fallschirmspringer kann nicht um 17:55 bereits gelandet sein und um 17:56 über der Tribüne schweben → beide Bilder zeigen dann den Sprung in der Luft (kein Bodenkontakt). Widersprüchliche Aussagen markieren und anhand des Bildinhalts auflösen (Re-Analyse durch `vision`).
+- **Verwechslungsgefahr:** Können Bilder verwechselt worden sein (z. B. Cheerdancerin vs. Spieler, Tarnmuster-Tanzoutfit vs. Trikot)? Bei Unsicherheit die betroffenen Einzelbilder erneut zur Analyse geben (mit korrigiertem Verständnis als Kontext).
+- **Serien-Konsistenz:** Bilder einer Serie (dichte `captureDate`s) müssen dieselben Personen/Szenen konsistent benennen.
+- **Sport-Logik:** Passt die Szene (z. B. Lauf, Pass, Tackle, TD-Jubel) zur Spielsituation laut Ticker? Nicht passende Zuordnungen korrigieren.
+- **Roster-Namen:** Liegt vom User eine Roster-Liste (Trikotnummern + Spielernamen) vor, werden erkennbare Nummern zusätzlich mit dem Namen benannt (z. B. „Karri Pajarinen (Nummer 24)"). Nicht belegbare Namen nicht erfinden.
+
 ### Schritt 2: Beschreibungen (Ticker-Matching nur bei Sport-Events)
 
 Erstelle für **JEDES** Bild:
@@ -176,6 +186,18 @@ Erstelle für **JEDES** Bild:
 - Gilt, wenn **eine einzige Gallerie** verwendet wird: Sie steht **am Ende** des Artikels – **Text vorher, kein Text mehr nachher.** Auch Einleitungs-/Fazit-Teile gehören **vor** die Gallerie. Struktur: Einleitung → Hauptteil → Fazit → `<Gallery sorted={IMAGES}></Gallery>` (als letztes Element).
 - Wird dagegen entschieden, dass **mehrere Gallerien** den Artikel besser strukturieren (z. B. je ein Block pro Spielabschnitt), gilt diese Regel **nicht** – dann werden die Gallerien sinvoll in den Text eingebettet und Text steht davor und danach.
 
+### Schritt 3c: Gallerie-Struktur-Expertenberatung (bei Sondergalerien, verbindlich bei Abweichung)
+
+Bei Events mit **besonderen Bildgruppen** (z. B. Rahmenprogramm wie Bundesheer-Fallschirmsprung mit Spielball, Cheerleader-Show, Fan-Gruppen, Porträt-Reihen) entscheidet **nicht der Hauptagent allein**, wie die Gallerien strukturiert werden:
+
+1. **Kandidaten für Sondergalerien erkennen** (aus den `vision`-Ergebnissen): eigenständige Bildgruppen, die sich thematisch klar vom Spiel abheben und einen kurzen eigenen Textblock verdienen. Beispiel: 3+ Fotos einer Fallschirmspringer-Aktion mit Österreich-/EU-Flagge vor Anpfiff = eigene Galerie.
+2. **`author`-Subagent als Experte konsultieren** – vor dem eigentlichen Artikel-Schreiben. Übergib:
+   - Event-Kontext (Teams, Endstand, Event-Rahmen wie "Bundesheer-Spieltag")
+   - Die Bildgruppen (Vorprogramm/Bundesheer, Spiel-Action Q1-Q4, Cheerleader inkl. Team-Namen wie Millennium Dancers mit goldenen Poms, Spirit Squad violett/gold)
+   - Konkrete Fragen: Soll die Gruppe eine eigene Galerie mit Textblock bekommen? Reicht die Bildanzahl? Im Hauptartikel integrieren oder eigener Artikel (SEO-Abwägung)? Empfohlene Endstruktur?
+3. **Empfehlung dem User präsentieren** und freigeben lassen, bevor der Artikel geschrieben wird. Empfehlungen des `author`-Subagents (z. B. "Bundesheer-Galerie direkt nach der Einleitung, Cheerleader-Galerie mit kurzem Text als Kontrast am Ende") sind Richtwerte, nicht bindend – der User entscheidet.
+4. **Mehrere Gallerien → Schritt 3b-Regel (einzige Gallerie am Ende) entfällt.** Die Gallerien werden mit kurzen Textblöcken sinnvoll in den Artikel eingebettet (Text davor und danach).
+
 ### Schritt 4: Freigabe einholen
 
 **WICHTIG: Keine Dateien schreiben ohne explizite Freigabe!**
@@ -212,6 +234,8 @@ Regeln:
 ### Schritt 5: Bilder & YAMLs physisch umbenennen (nach Freigabe)
 
 **Bilder und YAMLs MÜSSEN immer physisch umbenannt werden!**
+
+**Teilfreigabe (verbindlich):** Gibt der User nur einen Teil der Bilder frei (z. B. „ab Bild X noch nicht kontrolliert, bis 35 freigegeben"), werden **nur die freigegebenen Bilder** sofort physisch umbenannt. Die übrigen Bilder behalten ihren Originalnamen, bis sie freigegeben sind. Der Reststatus (welche Bilder noch ausstehen) wird transparent berichtet; eine erneute Analyse erfolgt nur auf Anforderung des Users. Artikel/`index.mdx` werden erst geschrieben, wenn alle Bilder freigegeben sind.
 
 1. Benenne jedes Bild in einen sprechenden, SEO-freundlichen Dateinamen um:
    - Kleinbuchstaben, Bindestriche statt Leerzeichen, keine Umlaute (ä→ae, ö→oe, ü→ue, ß→ss)
