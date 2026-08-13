@@ -11,7 +11,6 @@ export const test = base.extend<{ capture: Capture }>({
   capture: async ({ page }, use) => {
     const events: TrackEvent[] = [];
 
-    await page.route("**/stats.reisinger.pictures/**", (route) => route.abort());
     await page.route("**/form.reisinger.pictures/**", (route) => route.abort());
     await page.exposeFunction("__trackCapture", (name: string, payload?: Record<string, string | number | boolean>) => {
       events.push({ name, payload });
