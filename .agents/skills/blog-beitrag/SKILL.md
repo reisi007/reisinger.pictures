@@ -1,6 +1,6 @@
 ---
 name: blog-beitrag
-description: Verarbeitet Event-Bilder (Sport, Lifestyle) zu strukturierten Blog-Artikeln: EXIF-Daten sammeln, Bilder analysieren & kategorisieren (A/B/C), SEO-Beschreibungen erstellen, bei Sport-Events mit Liveticker matchen, Artikel schreiben. YAML-Sidecars NUR nach expliziter Freigabe erstellen, dann `add-metadata.mjs` für slug/metadata/categories laufen lassen. Enthält sport-spezifische Zeitlogik (Fußball Brutto, Eishockey/AmFoot Netto) und Parallel-Verarbeitung der vision-Batches bei Nicht-Sport-Events. Bildanalyse über den `vision`-Subagent (max. 10 Bilder gleichzeitig, parallel bei Nicht-Sport / sequenziell bei Sport), kreative Artikeltexte über den `author`-Subagent. TRIGGER when Event-Bilder verarbeitet, Blog-Artikel geschrieben oder Bilder zu einem Event mit Liveticker strukturiert werden sollen.
+description: Verarbeitet Event-Bilder (Sport, Lifestyle) zu strukturierten Blog-Artikeln: EXIF-Daten sammeln, Bilder analysieren & kategorisieren (A/B/C), SEO-Beschreibungen erstellen, bei Sport-Events mit Liveticker matchen, Artikel schreiben. YAML-Sidecars NUR nach expliziter Freigabe erstellen, dann `add-metadata.mjs` für slug/metadata/categories laufen lassen. Enthält sport-spezifische Zeitlogik (Fußball Brutto, Eishockey/AmFoot Netto) und Parallel-Verarbeitung der vision-Batches bei Nicht-Sport-Events. Bildanalyse über den `vision`-Subagent (max. 10 Bilder gleichzeitig, parallel bei Nicht-Sport / sequenziell bei Sport), kreative Artikeltexte über den `author`-Subagent. Mehrdeutige Bilder liefert der `vision`-Subagent mit mehreren Interpretationen zurück, die dem User als interaktive Fragen (`question`-Tool) statt in einer Tabelle präsentiert werden. TRIGGER when Event-Bilder verarbeitet, Blog-Artikel geschrieben oder Bilder zu einem Event mit Liveticker strukturiert werden sollen.
 ---
 
 # Blog-Beitrag: Bilder & Artikel verarbeiten
@@ -95,6 +95,7 @@ Jetzt, da die Zeitstempel aller Bilder vorliegen, wird die Bildanalyse an den `v
    - **Serien-/Szenen-Erkennung:** Bilder mit dicht aufeinanderfolgenden `captureDate`s (kurz hintereinander) gehören meist zur **gleichen Szene** mit **gleichen Personen** → bitte als Serie markieren und Personen konsistent benennen
    - **Nur bei Sport-Events zusätzlich:** Den **Ticker-Zeitkontext** (für jedes Batch-Bild die Ticker-Ereignisse ±5 Minuten um den Capture-Zeitpunkt aus Schritt 0.4) als Zuordnungshilfe für die Szene, sowie **Zeitkorrektur erlaubt** – der `vision`-Subagent darf die angenommene Ticker-Zuordnung korrigieren, wenn Bildinhalt und Ticker-Ereignis nicht zusammenpassen (Korrektur begründen)
    - Fordere als Rückgabe je Bild: Original-Name, Kategorie [A]/[B]/[C], visuelle Beschreibung, erkennbare Personen/Nummern. **Nur bei Sport-Events zusätzlich:** bestätigte oder korrigierte Ticker-Zuordnung (inkl. Begründung)
+   - **Mehrdeutigkeit (wenn es Sinn macht):** Ist der Bildinhalt uneindeutig (z. B. Person/Szene nicht sicher identifizierbar, mehrere plausible Deutungen), gibt der `vision`-Subagent **mehrere Interpretationen** zurück – je Interpretation: Beschreibung, erkennbare Personen/Nummern und Begründung. Keine erzwungene Einzeldeutung bei unsicheren Bildern. Eindeutige Bilder liefern weiterhin genau eine Interpretation.
 
 **Kategorien (an den `vision`-Subagent weitergeben):**
 
@@ -120,6 +121,7 @@ Nach der Bildanalyse die Aussagen des `vision`-Subagents auf Plausibilität prü
 - **Serien-Konsistenz:** Bilder einer Serie (dichte `captureDate`s) müssen dieselben Personen/Szenen konsistent benennen.
 - **Sport-Logik:** Passt die Szene (z. B. Lauf, Pass, Tackle, TD-Jubel) zur Spielsituation laut Ticker? Nicht passende Zuordnungen korrigieren.
 - **Roster-Namen:** Liegt vom User eine Roster-Liste (Trikotnummern + Spielernamen) vor, werden erkennbare Nummern zusätzlich mit dem Namen benannt (z. B. „Karri Pajarinen (Nummer 24)"). Nicht belegbare Namen nicht erfinden.
+- **Mehrdeutige Bilder markieren:** Liefert der `vision`-Subagent mehrere Interpretationen, werden diese **unverändert** übernommen und zur Klärung an den User gegeben (Schritt 4). Nicht eigenmächtig eine Deutung auswählen.
 
 ### Schritt 2: Beschreibungen (Ticker-Matching nur bei Sport-Events)
 
@@ -203,6 +205,7 @@ Bei Events mit **besonderen Bildgruppen** (z. B. Rahmenprogramm wie Bundesheer-F
 **WICHTIG: Keine Dateien schreiben ohne explizite Freigabe!**
 
 1. Zeige die **Bild-Verarbeitungsliste** und den **Artikel** dem User.
+   - **Mehrdeutige Bilder → interaktive Fragen statt Tabelle:** Bilder mit mehreren Interpretationen (aus Schritt 1) werden **nicht** in die Verarbeitungsliste/Tabelle aufgenommen. Stattdessen jede Interpretation einzeln als **interaktive Frage** über das `question`-Tool präsentieren (z. B. „IMG_042.jpg: Deutung A (…) oder Deutung B (…)?", ggf. mit Bildpfad). Der User wählt direkt eine Deutung – sie bestimmt Beschreibung **und** SEO-Dateinamen. Erst nach der Entscheidung wandert das Bild mit der gewählten Interpretation in die Verarbeitungsliste.
 2. Frage gezielt nach:
    - Sind die Beschreibungen korrekt? **(Wichtigster Punkt:** eine falsche Beschriftung ist essentiell zu korrigieren**)
    - Fehlen Bilder?
@@ -330,6 +333,8 @@ Die Kategorie `[A]`/`[B]`/`[C]` ist eine interne Klassifikation – sie wird **n
 ```
 
 **Bei Nicht-Sport-Events:** Die Spalte „Ticker-Zuordnung" entfällt in der Verarbeitungsliste.
+
+**Mehrdeutige Bilder (NICHT in der Tabelle):** Bilder mit mehreren Interpretationen erscheinen nicht in der Verarbeitungsliste, sondern werden als **interaktive Fragen** (`question`-Tool) präsentiert (siehe Schritt 4). Erst nach der User-Entscheidung wird das Bild mit der gewählten Interpretation in die Liste aufgenommen.
 
 ### Artikel (Vorschau)
 
