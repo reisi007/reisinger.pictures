@@ -1,12 +1,15 @@
 ---
 import { buildSeoMetaTags, canonicalUrl } from "@reisinger/shared/seo/meta";
 
+import type { FeedDiscoveryLink } from "../feeds/feed-model";
+
 interface Props {
   title: string;
   description?: string;
   keywords?: string[];
   noIndex?: boolean;
   author?: string;
+  feeds?: FeedDiscoveryLink[];
 }
 
 const {
@@ -14,7 +17,8 @@ const {
   description,
   noIndex = false,
   keywords,
-  author = "Florian Reisinger"
+  author = "Florian Reisinger",
+  feeds
 } = Astro.props;
 
 const { href, pathname } = Astro.url;
@@ -33,6 +37,9 @@ const metaTags = buildSeoMetaTags({
 <head>
   <meta name="generator" content={Astro.generator} />
   <link rel="sitemap" href="/sitemap-index.xml" />
+  {feeds?.map(feed => (
+    <link rel="alternate" type={feed.type} title={feed.title} href={feed.href} />
+  ))}
 
   <title>{title}</title>
   {metaTags.map(tag => tag.attr === "name"

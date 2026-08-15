@@ -11,6 +11,7 @@ import { type SchemaCreationFunction } from "../../../components/SchemaOrg";
 import SchemaOrg from "../../../components/SchemaOrg.astro";
 import { createCollectionPageSchema } from "../../../components/SchemaOrg.factory";
 import SocialImage from "../../../components/SocialImage.astro";
+import { portfolioFeedDiscoveryLinks } from "../../../feeds/feed-model";
 
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
   const overviewPages = (await getCollection("portfolioOverviews"));
@@ -45,6 +46,8 @@ const { heroImage, date, updated } = posts[0].data;
 
 const description = overviewDescription ?? `Portfolio-Beiträge rund um „${title}" von Fotograf Florian Reisinger aus Linz.`;
 
+const feeds = portfolioFeedDiscoveryLinks(id, title);
+
 const createData: SchemaCreationFunction = (_, __, df) => createCollectionPageSchema({
   name: title,
   description,
@@ -53,7 +56,7 @@ const createData: SchemaCreationFunction = (_, __, df) => createCollectionPageSc
 });
 ---
 <MinimalPage>
-  <BaseHead title={title} description={description} noIndex={!(id === "/" && page.url.prev === undefined)} slot="head">
+  <BaseHead title={title} description={description} noIndex={!(id === "/" && page.url.prev === undefined)} feeds={feeds} slot="head">
     {heroImage && <SocialImage name={heroImage} />}
     <SchemaOrg createData={createData} />
   </BaseHead>
