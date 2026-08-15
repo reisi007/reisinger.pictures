@@ -59,3 +59,7 @@ For tasks requiring subjective selection (e.g., curating images/testimonials) or
 - **Automatische Erweiterung:** Wenn bei der Entwicklung neue Grenzfälle, Konflikte (z.B. bei URLs, Bezeichnungen) oder Architektur-Entscheidungen auftreten, **muss** sofort eine neue Regel im Ordner `rules/` dokumentiert oder eine bestehende Regel erweitert werden.
 - **Skill-Pflege:** Skills werden via Symlink im globalen Skill-Ordner (`~/.agents/skills/`) verwaltet. Änderungen an Content-Strukturen, Naming-Konventionen oder dem Caption-/Review-Flow müssen unmittelbar im jeweiligen Skill nachgezogen werden.
 - **Ziel:** Ein konsistentes, sich selbst dokumentierendes System, das von allen KI-Agenten fehlerfrei verstanden und fortgeführt wird.
+
+## TODO (UI-Review)
+
+UI-Review-Screenshot-Skill noch nicht angewendet (Playwright-Harness + Vision-Analyse). Referenz: ocg-price-tracker/tests/screenshots (ui-screenshots.spec.ts mit Section-Captures).
