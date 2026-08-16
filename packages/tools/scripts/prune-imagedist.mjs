@@ -10,7 +10,7 @@ const IMAGE_SOURCE_DIRS = [
   path.join(ROOT, "src", "content", "portfolio"),
   path.join(ROOT, "src", "content", "simple"),
 ];
-const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png"]);
+const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".svg"]);
 
 async function getAllFiles(dirPath) {
   let filesArray = [];
