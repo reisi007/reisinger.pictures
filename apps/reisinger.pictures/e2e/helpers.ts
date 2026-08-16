@@ -33,6 +33,11 @@ export function eventsOf(capture: Capture, name: string): TrackEvent[] {
 export async function openModal(page: Page): Promise<void> {
   await page.locator('[data-contact-open="fab"]').click();
   await page.locator("#contact_modal").waitFor({ state: "visible" });
+  await waitForFormHydrated(page);
+}
+
+export async function waitForFormHydrated(page: Page): Promise<void> {
+  await page.waitForFunction(() => document.documentElement.dataset.formHydrated === "true");
 }
 
 export async function fillContactForm(page: Page, name = "E2E Tester", email = "e2e@test.local"): Promise<void> {

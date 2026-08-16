@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test";
 
-import { closeModal, eventsOf, fillContactForm, openModal, test } from "./helpers";
+import { closeModal, eventsOf, fillContactForm, openModal, test, waitForFormHydrated } from "./helpers";
 
 test("tracks contact_open from the floating action button", async ({ page, capture }) => {
   await page.goto("/");
@@ -69,6 +69,7 @@ test("tracks contact_form_submit with subject_prefix when opened via TFP", async
   await page.locator("#contact_modal").waitFor({ state: "visible" });
 
   await fillContactForm(page);
+  await waitForFormHydrated(page);
   await page.locator('#reisinger-contact-form button[type="submit"]').click();
 
   await expect.poll(() => eventsOf(capture, "contact_form_submit").length).toBeGreaterThan(0);
@@ -83,8 +84,14 @@ test("tracks contact_abort when the dialog is closed", async ({ page, capture })
   await expect.poll(() => eventsOf(capture, "contact_abort").length).toBeGreaterThan(0);
 });
 
-test("tracks contact_form_success on the thank-you page", async ({ page, capture }) => {
-  await page.goto("/?sent=true");
+test("tracks contact_form_success on successful AJAX submit", async ({ page, capture }) => {
+  await page.route("**/form.reisinger.pictures/**", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) }));
+  await page.goto("/");
+  await openModal(page);
+  await fillContactForm(page);
+  await waitForFormHydrated(page);
+
+  await page.locator('#reisinger-contact-form button[type="submit"]').click();
 
   await expect.poll(() => eventsOf(capture, "contact_form_success").length).toBeGreaterThan(0);
 });

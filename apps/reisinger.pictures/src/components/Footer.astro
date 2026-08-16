@@ -1,5 +1,5 @@
 ---
-import Form from "@reisinger/shared/components/Form.astro";
+import ContactForm from "../solid/ContactForm";
 
 interface Props {
   showContact?: boolean;
@@ -44,9 +44,82 @@ const today = new Date();
         </button>
       </form>
       <div class="mt-4">
-        <Form />
+        <ContactForm client:visible />
       </div>
     </div>
   </dialog>
 </>
 )}
+
+<script>
+  import { trackEvent } from "../tracking";
+
+  document.addEventListener("astro:page-load", () => {
+    const form = document.getElementById("reisinger-contact-form") as HTMLFormElement;
+    const modal = document.getElementById("contact_modal") as HTMLDialogElement;
+    if (!form) return;
+
+    const nameInput = document.getElementById("form__name") as HTMLInputElement;
+    const subjectInput = document.getElementById("form-subject") as HTMLInputElement;
+
+    const updateSubject = () => {
+      if (!nameInput || !subjectInput) return;
+      subjectInput.value = nameInput.value.trim()
+        ? "Neue Nachricht von " + nameInput.value.trim()
+        : "Allgemeine Anfrage";
+    };
+
+    const fillForm = (params: URLSearchParams) => {
+      for (const [key, value] of params.entries()) {
+        const element = form.elements.namedItem(key);
+        if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement || element instanceof HTMLSelectElement) {
+          element.value = value;
+        }
+      }
+      updateSubject();
+    };
+
+    if (nameInput) {
+      nameInput.addEventListener("input", updateSubject);
+    }
+
+    // 1. Initial aus URL-Parametern befüllen
+    fillForm(new URLSearchParams(window.location.search));
+
+    // 2. WICHTIG FÜR BROWSER-BACK:
+    // Falls der Browser den Namen aus dem Cache wiederhergestellt hat,
+    // setzen wir das Subject jetzt einmalig beim Page-Load passend zum aktuellen Wert.
+    updateSubject();
+
+    if (modal) {
+      modal.addEventListener("close", () => {
+        // Programmatic close after a successful AJAX submit must not count as abort.
+        if (modal.dataset.contactAutoClose !== "true") {
+          trackEvent("contact_abort");
+        }
+        delete modal.dataset.contactAutoClose;
+        if (window.location.hash === "#kontakt" || window.location.search !== "") {
+          history.replaceState(null, "", window.location.pathname);
+        }
+      });
+    }
+
+    if (window.location.hash === "#kontakt" && modal) {
+      modal.showModal();
+    }
+
+    document.addEventListener("click", (e) => {
+      const link = (e.target as HTMLElement)?.closest("a[href*='#kontakt']");
+      if (!link) return;
+      const targetUrl = new URL((link as HTMLAnchorElement).href);
+      if (targetUrl.pathname === window.location.pathname) {
+        e.preventDefault();
+        fillForm(targetUrl.searchParams);
+        history.pushState(null, "", targetUrl.href);
+        if (modal && !modal.open) {
+          modal.showModal();
+        }
+      }
+    });
+  });
+</script>
