@@ -9,7 +9,7 @@ const inputClass = "input w-full border-2 border-base-content/20 bg-base-100 tex
 const textareaClass = "textarea w-full border-2 border-base-content/20 bg-base-100 text-base-content focus:border-primary focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all";
 
 type Toast = {
-  type: "loading" | "success";
+  type: "success";
 };
 
 export default function ContactForm() {
@@ -21,8 +21,7 @@ export default function ContactForm() {
   });
 
   createEffect(() => {
-    const current = toast();
-    if (!current) return;
+    if (!toast()) return;
 
     const container = document.createElement("div");
     container.className = "toast toast-top toast-center z-[9999] mt-16";
@@ -30,49 +29,32 @@ export default function ContactForm() {
     container.setAttribute("aria-live", "polite");
 
     const alert = document.createElement("div");
-    alert.className =
-      current.type === "loading"
-        ? "alert bg-base-100 text-base-content shadow-lg"
-        : "alert bg-primary text-primary-content shadow-lg";
+    alert.className = "alert bg-primary text-primary-content border-primary shadow-lg";
 
-    let icon: HTMLElement | SVGElement;
-    if (current.type === "loading") {
-      const spinner = document.createElement("span");
-      spinner.className = "loading loading-spinner loading-sm text-primary";
-      icon = spinner;
-    } else {
-      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svg.setAttribute("viewBox", "0 0 24 24");
-      svg.setAttribute("aria-hidden", "true");
-      svg.setAttribute("fill", "currentColor");
-      svg.classList.add("size-6", "shrink-0", "text-primary-content");
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("fill", "currentColor");
+    svg.classList.add("size-6", "shrink-0", "text-primary-content");
 
-      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      path.setAttribute("d", "M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z");
-      svg.appendChild(path);
-      icon = svg;
-    }
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", "M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z");
+    svg.appendChild(path);
 
     const message = document.createElement("span");
-    message.textContent =
-      current.type === "loading"
-        ? "Nachricht wird versandt ..."
-        : "Nachricht erfolgreich versandt!";
+    message.textContent = "Nachricht erfolgreich versandt!";
 
-    alert.append(icon, message);
+    alert.append(svg, message);
     container.appendChild(alert);
     document.body.appendChild(container);
 
-    const dismiss =
-      current.type === "loading"
-        ? undefined
-        : setTimeout(() => {
-            container.classList.add("opacity-0", "transition-opacity", "duration-[400ms]");
-            setTimeout(() => container.remove(), 400);
-          }, 4000);
+    const dismiss = setTimeout(() => {
+      container.classList.add("opacity-0", "transition-opacity", "duration-[400ms]");
+      setTimeout(() => container.remove(), 400);
+    }, 4000);
 
     onCleanup(() => {
-      if (dismiss) clearTimeout(dismiss);
+      clearTimeout(dismiss);
       container.remove();
     });
   });
@@ -95,7 +77,6 @@ export default function ContactForm() {
     });
 
     setPending(true);
-    setToast({ type: "loading" });
     try {
       const res = await fetch(ACTION_URL, {
         method: "POST",
