@@ -1,43 +1,10 @@
-import { test as base, type Page } from "@playwright/test";
+import { test, type Page } from "@playwright/test";
 
-export type TrackEvent = {
-  name: string;
-  payload?: Record<string, string | number | boolean>;
-};
-
-export type Capture = () => TrackEvent[];
-
-export const test = base.extend<{ capture: Capture }>({
-  capture: async ({ page }, use) => {
-    const events: TrackEvent[] = [];
-
-    await page.route("**/form.reisinger.pictures/**", (route) => route.abort());
-    await page.exposeFunction("__trackCapture", (name: string, payload?: Record<string, string | number | boolean>) => {
-      events.push({ name, payload });
-    });
-    await page.addInitScript(() => {
-      window.trackEvent = (name: string, payload?: Record<string, string | number | boolean>) => {
-        (window as unknown as { __trackCapture: (n: string, p?: Record<string, string | number | boolean>) => void })
-          .__trackCapture(name, payload);
-      };
-    });
-
-    await use(() => [...events]);
-  }
-});
-
-export function eventsOf(capture: Capture, name: string): TrackEvent[] {
-  return capture().filter((event) => event.name === name);
-}
+export { test };
 
 export async function openModal(page: Page): Promise<void> {
   await page.locator('[data-contact-open="fab"]').click();
   await page.locator("#contact_modal").waitFor({ state: "visible" });
-  await waitForFormHydrated(page);
-}
-
-export async function waitForFormHydrated(page: Page): Promise<void> {
-  await page.waitForFunction(() => document.documentElement.dataset.formHydrated === "true");
 }
 
 export async function fillContactForm(page: Page, name = "E2E Tester", email = "e2e@test.local"): Promise<void> {

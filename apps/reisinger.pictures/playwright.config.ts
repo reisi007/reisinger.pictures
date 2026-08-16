@@ -8,13 +8,13 @@ export default defineConfig({
   workers: process.env.CI ? 2 : undefined,
   reporter: process.env.CI ? "github" : "list",
   use: {
-    baseURL: "http://localhost:4321",
+    baseURL: "http://localhost:4322",
     trace: "on-first-retry"
   },
   webServer: {
-    command: "pnpm preview",
-    url: "http://localhost:4321",
-    reuseExistingServer: !process.env.CI,
+    command: "pnpm preview --port 4322 --strictPort",
+    url: "http://localhost:4322",
+    reuseExistingServer: false,
     timeout: 120_000
   }
 });

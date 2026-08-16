@@ -9,7 +9,7 @@ const inputClass = "input w-full border-2 border-base-content/20 bg-base-100 tex
 const textareaClass = "textarea w-full border-2 border-base-content/20 bg-base-100 text-base-content focus:border-primary focus:ring-2 focus:ring-primary/50 focus:outline-none transition-all";
 
 type Toast = {
-  type: "loading" | "success" | "error";
+  type: "loading" | "success";
 };
 
 export default function ContactForm() {
@@ -33,9 +33,7 @@ export default function ContactForm() {
     alert.className =
       current.type === "loading"
         ? "alert bg-base-100 text-base-content shadow-lg"
-        : current.type === "success"
-          ? "alert bg-primary text-primary-content shadow-lg"
-          : "alert alert-error shadow-lg";
+        : "alert bg-primary text-primary-content shadow-lg";
 
     let icon: HTMLElement | SVGElement;
     if (current.type === "loading") {
@@ -46,23 +44,11 @@ export default function ContactForm() {
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("viewBox", "0 0 24 24");
       svg.setAttribute("aria-hidden", "true");
-      if (current.type === "success") {
-        svg.setAttribute("fill", "currentColor");
-      } else {
-        svg.setAttribute("fill", "none");
-        svg.setAttribute("stroke", "currentColor");
-        svg.setAttribute("stroke-width", "2.5");
-        svg.setAttribute("stroke-linecap", "round");
-        svg.setAttribute("stroke-linejoin", "round");
-      }
-      svg.classList.add(
-        "size-6",
-        "shrink-0",
-        current.type === "success" ? "text-primary-content" : "text-error",
-      );
+      svg.setAttribute("fill", "currentColor");
+      svg.classList.add("size-6", "shrink-0", "text-primary-content");
 
       const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      path.setAttribute("d", current.type === "success" ? "M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" : "M12 8v4m0 4h.01");
+      path.setAttribute("d", "M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z");
       svg.appendChild(path);
       icon = svg;
     }
@@ -71,9 +57,7 @@ export default function ContactForm() {
     message.textContent =
       current.type === "loading"
         ? "Nachricht wird versandt ..."
-        : current.type === "success"
-        ? "Nachricht erfolgreich versandt!"
-        : "Versand fehlgeschlagen – bitte versuche es später noch einmal.";
+        : "Nachricht erfolgreich versandt!";
 
     alert.append(icon, message);
     container.appendChild(alert);
@@ -133,7 +117,7 @@ export default function ContactForm() {
 
       setToast({ type: "success" });
     } catch {
-      setToast({ type: "error" });
+      setToast(null);
     } finally {
       setPending(false);
     }
