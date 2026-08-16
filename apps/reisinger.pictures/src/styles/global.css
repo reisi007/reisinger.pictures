@@ -85,6 +85,24 @@
     .checkbox:not(:checked) {
         border-color: color-mix(in oklch, var(--color-base-content) 40%, transparent);
     }
+
+    .scroll-progress-track {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        z-index: 60;
+        pointer-events: none;
+    }
+
+    .scroll-progress-fill {
+        height: 100%;
+        width: 0;
+        background: var(--color-primary);
+        border-end-end-radius: 9999px;
+        box-shadow: 0 0 6px color-mix(in oklab, var(--color-primary) 60%, transparent);
+    }
 }
 
 @layer utilities {
