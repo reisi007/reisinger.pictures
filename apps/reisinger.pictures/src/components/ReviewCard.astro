@@ -47,6 +47,7 @@ const categoryHref = type !== undefined ? `/shootings/${type}/testimonials` : un
             <div>
               <p class="font-bold text-lg m-0!">{name}</p>
               {role && <p class="text-sm opacity-70 m-0!">{role}</p>}
+              {source !== undefined && <ReviewSocialLink source={source} class="mt-2" />}
             </div>
           </div>
         </div>
@@ -95,5 +96,5 @@ const categoryHref = type !== undefined ? `/shootings/${type}/testimonials` : un
       }
     </div>
   )}
-  {source !== undefined && <ReviewSocialLink source={source} class={layout === "quote" ? "right-6 top-6" : "right-6"} />}
+  {layout !== "quote" && source !== undefined && <ReviewSocialLink source={source} class="absolute right-4 top-4 z-10" />}
 </div>

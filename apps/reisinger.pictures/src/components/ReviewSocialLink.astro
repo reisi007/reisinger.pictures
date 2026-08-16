@@ -7,20 +7,25 @@ interface Props {
 const { source, class: className = "" } = Astro.props;
 
 let iconClass = "";
+let label = "Quelle";
 try {
   const url = new URL(source);
   const host = url.hostname.toLowerCase();
   if (host.includes("g.co") || host.includes("goo.gl") || host.includes("google")) {
     iconClass = "icon-[mdi--google]";
+    label = "Google";
   } else if (host.includes("facebook.com")) {
     iconClass = "icon-[mdi--facebook]";
+    label = "Facebook";
+  } else if (host.includes("instagram.com")) {
+    iconClass = "icon-[mdi--instagram]";
+    label = "Instagram";
   }
 } catch {
   // Invalid URL fallback
 }
 ---
 {iconClass && (
-  <a href={source} target="_blank" rel="noopener noreferrer" class:list={["absolute text-3xl", iconClass, className]}>
-    <span class="sr-only">Quelle ansehen</span>
+  <a href={source} target="_blank" rel="noopener noreferrer" title={`Bewertung auf ${label} ansehen`} aria-label={`Bewertung auf ${label} ansehen`} class:list={["badge badge-soft badge-lg p-3 shadow-sm no-underline border border-base-300 bg-base-100/90 backdrop-blur text-primary", iconClass, className]}>
   </a>
 )}
