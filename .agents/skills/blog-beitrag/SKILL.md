@@ -24,7 +24,7 @@ Du analysierst die Bilder, erstellst Beschreibungen und verfasst einen packenden
 
 > **Global Linking:** Der Skill funktioniert von jedem beliebigen Ordner aus. Er sucht automatisch nach Bilddateien (`.jpg`, `.jpeg`, `.png`, `.webp`) im angegebenen oder aktuellen Ordner und nach Kontext-Dateien (`liveticker.txt`, `ticker.md`, `notes.md`, `event.md`, `context.txt`) im selben oder übergeordneten Ordner. Keine Kontextangabe vom User nötig, wenn die Bilder in einem eigenen Ordner liegen.
 
-> **Kontext-Datei löschen (verbindlich):** Wird der Event-Kontext als Datei übergeben (z. B. `context.txt`, `liveticker.txt`, `ticker.md`, `notes.md`, `event.md`), wird diese Datei nach **Fertigstellung des Blog-Beitrags** (nach Freigabe und Schreiben aller Dateien) gelöscht. Sie ist nur ein Arbeitsmittel und soll nicht im Repository verbleiben.
+> **Info-/Kontext-Dateien löschen (verbindlich, ohne Rückfrage):** Event-Kontext-Dateien (z. B. `info.txt`, `liveticker.txt`, `ticker.md`, `notes.md`, `event.md`, `context.txt`) sowie Referenz-Bilder ohne YAML-Sidecar (z. B. `aufstellung.jpg`, `schema.png`) werden nach **Fertigstellung des Blog-Beitrags** (nach Freigabe und Schreiben aller Dateien) automatisch gelöscht – **ohne den User zu fragen**. Sie sind nur Arbeitsmittel und sollen nicht im Repository verbleiben. Ausnahme: Vom User explizit als dauerhaft gewünscht gekennzeichnet.
 
 ### Event-Typ bestimmen (vor dem Workflow)
 
@@ -93,6 +93,8 @@ Jetzt, da die Zeitstempel aller Bilder vorliegen, wird die Bildanalyse an den `v
    - Das Sport-spezifische Prompting (siehe unten)
    - Die EXIF-`captureDate`-Zeitstempel jedes Batch-Bildes
    - **Serien-/Szenen-Erkennung:** Bilder mit dicht aufeinanderfolgenden `captureDate`s (kurz hintereinander) gehören meist zur **gleichen Szene** mit **gleichen Personen** → bitte als Serie markieren und Personen konsistent benennen
+   - **Spieler-Identifikation (verbindlich, Sport):** Der `vision`-Subagent muss bei jedem Bild **aktiv versuchen, Spieler beim Namen zu nennen** – anhand von Trikotnummer (→ Roster), Gesichtszügen, Frisur/Dreadlocks, Tätowierungen, Körperbau, Ticker-Zuordnung (wer war laut Ticker an der Szene beteiligt) und Serien-Kontext (gleiche Personen wie Nachbarbilder). Ergebnis je Person: **Name + Begründung + Konfidenz** (hoch/mittel/niedrig). Nur wenn keine belastbare Identifikation möglich ist, allgemein formulieren (z. B. „ein SV-Ried-Spieler").
+   - **Fokus-Priorisierung (verbindlich):** Der `vision`-Subagent beschreibt vorrangig die **scharf abgebildeten, im Fokus liegenden** Elemente einer Szene und priorisiert sie für Beschreibung und Personen-Identifikation. **Unschärfe-/Bokeh-Elemente** (unscharfe Vorder-/Hintergründe, stark verwischte Spieler) sind **nicht wichtig**: sie werden ignoriert bzw. nur beiläufig erwähnt, nie in den Vordergrund der Beschreibung gestellt und nie mit Spielernamen versehen. Bei Serien: aufeinanderfolgende Bilder dürfen verschiedene Fokus-Ebenen zeigen – jeweils den scharfen Teil beschreiben.
    - **Nur bei Sport-Events zusätzlich:** Den **Ticker-Zeitkontext** (für jedes Batch-Bild die Ticker-Ereignisse ±5 Minuten um den Capture-Zeitpunkt aus Schritt 0.4) als Zuordnungshilfe für die Szene, sowie **Zeitkorrektur erlaubt** – der `vision`-Subagent darf die angenommene Ticker-Zuordnung korrigieren, wenn Bildinhalt und Ticker-Ereignis nicht zusammenpassen (Korrektur begründen)
    - Fordere als Rückgabe je Bild: Original-Name, Kategorie [A]/[B]/[C], visuelle Beschreibung, erkennbare Personen/Nummern. **Nur bei Sport-Events zusätzlich:** bestätigte oder korrigierte Ticker-Zuordnung (inkl. Begründung)
    - **Mehrdeutigkeit (wenn es Sinn macht):** Ist der Bildinhalt uneindeutig (z. B. Person/Szene nicht sicher identifizierbar, mehrere plausible Deutungen), gibt der `vision`-Subagent **mehrere Interpretationen** zurück – je Interpretation: Beschreibung, erkennbare Personen/Nummern und Begründung. Keine erzwungene Einzeldeutung bei unsicheren Bildern. Eindeutige Bilder liefern weiterhin genau eine Interpretation.
@@ -120,7 +122,7 @@ Nach der Bildanalyse die Aussagen des `vision`-Subagents auf Plausibilität prü
 - **Verwechslungsgefahr:** Können Bilder verwechselt worden sein (z. B. Cheerdancerin vs. Spieler, Tarnmuster-Tanzoutfit vs. Trikot)? Bei Unsicherheit die betroffenen Einzelbilder erneut zur Analyse geben (mit korrigiertem Verständnis als Kontext).
 - **Serien-Konsistenz:** Bilder einer Serie (dichte `captureDate`s) müssen dieselben Personen/Szenen konsistent benennen.
 - **Sport-Logik:** Passt die Szene (z. B. Lauf, Pass, Tackle, TD-Jubel) zur Spielsituation laut Ticker? Nicht passende Zuordnungen korrigieren.
-- **Roster-Namen:** Liegt vom User eine Roster-Liste (Trikotnummern + Spielernamen) vor, werden erkennbare Nummern zusätzlich mit dem Namen benannt (z. B. „Karri Pajarinen (Nummer 24)"). Nicht belegbare Namen nicht erfinden.
+- **Roster-Namen:** Liegt vom User eine Roster-Liste (Trikotnummern + Spielernamen) vor, werden erkennbare Nummern zusätzlich mit dem Namen benannt (z. B. „Karri Pajarinen (Nummer 24)"). Nicht belegbare Namen nicht erfinden. **Namen aktiv heraussuchen:** Der Hauptagent kombiniert erkannte Nummer, Roster, Ticker-Beteiligung und Serien-Kontext und benennt Spieler proaktiv beim Namen. Allgemeine Floskeln („ein LASK-Spieler") sind die Ausnahme, keine Voreinstellung – sie kommen nur, wenn die Identifikation wirklich unklar bleibt.
 - **Mehrdeutige Bilder markieren:** Liefert der `vision`-Subagent mehrere Interpretationen, werden diese **unverändert** übernommen und zur Klärung an den User gegeben (Schritt 4). Nicht eigenmächtig eine Deutung auswählen.
 
 ### Schritt 2: Beschreibungen (Ticker-Matching nur bei Sport-Events)
@@ -129,7 +131,7 @@ Erstelle für **JEDES** Bild:
 
 1. **Deutsche Beschreibung** (für YAML-Sidecar, max. 200 Zeichen):
    - Beschreibe die Szene sachlich und präzise auf Deutsch.
-   - Nenne erkennbare Spieler mit Name oder Trikotnummer.
+   - Nenne erkennbare Spieler **mit Namen**, sobald eine belastbare Identifikation vorliegt (Trikotnummer + Roster, Ticker-Beteiligung, Gesicht/Frisur/Tätowierungen, Serien-Kontext). Allgemeine Formulierungen („ein SV-Ried-Spieler") **nur** bei unklarer Identifikation – im Zweifel die erkannte Trikotnummer angeben.
    - **Zeichensatz-Kontrolle (verbindlich):** Beschreibungen dürfen NUR deutsche Buchstaben (a-z, A-Z), Umlaute (äöüÄÖÜ), ß, Zahlen und Satzzeichen enthalten. Keine chinesischen, japanischen, arabischen oder anderen fremden Zeichen. Vor dem Schreiben IMMER explizit prüfen!
    - Keine Umlaute im Slug (ä → ae, ö → oe, ü → ue, ß → ss).
 
